@@ -1,0 +1,18 @@
+version: "3.3"
+services:
+  portainer-ce:
+    container_name: portainer
+    restart: always
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - portainer_data:/data
+    image: portainer/portainer-ee:latest
+    networks:
+      - proxy_default
+
+networks:
+  proxy_default:
+    external: true
+
+volumes:
+  portainer_data: {}

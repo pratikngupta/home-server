@@ -1,5 +1,6 @@
-# ignore data/ anywhere in the path
+# ignore data/ and content/ anywhere in the path
 data/
+content/
 
 # ignore .env files
 *.env

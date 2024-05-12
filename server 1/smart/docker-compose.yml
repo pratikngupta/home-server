@@ -1,0 +1,26 @@
+version: "3"
+services:
+  homeassistant:
+    container_name: homeassistant
+    image: ghcr.io/home-assistant/home-assistant:stable
+    volumes:
+      - ./data/homeassistant:/config
+      - /etc/localtime:/etc/localtime:ro
+      - /run/dbus:/run/dbus:ro
+    restart: unless-stopped
+    privileged: true
+    network_mode: host
+
+  matter-server:
+    image: ghcr.io/home-assistant-libs/python-matter-server:stable
+    container_name: matter-server
+    restart: unless-stopped
+    security_opt:
+      - apparmor=unconfined
+    volumes:
+      - ./data/matter:/data
+      - /run/dbus:/run/dbus:ro
+    network_mode: host
+networks:
+  proxy_default:
+    external: true

@@ -1,0 +1,34 @@
+services:
+  bitwarden:
+    container_name: bitwarden
+    depends_on:
+      - db
+    env_file:
+      - settings.env
+    image: ${REGISTRY:-bitwarden}/self-host:${TAG:-beta}
+    restart: always
+    ports: []
+    volumes:
+      - bitwarden:/etc/bitwarden
+      - logs:/var/log/bitwarden
+    networks:
+      - proxy_default
+      
+  # MariaDB Example
+  db:
+    environment:
+      MARIADB_USER: bitwarden
+      MARIADB_PASSWORD: super_strong_password
+      MARIADB_DATABASE: bitwarden_vault
+      MARIADB_RANDOM_ROOT_PASSWORD: "true"
+    image: mariadb:10
+    restart: always
+    volumes:
+      - data:/var/lib/mysql
+volumes:
+  bitwarden: null
+  logs: null
+  data: null
+networks:
+  proxy_default:
+    external: true

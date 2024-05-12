@@ -1,0 +1,55 @@
+services:
+  uptime-kuma:
+    image: louislam/uptime-kuma:1
+    container_name: uptime-kuma
+    volumes:
+      - ./data/kuma:/app/data
+      - /var/run/docker.sock:/var/run/docker.sock
+    restart: unless-stopped
+    networks:
+      - proxy_default
+  dockge:
+    image: louislam/dockge:1
+    container_name: dockge
+    restart: unless-stopped
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./data/dockge:/app/data
+      - ${DOCKGE_STACKS_DIR}:${DOCKGE_STACKS_DIR}
+    environment:
+      # Tell Dockge where to find the stacks
+      - DOCKGE_STACKS_DIR=${DOCKGE_STACKS_DIR}
+    networks:
+      - proxy_default
+  dozzle:
+    container_name: dozzle
+    image: amir20/dozzle:latest
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - proxy_default
+    environment:
+      DOZZLE_REMOTE_HOST: ${DOZZLE_REMOTE_HOST}
+      DOZZLE_HOSTNAME: ${DOZZLE_HOSTNAME}
+  diun:
+    container_name: diun
+    image: crazymax/diun:latest
+    command: serve
+    volumes:
+      - ./data/diun:/data
+      - ./data/diun/diun.yml:/diun.yml:ro
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - TZ=America/Toronto
+      - LOG_LEVEL=info
+      - LOG_JSON=false
+    restart: always
+  speedtest:
+    restart: unless-stopped
+    container_name: speedtest
+    image: openspeedtest/latest
+    networks:
+      - proxy_default
+networks:
+  proxy_default:
+    external: true

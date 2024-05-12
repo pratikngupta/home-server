@@ -1,0 +1,137 @@
+version: "3.9"
+services:
+  plex:
+    image: plexinc/pms-docker
+    container_name: plex
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - VERSION=docker
+      - HOSTNAME=”PlexServer”
+    volumes:
+      - ./data/plex:/config
+      - ./content/media:/data/media
+      - /mnt/main/Movie:/movies
+    network_mode: host
+    # ports: # when network: bridge
+    #   - "32400:32400/tcp" 
+    #   - "8324:8324/tcp" # Required if network: bridge
+    #   - "32469:32469/tcp" # Required if network: bridge
+    #   - "1900:1900/udp" # Required if network: bridge
+    #   - "32410:32410/udp" # Required if network: bridge
+    #   - "32412:32412/udp" # Required if network: bridge
+    #   - "32413:32413/udp" # Required if network: bridge
+    #   - "32414:32414/udp" # Required if network: bridge
+    privileged: true # libusb_init failed
+    restart: unless-stopped
+    # networks:
+    #   - media-network
+
+  tautulli:
+    image: lscr.io/linuxserver/tautulli:latest
+    container_name: tautulli
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+    volumes:
+      - ./data/tautulli/config:/config
+    restart: unless-stopped
+    networks:
+      - media-network
+      - proxy_default
+  radarr:
+    image: linuxserver/radarr
+    container_name: radarr
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/Toronto
+    volumes:
+      - ./data/radarr:/config
+      - ./content:/data
+      - /mnt/main/Movie:/movies
+    restart: unless-stopped
+    networks:
+      - media-network
+      - proxy_default
+  # Radarr: Movie management system
+  sonarr:
+    image: linuxserver/sonarr
+    container_name: sonarr
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/Toronto
+    volumes:
+      - ./data/sonarr:/config
+      - ./content:/data
+    restart: unless-stopped
+    networks:
+      - media-network
+      - proxy_default
+  # Sonarr: TV management system
+  prowlarr:
+    image: linuxserver/prowlarr
+    container_name: prowlarr
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/Toronto
+    volumes:
+      - ./data/prowlarr:/config
+    restart: unless-stopped
+    networks:
+      - media-network
+      - proxy_default
+  # qBittorrent: Torrent client
+  qbittorrent:
+    image: linuxserver/qbittorrent
+    container_name: qbittorrent
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/Toronto
+    volumes:
+      - ./data/qbittorrent:/config
+      - ./content/torrents:/data/torrents
+    restart: unless-stopped
+    networks:
+      - media-network
+      - proxy_default
+    ports:
+      - 8080:8080
+  overseerr:
+    image: sctx/overseerr
+    container_name: overseerr
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - LOG_LEVEL=debug
+      - TZ=America/Toronto
+    networks:
+      - media-network
+      - proxy_default
+    volumes:
+      - ./data/overseerr:/app/config
+    restart: unless-stopped
+  homarr:
+    container_name: homarr
+    image: ghcr.io/ajnart/homarr:latest
+    restart: unless-stopped
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/Toronto
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./data/homarr/configs:/app/data/configs
+      - ./data/homarr/icons:/app/public/icons
+      - ./data/homarr/data:/data
+    networks:
+      - media-network
+      - proxy_default
+networks:
+  media-network: null
+  proxy_default:
+    external: true
