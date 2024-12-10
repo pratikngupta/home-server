@@ -1,0 +1,119 @@
+######################################################
+#
+# Media Server
+#
+# Services: Plex, Jellyfin
+#
+######################################################
+
+services:
+  plex:
+    image: plexinc/pms-docker:latest
+    container_name: plex
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - VERSION=docker
+      - HOSTNAME=plex.webninja.me
+    volumes:
+      - ./data/plex:/config
+      - ./content/media:/data/media
+      - /mnt/main/Movie:/movies
+      - "/home/pratik/Docker/onedrive/data/Movies (Homelab Upload):/onedrive"
+
+    network_mode: host
+    privileged: true # libusb_init failed
+    restart: unless-stopped
+    # networks:
+    #   - media-network
+    devices:
+      - /dev/dri:/dev/dri
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.plex.rule=Host(`playninja.${DOMAIN}`)"
+      - "traefik.http.routers.plex.entrypoints=https"
+      - "traefik.http.routers.plex.tls=true"
+      - "traefik.http.routers.plex.service=plex-media-server@file"
+      - "traefik.http.routers.plex.middlewares=jellyfin-mw"
+
+      ## HTTP Service
+      - "traefik.http.services.plex.loadBalancer.server.port=32400"
+      - "traefik.http.services.plex.loadBalancer.passHostHeader=true"
+
+      ## Middleware
+      - "traefik.http.middlewares.jellyfin-mw.headers.customResponseHeaders.X-Robots-Tag=noindex,nofollow,nosnippet,noarchive,notranslate,noimageindex"
+      - "traefik.http.middlewares.jellyfin-mw.headers.SSLRedirect=true"
+      - "traefik.http.middlewares.jellyfin-mw.headers.SSLForceHost=true"
+      - "traefik.http.middlewares.jellyfin-mw.headers.STSSeconds=315360000"
+      - "traefik.http.middlewares.jellyfin-mw.headers.STSIncludeSubdomains=true"
+      - "traefik.http.middlewares.jellyfin-mw.headers.STSPreload=true"
+      - "traefik.http.middlewares.jellyfin-mw.headers.forceSTSHeader=true"
+      - "traefik.http.middlewares.jellyfin-mw.headers.frameDeny=true"
+      - "traefik.http.middlewares.jellyfin-mw.headers.contentTypeNosniff=true"
+      - "traefik.http.middlewares.jellyfin-mw.headers.customResponseHeaders.X-XSS-PROTECTION=1"
+      - "traefik.http.middlewares.jellyfin-mw.headers.customFrameOptionsValue='allow-from https://${DOMAIN}'"
+
+  # jellyfin:
+  #   image: lscr.io/linuxserver/jellyfin:latest
+  #   container_name: jellyfin
+  #   environment:
+  #     - PUID=1000
+  #     - PGID=1000
+  #     - TZ=America/Toronto
+  #     - DOCKER_MODS=linuxserver/mods:jellyfin-opencl-intel
+  #   volumes:
+  #     - ./data/jellyfin:/config
+  #     - ./content/media:/data/movies
+  #     - /mnt/main/Movie:/movies
+  #     - /home/pratik/Docker/youtube/data:/youtube
+  #   network_mode: "host"
+  #   restart: unless-stopped
+  #   devices:
+  #     - /dev/dri:/dev/dri
+
+  #   labels:
+  #     - "traefik.enable=true"
+
+  #     ## Middleware
+  #     - "traefik.http.middlewares.jellyfin-mw.headers.customResponseHeaders.X-Robots-Tag=noindex,nofollow,nosnippet,noarchive,notranslate,noimageindex"
+  #     - "traefik.http.middlewares.jellyfin-mw.headers.SSLRedirect=true"
+  #     - "traefik.http.middlewares.jellyfin-mw.headers.SSLForceHost=true"
+  #     - "traefik.http.middlewares.jellyfin-mw.headers.STSSeconds=315360000"
+  #     - "traefik.http.middlewares.jellyfin-mw.headers.STSIncludeSubdomains=true"
+  #     - "traefik.http.middlewares.jellyfin-mw.headers.STSPreload=true"
+  #     - "traefik.http.middlewares.jellyfin-mw.headers.forceSTSHeader=true"
+  #     - "traefik.http.middlewares.jellyfin-mw.headers.frameDeny=true"
+  #     - "traefik.http.middlewares.jellyfin-mw.headers.contentTypeNosniff=true"
+  #     - "traefik.http.middlewares.jellyfin-mw.headers.customResponseHeaders.X-XSS-PROTECTION=1"
+  #     - "traefik.http.middlewares.jellyfin-mw.headers.customFrameOptionsValue='allow-from https://${DOMAIN}'"
+
+  #     ## HTTP Service
+  #     - "traefik.http.services.jellyfin-svc.loadBalancer.server.port=8096"
+  #     - "traefik.http.services.jellyfin-svc.loadBalancer.passHostHeader=true"
+
+  #     ## External Access
+  #     - "traefik.http.routers.jellyfin-external.rule=Host(`jellyfin.${EXTERNAL_DOMAIN}`)"
+  #     - "traefik.http.routers.jellyfin-external.entrypoints=https"
+  #     - "traefik.http.routers.jellyfin-external.tls=true"
+  #     - "traefik.http.routers.jellyfin-external.service=jellyfin-svc@file"
+  #     - "traefik.http.routers.jellyfin-external.middlewares=chain-google-oauth@file,jellyfin-mw"
+
+  #     ## Internal Access
+  #     - "traefik.http.routers.jellyfin-internal.rule=Host(`jellyfin.${INTERNAL_DOMAIN}`)"
+  #     - "traefik.http.routers.jellyfin-internal.entrypoints=https"
+  #     - "traefik.http.routers.jellyfin-internal.tls=true"
+  #     - "traefik.http.routers.jellyfin-internal.service=jellyfin-svc@file"
+  #     - "traefik.http.routers.jellyfin-internal.middlewares=jellyfin-mw"
+
+  #     ## getHomepage Labels
+  #     - "homepage.group=Media"
+  #     - "homepage.name=Jellyfin"
+  #     - "homepage.icon=jellyfin"
+  #     - "homepage.instance.internal.href=http://jellyfin:8096/"
+  #     - "homepage.href=https://jellyfin.${EXTERNAL_DOMAIN}"
+  #     - "homepage.description=Media Server"
+  #     - "homepage.color=#FFA500"
+  #     - "homepage.widget.type=jellyfin"
+  #     - "homepage.widget.url=http://192.168.2.55:8096"
+  #     - "homepage.widget.key=43b6ec2e1a8e461883792ead2726d4b9"
+  #     - "homepage.widget.enableBlocks=true"

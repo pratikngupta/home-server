@@ -1,0 +1,228 @@
+######################################################
+#
+# Media Manager
+#
+# Services: radarr, sonarr, lidarr, prowlarr
+#
+######################################################
+
+services:
+  # Radarr: Movie management system
+  radarr:
+    image: linuxserver/radarr:latest
+    container_name: radarr
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/Toronto
+      - DOCKER_MODS=ghcr.io/themepark-dev/theme.park:radarr
+      - TP_THEME=power
+      - TP_ADDON=radarr-4k-logo|radarr-alt-calendar
+      - TP_COMMUNITY_THEME=true
+    volumes:
+      - ./data/radarr:/config
+      - ./content:/data
+      - /mnt/main/Movie:/movies
+      - "/home/pratik/Docker/onedrive/data/Movies (Homelab Upload):/onedrive"
+
+    restart: unless-stopped
+    networks:
+      - proxy_default
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers Auth Bypass
+      - "traefik.http.routers.radarr-rtr-bypass.entrypoints=https"
+      - "traefik.http.routers.radarr-rtr-bypass.rule=Host(`radarr.$DOMAIN`) && Header(`traefik-auth-bypass-key`, `$TRAEFIK_AUTH_BYPASS_KEY`)" # Bypass Auth for LunaSea on iOS
+      - "traefik.http.routers.radarr-rtr-bypass.priority=100"
+      ## HTTP Routers Auth
+      - "traefik.http.routers.radarr-rtr.entrypoints=https"
+      - "traefik.http.routers.radarr-rtr.rule=Host(`radarr.$DOMAIN`)"
+      - "traefik.http.routers.radarr-rtr.priority=99"
+      ## Enable tls
+      - "traefik.http.routers.radarr-rtr.tls=true"
+      - "traefik.http.routers.radarr-rtr-bypass.tls=true"
+      ## Middlewares
+      - "traefik.http.routers.radarr-rtr-bypass.middlewares=chain-no-auth@file"
+      - "traefik.http.routers.radarr-rtr.middlewares=chain-google-oauth@file"
+      ## HTTP Services
+      - "traefik.http.routers.radarr-rtr.service=radarr-svc"
+      - "traefik.http.routers.radarr-rtr-bypass.service=radarr-svc"
+      - "traefik.http.services.radarr-svc.loadbalancer.server.port=7878"
+
+  # Sonarr: TV management system
+  sonarr:
+    image: linuxserver/sonarr:latest
+    container_name: sonarr
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/Toronto
+      - DOCKER_MODS=ghcr.io/themepark-dev/theme.park:sonarr
+      - TP_THEME=mind
+      - TP_ADDON=sonarr-4k-text-logo
+      - TP_COMMUNITY_THEME=true
+    # ports:
+    #   - 8989:8989
+    volumes:
+      - ./data/sonarr:/config
+      - ./content:/data
+    restart: unless-stopped
+    networks:
+      - proxy_default
+
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers Auth Bypass
+      - "traefik.http.routers.sonarr-rtr-bypass.entrypoints=https"
+      - "traefik.http.routers.sonarr-rtr-bypass.rule=Host(`sonarr.$DOMAIN`) && Header(`traefik-auth-bypass-key`, `$TRAEFIK_AUTH_BYPASS_KEY`)" # Bypass Auth for LunaSea on iOS
+      - "traefik.http.routers.sonarr-rtr-bypass.priority=100"
+      ## HTTP Routers Auth
+      - "traefik.http.routers.sonarr-rtr.entrypoints=https"
+      - "traefik.http.routers.sonarr-rtr.rule=Host(`sonarr.$DOMAIN`)"
+      - "traefik.http.routers.sonarr-rtr.priority=99"
+      ## Enable tls
+      - "traefik.http.routers.sonarr-rtr.tls=true"
+      - "traefik.http.routers.sonarr-rtr-bypass.tls=true"
+      ## Middlewares
+      - "traefik.http.routers.sonarr-rtr-bypass.middlewares=chain-no-auth@file"
+      - "traefik.http.routers.sonarr-rtr.middlewares=chain-google-oauth@file"
+      ## HTTP Services
+      - "traefik.http.routers.sonarr-rtr.service=sonarr-svc"
+      - "traefik.http.routers.sonarr-rtr-bypass.service=sonarr-svc"
+      - "traefik.http.services.sonarr-svc.loadbalancer.server.port=8989"
+
+      ## getHomepage Labels
+      - "homepage.group=Arrs"
+      - "homepage.name=Sonarr"
+      - "homepage.icon=sonarr"
+      - "homepage.instance.internal.href=http://sonarr:8989/"
+      - "homepage.href=https://sonarr.${DOMAIN}/"
+      - "homepage.description=TV management system"
+      - "homepage.color=#FFA500"
+      - "homepage.widget.type=sonarr"
+      - "homepage.widget.url=http://sonarr:8989"
+      - "homepage.widget.key=6d52b8d1ebc64ecfbcfc6ced6f0c0e4c"
+
+  # Lidarr - Music
+  lidarr:
+    image: lscr.io/linuxserver/lidarr:latest
+    container_name: lidarr
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/Toronto
+    # ports:
+    #   - 8686:8686
+    volumes:
+      - ./data/lidarr:/config
+      - ./content:/data
+    networks:
+      - proxy_default
+    restart: unless-stopped
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers Auth Bypass
+      - "traefik.http.routers.lidarr-rtr-bypass.entrypoints=https"
+      - "traefik.http.routers.lidarr-rtr-bypass.rule=Host(`lidarr.$DOMAIN`) && Header(`traefik-auth-bypass-key`, `$TRAEFIK_AUTH_BYPASS_KEY`)" # Bypass Auth for LunaSea on iOS
+      - "traefik.http.routers.lidarr-rtr-bypass.priority=100"
+      ## HTTP Routers Auth
+      - "traefik.http.routers.lidarr-rtr.entrypoints=https"
+      - "traefik.http.routers.lidarr-rtr.rule=Host(`lidarr.$DOMAIN`)"
+      - "traefik.http.routers.lidarr-rtr.priority=99"
+      ## Enable tls
+      - "traefik.http.routers.lidarr-rtr.tls=true"
+      - "traefik.http.routers.lidarr-rtr-bypass.tls=true"
+      ## Middlewares
+      - "traefik.http.routers.lidarr-rtr-bypass.middlewares=chain-no-auth@file"
+      - "traefik.http.routers.lidarr-rtr.middlewares=chain-google-oauth@file"
+      ## HTTP Services
+      - "traefik.http.routers.lidarr-rtr.service=lidarr-svc"
+      - "traefik.http.routers.lidarr-rtr-bypass.service=lidarr-svc"
+      - "traefik.http.services.lidarr-svc.loadbalancer.server.port=8686"
+
+      ## getHomepage Labels
+      - "homepage.group=Arrs"
+      - "homepage.name=Lidarr"
+      - "homepage.icon=lidarr"
+      - "homepage.instance.internal.href=http://lidarr:8686/"
+      - "homepage.href=https://lidarr.${EXTERNAL_DOMAIN}/"
+      - "homepage.description=Music management system"
+      - "homepage.color=#FFA500"
+      - "homepage.widget.type=lidarr"
+      - "homepage.widget.url=http://lidarr:8686"
+      - homepage.widget.key=e87d2a24e8894c108cc13b21180767d4
+
+  # Prowlarr: Indexer manager
+  prowlarr:
+    image: linuxserver/prowlarr
+    container_name: prowlarr
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/Toronto
+      - DOCKER_MODS=ghcr.io/themepark-dev/theme.park:prowlarr
+      - TP_THEME=power
+      - TP_ADDON=prowlarr-4k-logo
+      - TP_COMMUNITY_THEME=true
+    # ports:
+    #   - 9696:9696
+    volumes:
+      - ./data/prowlarr:/config
+    restart: unless-stopped
+    networks:
+      - proxy_default
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers Auth Bypass
+      - "traefik.http.routers.prowlarr-rtr-bypass.entrypoints=https"
+      - "traefik.http.routers.prowlarr-rtr-bypass.rule=Host(`prowlarr.$DOMAIN`) && Header(`traefik-auth-bypass-key`, `$TRAEFIK_AUTH_BYPASS_KEY`)"
+      - "traefik.http.routers.prowlarr-rtr-bypass.priority=100"
+      ## HTTP Routers Auth
+      - "traefik.http.routers.prowlarr-rtr.entrypoints=https"
+      - "traefik.http.routers.prowlarr-rtr.rule=Host(`prowlarr.$DOMAIN`)"
+      - "traefik.http.routers.prowlarr-rtr.priority=99"
+      ## Enable tls
+      - "traefik.http.routers.prowlarr-rtr.tls=true"
+      - "traefik.http.routers.prowlarr-rtr-bypass.tls=true"
+      ## Middlewares
+      - "traefik.http.routers.prowlarr-rtr-bypass.middlewares=chain-no-auth@file"
+      - "traefik.http.routers.prowlarr-rtr.middlewares=chain-google-oauth@file"
+      ## HTTP Services
+      - "traefik.http.routers.prowlarr-rtr.service=prowlarr-svc"
+      - "traefik.http.routers.prowlarr-rtr-bypass.service=prowlarr-svc"
+      - "traefik.http.services.prowlarr-svc.loadbalancer.server.port=9696"
+
+      ## getHomepage Labels
+      - "homepage.group=Arrs"
+      - "homepage.name=Prowlarr"
+      - "homepage.icon=prowlarr"
+      - "homepage.href=https://prowlarr.${DOMAIN}/"
+      - "homepage.description=Indexer manager"
+      - "homepage.color=#FFA500"
+      - "homepage.widget.type=prowlarr"
+      - "homepage.widget.url=http://prowlarr:9696"
+      - "homepage.widget.key=bd0fe38fb06b4d5d93888a720c6b1f6e"
+
+networks:
+  proxy_default:
+    external: true
+### SAMPLE TRAEFIK LABELS WITH GOOGLE_OAUTH MIDDLEWARE
+# - "traefik.enable=true"
+# ## HTTP Routers Auth Bypass
+# - "traefik.http.routers.prowlarr-rtr-bypass.entrypoints=https"
+# - "traefik.http.routers.prowlarr-rtr-bypass.rule=Host(`prowlarr.$DOMAIN`) && Header(`traefik-auth-bypass-key`, `$TRAEFIK_AUTH_BYPASS_KEY`)" # Bypass Auth for LunaSea on iOS
+# - "traefik.http.routers.prowlarr-rtr-bypass.priority=100"
+# ## HTTP Routers Auth
+# - "traefik.http.routers.prowlarr-rtr.entrypoints=https"
+# - "traefik.http.routers.prowlarr-rtr.rule=Host(`prowlarr.$DOMAIN`)"
+# - "traefik.http.routers.prowlarr-rtr.priority=99"
+# ## Enable tls
+# - "traefik.http.routers.radarr-rtr.tls=true"
+# - "traefik.http.routers.radarr-rtr-bypass.tls=true"
+# ## Middleware
+# - "traefik.http.routers.prowlarr-rtr-bypass.middlewares=chain-no-auth@file"
+# - "traefik.http.routers.prowlarr-rtr.middlewares=chain-google-oauth@file"
+# ## HTTP Services
+# - "traefik.http.routers.prowlarr-rtr.service=prowlarr-svc"
+# - "traefik.http.routers.prowlarr-rtr-bypass.service=prowlarr-svc"
+# - "traefik.http.services.prowlarr-svc.loadbalancer.server.port=9696"

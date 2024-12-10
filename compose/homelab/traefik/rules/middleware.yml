@@ -1,0 +1,83 @@
+http:
+  middlewares:
+    sonarr-dark:
+      plugin:
+        theme-park:
+          # The name of the supported application listed on https://docs.theme-park.dev/themes.
+          app: sonarr
+
+          # The name of the supported theme listed on https://docs.theme-park.dev/theme-options/ or https://docs.theme-park.dev/community-themes/
+          theme: dark
+
+          # This currently only supports '4k-logo' and 'darker' addons. Future addons that follow a similar syntax will work as well.
+          # For refernce: https://docs.theme-park.dev/themes/addons/
+          addons:
+            - sonarr-4k-logo
+
+    radarr-theme:
+      plugin:
+        theme-park:
+          # The name of the supported application listed on https://docs.theme-park.dev/themes.
+          app: radarr
+
+          # If using the 'darker' addon the theme MUST be excluded or set to 'base'
+          theme: base
+
+          # Multiple addons can be included at the same time
+          addons:
+            - radarr-darker
+            - radarr-4k-logo
+
+    vaultwarden-theme:
+      plugin:
+        theme-park:
+          # The name of the supported application listed on https://docs.theme-park.dev/themes.
+          app: vaultwarden
+
+          # If using the 'darker' addon the theme MUST be excluded or set to 'base'
+          theme: soul
+
+    kuma-theme:
+      plugin:
+        theme-park:
+          # The name of the supported application listed on https://docs.theme-park.dev/themes.
+          app: uptime-kuma
+
+          # If using the 'darker' addon the theme MUST be excluded or set to 'base'
+          theme: soul
+
+    qbittorrent-theme:
+      plugin:
+        theme-park:
+          # The name of the supported application listed on https://docs.theme-park.dev/themes.
+          app: qbittorrent
+
+          # If using the 'darker' addon the theme MUST be excluded or set to 'base'
+          theme: base
+
+    requestrr-theme:
+      plugin:
+        theme-park:
+          # The name of the supported application listed on https://docs.theme-park.dev/themes.
+          app: requestrr
+
+          # If using the 'darker' addon the theme MUST be excluded or set to 'base'
+          theme: base
+
+    tautulli-theme:
+      plugin:
+        theme-park:
+          # The name of the supported application listed on https://docs.theme-park.dev/themes.
+          app: tautulli
+
+          # If using the 'darker' addon the theme MUST be excluded or set to 'base'
+          theme: base
+
+    overseerr-theme:
+      plugin:
+        theme-park:
+          # The name of the supported application listed on https://docs.theme-park.dev/themes.
+          app: overseerr
+
+          # If using the 'darker' addon the theme MUST be excluded or set to 'base'
+          theme: base

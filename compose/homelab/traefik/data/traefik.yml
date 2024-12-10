@@ -1,0 +1,76 @@
+api:
+  dashboard: true
+
+entryPoints:
+  http:
+    address: ":80"
+    http:
+      redirections:
+        entryPoint:
+          to: https
+          scheme: https
+
+  # metrics:
+  #   address: :8082
+
+  https:
+    address: ":443"
+
+serversTransport:
+  insecureSkipVerify: true
+
+providers:
+  docker:
+    endpoint: "unix:///var/run/docker.sock"
+    exposedByDefault: false
+  file:
+    # Load dynamic configuration .yml files in this directory
+    directory: "/rules"
+    watch: true
+
+accessLog:
+  filePath: "./data/access.log"
+  bufferingSize: 100
+
+certificatesResolvers:
+  cloudflare:
+    acme:
+      email: pratikngupta@outlook.com
+      storage: acme.json
+      caServer: https://acme-v02.api.letsencrypt.org/directory # prod (default)
+      # caServer: https://acme-staging-v02.api.letsencrypt.org/directory # staging
+      dnsChallenge:
+        provider: cloudflare
+        disablePropagationCheck: true # uncomment this if you have issues pulling certificates through cloudflare, By setting this flag to true disables the need to wait for the propagation of the TXT record to all authoritative name servers.
+        delayBeforeCheck: 60s # uncomment along with disablePropagationCheck if needed to ensure the TXT record is ready before verification is attempted
+        resolvers:
+          - "1.1.1.1:53"
+          - "1.0.0.1:53"
+
+experimental:
+  plugins:
+    theme-park:
+      modulename: "github.com/packruler/traefik-themepark"
+      version: "v1.2.0"
+    cloudflare:
+      moduleName: github.com/Desuuuu/traefik-cloudflare-plugin
+      version: v1.0.0
+    # # geoblock:
+    # geoblock:
+    #   moduleName: github.com/nscuro/traefik-plugin-geoblock
+    #   version: v0.5.0
+    # redirectRegex:
+    #   moduleName: github.com/traefik/traefik/v2@v2.5.0
+    #   version: v2.5.0
+
+# metrics:
+#   prometheus:
+#     buckets:
+#       - 0.1
+#       - 0.3
+#       - 1.2
+#       - 5.0
+#     addEntryPointsLabels: true
+#     addRoutersLabels: true
+#     addServicesLabels: true
+#     entryPoint: metrics

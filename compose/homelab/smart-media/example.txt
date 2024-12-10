@@ -1,0 +1,8 @@
+DOMAIN=example.com
+EXTERNAL_DOMAIN=example.com
+INTERNAL_DOMAIN=internal.example.com
+
+TRAEFIK_AUTH_BYPASS_KEY=
+TAUTULLI_API_KEY=
+RADARR_API_KEY=
+

@@ -1,0 +1,78 @@
+secrets:
+  oauth_secrets:
+    file: ./data/oauth_secrets
+
+services:
+  traefik:
+    image: traefik:v3.2
+    container_name: traefik
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    networks:
+      - proxy_default
+    ports:
+      - 80:80
+      - 443:443
+      - 443:443/tcp # Uncomment if you want HTTP3
+      - 443:443/udp # Uncomment if you want HTTP3
+      # - 8082:8082 # for metrics
+    env_file:
+      - .env
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./data/traefik.yml:/traefik.yml:ro
+      - ./data/acme.json:/acme.json
+      - ./rules:/rules
+      # - ./data/config.yml:/config.yml:ro
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.traefik.entrypoints=http"
+      - "traefik.http.routers.traefik.rule=Host(`traefik-dashboard.${DOMAIN}`)"
+      - "traefik.http.routers.traefik.middlewares=chain-google-oauth@file"
+      - "traefik.http.routers.traefik-secure.middlewares=chain-google-oauth@file"
+      - "traefik.http.middlewares.traefik-https-redirect.redirectscheme.scheme=https"
+      - "traefik.http.middlewares.sslheader.headers.customrequestheaders.X-Forwarded-Proto=https"
+      - "traefik.http.routers.traefik.middlewares=traefik-https-redirect"
+      - "traefik.http.routers.traefik-secure.entrypoints=https"
+      - "traefik.http.routers.traefik-secure.rule=Host(`traefik-dashboard.${DOMAIN}`)"
+      - "traefik.http.routers.traefik-secure.tls=true"
+      - "traefik.http.routers.traefik-secure.tls.certresolver=cloudflare"
+      - "traefik.http.routers.traefik-secure.tls.domains[0].main=${DOMAIN}"
+      - "traefik.http.routers.traefik-secure.tls.domains[0].sans=*.${DOMAIN}, lan.${DOMAIN}, *.lan.${DOMAIN}, secure.${DOMAIN}, *.secure.${DOMAIN}"
+
+      # ## Internal Traefik Dashboard
+      # - "traefik.http.routers.traefik-internal.rule=Host(`traefik-dashboard.lan.${DOMAIN}`)"
+      # - "traefik.http.routers.traefik-internal.entrypoints=https"
+      # - "traefik.http.routers.traefik-internal.tls=true"
+      # - ## no auth for internal dashboard
+      # - "traefik.http.routers.traefik-internal.middlewares=no-auth@file"
+      - "traefik.http.routers.traefik-secure.service=api@internal"
+
+  oauth:
+    container_name: oauth
+    # image: thomseddon/traefik-forward-auth:latest
+    image: ghcr.io/jordemort/traefik-forward-auth:latest
+    security_opt:
+      - no-new-privileges:true
+    restart: unless-stopped
+    env_file:
+      - .env
+    networks:
+      - proxy_default
+    labels:
+      - "traefik.enable=true"
+      # HTTP Routers
+      - "traefik.http.routers.oauth-rtr.tls=true"
+      - "traefik.http.routers.oauth-rtr.entrypoints=https"
+      - "traefik.http.routers.oauth-rtr.rule=Host(`oauth.$DOMAIN`)"
+      # Middlewares
+      - "traefik.http.routers.oauth-rtr.middlewares=chain-google-oauth@file"
+      # HTTP Services
+      - "traefik.http.routers.oauth-rtr.service=oauth-svc"
+      - "traefik.http.services.oauth-svc.loadbalancer.server.port=4181"
+
+networks:
+  proxy_default:
+    external: true

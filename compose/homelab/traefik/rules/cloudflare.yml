@@ -1,0 +1,7 @@
+http:
+  middlewares:
+    cloudflare:
+      plugin:
+        cloudflare:
+          trustedCIDRs: []
+          overwriteForwardedFor: true
