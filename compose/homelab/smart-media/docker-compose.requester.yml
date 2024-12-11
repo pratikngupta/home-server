@@ -6,6 +6,7 @@
 #
 ######################################################
 
+
 services:
   # jellyseerr:
   #   image: fallenbagel/jellyseerr:latest
@@ -36,11 +37,12 @@ services:
       - PUID=1000
       - PGID=1000
       - LOG_LEVEL=debug
-      - TZ=America/Toronto
     networks:
       - proxy_default
     volumes:
       - ./data/overseerr:/app/config
+    # timezone 
+      - /etc/localtime:/etc/localtime:ro
     restart: unless-stopped
     labels:
       - "traefik.enable=true"
@@ -73,7 +75,7 @@ services:
       - "traefik.http.routers.overseerr-webninja.priority=100"
       # define service for the redirect
       - "traefik.http.routers.overseerr-webninja.service=overseerr-webninja"
-      - "traefik.http.services.overseerr-webninja.loadbalancer.server.port=5055"
+      - "traefik.http.services.overseerr-webninja.loadbalancer.server.port=5055"   
 
   requestrr:
     image: darkalfx/requestrr
@@ -81,6 +83,8 @@ services:
     container_name: requestrr
     volumes:
       - ./data/requestrr/config:/root/config
+    # timezone 
+      - /etc/localtime:/etc/localtime:ro
     restart: unless-stopped
     networks:
       - proxy_default

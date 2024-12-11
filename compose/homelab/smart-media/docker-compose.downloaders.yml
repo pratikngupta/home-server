@@ -15,11 +15,12 @@ services:
     environment:
       - PUID=1000
       - PGID=1000
-      - TZ=America/Toronto
       - DOCKER_MODS=ghcr.io/gabe565/linuxserver-mod-vuetorrent
     volumes:
       - ./data/qbittorrent:/config
       - ./content/torrents:/data/torrents
+      # timezone 
+      - /etc/localtime:/etc/localtime:ro
     restart: unless-stopped
     networks:
       - proxy_default

@@ -20,6 +20,8 @@ services:
       - ./content/media:/data/media
       - /mnt/main/Movie:/movies
       - "/home/pratik/Docker/onedrive/data/Movies (Homelab Upload):/onedrive"
+    # timezone 
+      - /etc/localtime:/etc/localtime:ro
 
     network_mode: host
     privileged: true # libusb_init failed

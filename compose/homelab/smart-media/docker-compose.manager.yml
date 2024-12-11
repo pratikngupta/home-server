@@ -14,7 +14,6 @@ services:
     environment:
       - PUID=1000
       - PGID=1000
-      - TZ=America/Toronto
       - DOCKER_MODS=ghcr.io/themepark-dev/theme.park:radarr
       - TP_THEME=power
       - TP_ADDON=radarr-4k-logo|radarr-alt-calendar
@@ -24,6 +23,8 @@ services:
       - ./content:/data
       - /mnt/main/Movie:/movies
       - "/home/pratik/Docker/onedrive/data/Movies (Homelab Upload):/onedrive"
+    # timezone
+      - /etc/localtime:/etc/localtime:ro
 
     restart: unless-stopped
     networks:
@@ -69,7 +70,6 @@ services:
     environment:
       - PUID=1000
       - PGID=1000
-      - TZ=America/Toronto
       - DOCKER_MODS=ghcr.io/themepark-dev/theme.park:sonarr
       - TP_THEME=mind
       - TP_ADDON=sonarr-4k-text-logo
@@ -79,6 +79,8 @@ services:
     volumes:
       - ./data/sonarr:/config
       - ./content:/data
+    # timezone 
+      - /etc/localtime:/etc/localtime:ro
     restart: unless-stopped
     networks:
       - proxy_default
@@ -124,12 +126,13 @@ services:
     environment:
       - PUID=1000
       - PGID=1000
-      - TZ=America/Toronto
     # ports:
     #   - 8686:8686
     volumes:
       - ./data/lidarr:/config
       - ./content:/data
+    # timezone 
+      - /etc/localtime:/etc/localtime:ro
     networks:
       - proxy_default
     restart: unless-stopped
@@ -173,7 +176,6 @@ services:
     environment:
       - PUID=1000
       - PGID=1000
-      - TZ=America/Toronto
       - DOCKER_MODS=ghcr.io/themepark-dev/theme.park:prowlarr
       - TP_THEME=power
       - TP_ADDON=prowlarr-4k-logo
@@ -182,6 +184,8 @@ services:
     #   - 9696:9696
     volumes:
       - ./data/prowlarr:/config
+    # timezone 
+      - /etc/localtime:/etc/localtime:ro
     restart: unless-stopped
     networks:
       - proxy_default
@@ -227,31 +231,31 @@ networks:
 ### SAMPLE TRAEFIK LABELS WITH GOOGLE_OAUTH MIDDLEWARE
 # - "traefik.enable=true"
 # ## HTTP Routers Auth Bypass
-# - "traefik.http.routers.prowlarr-rtr-bypass.entrypoints=https"
-# - "traefik.http.routers.prowlarr-rtr-bypass.rule=Host(`prowlarr.$DOMAIN`) && Header(`traefik-auth-bypass-key`, `$TRAEFIK_AUTH_BYPASS_KEY`)" # Bypass Auth for LunaSea on iOS
-# - "traefik.http.routers.prowlarr-rtr-bypass.priority=100"
+# - "traefik.http.routers.example-rtr-bypass.entrypoints=https"
+# - "traefik.http.routers.example-rtr-bypass.rule=Host(`example.$DOMAIN`) && Header(`traefik-auth-bypass-key`, `$TRAEFIK_AUTH_BYPASS_KEY`)" # Bypass Auth for LunaSea on iOS
+# - "traefik.http.routers.example-rtr-bypass.priority=100"
 # ## HTTP Routers Auth
-# - "traefik.http.routers.prowlarr-rtr.entrypoints=https"
-# - "traefik.http.routers.prowlarr-rtr.rule=Host(`prowlarr.$DOMAIN`)"
-# - "traefik.http.routers.prowlarr-rtr.priority=99"
+# - "traefik.http.routers.example-rtr.entrypoints=https"
+# - "traefik.http.routers.example-rtr.rule=Host(`example.$DOMAIN`)"
+# - "traefik.http.routers.example-rtr.priority=99"
 # ## Enable tls
 # - "traefik.http.routers.radarr-rtr.tls=true"
 # - "traefik.http.routers.radarr-rtr-bypass.tls=true"
 # ## Middleware
-# - "traefik.http.routers.prowlarr-rtr-bypass.middlewares=chain-no-auth@file"
-# - "traefik.http.routers.prowlarr-rtr.middlewares=chain-google-oauth@file"
+# - "traefik.http.routers.example-rtr-bypass.middlewares=chain-no-auth@file"
+# - "traefik.http.routers.example-rtr.middlewares=chain-google-oauth@file"
 # ## HTTP Services
-# - "traefik.http.routers.prowlarr-rtr.service=prowlarr-svc"
-# - "traefik.http.routers.prowlarr-rtr-bypass.service=prowlarr-svc"
-# - "traefik.http.services.prowlarr-svc.loadbalancer.server.port=9696"
+# - "traefik.http.routers.example-rtr.service=example-svc"
+# - "traefik.http.routers.example-rtr-bypass.service=example-svc"
+# - "traefik.http.services.example-svc.loadbalancer.server.port=9696"
 # ### REDIRECT TO GITHUB ### Usefull for redirecting to github page easily
-# # add if prowlarr.webninja.me/github is called, it will redirect to the github page
-# - "traefik.http.routers.prowlarr-webninja.rule=Host(`prowlarr.${DOMAIN}`) && Path(`/github`)"
-# - "traefik.http.routers.prowlarr-webninja.entrypoints=https"
-# - "traefik.http.routers.prowlarr-webninja.middlewares=redirect-to-github-prowlarr@file"
-# - "traefik.http.routers.prowlarr-webninja.tls=true"
+# # add if example.webninja.me/github is called, it will redirect to the github page
+# - "traefik.http.routers.example-webninja.rule=Host(`example.${DOMAIN}`) && Path(`/github`)"
+# - "traefik.http.routers.example-webninja.entrypoints=https"
+# - "traefik.http.routers.example-webninja.middlewares=redirect-to-github-example@file"
+# - "traefik.http.routers.example-webninja.tls=true"
 # # set priority to 1 so it will be checked first
-# - "traefik.http.routers.prowlarr-webninja.priority=100"
+# - "traefik.http.routers.example-webninja.priority=100"
 # # define service for the redirect
-# - "traefik.http.routers.prowlarr-webninja.service=prowlarr-webninja"
-# - "traefik.http.services.prowlarr-webninja.loadbalancer.server.port=9696"
+# - "traefik.http.routers.example-webninja.service=example-webninja"
+# - "traefik.http.services.example-webninja.loadbalancer.server.port=9696"

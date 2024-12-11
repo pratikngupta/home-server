@@ -13,9 +13,10 @@ services:
     environment:
       - PUID=1000
       - PGID=1000
-      - TZ=America/Toronto
     volumes:
       - ./data/tautulli/config:/config
+    # timezone 
+      - /etc/localtime:/etc/localtime:ro
     restart: unless-stopped
     networks:
       - proxy_default
@@ -59,8 +60,8 @@ services:
       - proxy_default
     volumes:
       - ./data/recyclarr:/config
-    environment:
-      - TZ=America/Toronto
+    # timezone 
+      - /etc/localtime:/etc/localtime:ro
 
 #  kometa:
 #    image: kometateam/kometa
