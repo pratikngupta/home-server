@@ -63,6 +63,18 @@ services:
       - "traefik.http.routers.overseerr-rtr-bypass.service=overseerr-svc"
       - "traefik.http.services.overseerr-svc.loadbalancer.server.port=5055"
 
+      ### REDIRECT TO GITHUB ### Usefull for redirecting to github page easily
+      # add if overseerr.webninja.me/github is called, it will redirect to the github page
+      - "traefik.http.routers.overseerr-webninja.rule=Host(`overseerr.${DOMAIN}`) && Path(`/github`)"
+      - "traefik.http.routers.overseerr-webninja.entrypoints=https"
+      - "traefik.http.routers.overseerr-webninja.middlewares=redirect-to-github-overseerr@file"
+      - "traefik.http.routers.overseerr-webninja.tls=true"
+      # set priority to 1 so it will be checked first
+      - "traefik.http.routers.overseerr-webninja.priority=100"
+      # define service for the redirect
+      - "traefik.http.routers.overseerr-webninja.service=overseerr-webninja"
+      - "traefik.http.services.overseerr-webninja.loadbalancer.server.port=5055"
+
   requestrr:
     image: darkalfx/requestrr
     hostname: requestrr

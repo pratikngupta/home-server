@@ -48,6 +48,19 @@ services:
       - "traefik.http.routers.radarr-rtr.service=radarr-svc"
       - "traefik.http.routers.radarr-rtr-bypass.service=radarr-svc"
       - "traefik.http.services.radarr-svc.loadbalancer.server.port=7878"
+      
+      ### REDIRECT TO GITHUB ### Usefull for redirecting to github page easily
+      # add if radarr.webninja.me/github is called, it will redirect to the github page
+      - "traefik.http.routers.radarr-webninja.rule=Host(`radarr.${DOMAIN}`) && Path(`/github`)"
+      - "traefik.http.routers.radarr-webninja.entrypoints=https"
+      - "traefik.http.routers.radarr-webninja.middlewares=redirect-to-github-radarr@file"
+      - "traefik.http.routers.radarr-webninja.tls=true"
+      # set priority to 1 so it will be checked first
+      - "traefik.http.routers.radarr-webninja.priority=100"
+      # define service for the redirect
+      - "traefik.http.routers.radarr-webninja.service=radarr-webninja"
+      - "traefik.http.services.radarr-webninja.loadbalancer.server.port=7878"
+      
 
   # Sonarr: TV management system
   sonarr:
@@ -91,17 +104,18 @@ services:
       - "traefik.http.routers.sonarr-rtr-bypass.service=sonarr-svc"
       - "traefik.http.services.sonarr-svc.loadbalancer.server.port=8989"
 
-      ## getHomepage Labels
-      - "homepage.group=Arrs"
-      - "homepage.name=Sonarr"
-      - "homepage.icon=sonarr"
-      - "homepage.instance.internal.href=http://sonarr:8989/"
-      - "homepage.href=https://sonarr.${DOMAIN}/"
-      - "homepage.description=TV management system"
-      - "homepage.color=#FFA500"
-      - "homepage.widget.type=sonarr"
-      - "homepage.widget.url=http://sonarr:8989"
-      - "homepage.widget.key=6d52b8d1ebc64ecfbcfc6ced6f0c0e4c"
+      ### REDIRECT TO GITHUB ### Usefull for redirecting to github page easily
+      # add if sonarr.webninja.me/github is called, it will redirect to the github page
+      - "traefik.http.routers.sonarr-webninja.rule=Host(`sonarr.${DOMAIN}`) && Path(`/github`)"
+      - "traefik.http.routers.sonarr-webninja.entrypoints=https"
+      - "traefik.http.routers.sonarr-webninja.middlewares=redirect-to-github-sonarr@file"
+      - "traefik.http.routers.sonarr-webninja.tls=true"
+      # set priority to 1 so it will be checked first
+      - "traefik.http.routers.sonarr-webninja.priority=100"
+      # define service for the redirect
+      - "traefik.http.routers.sonarr-webninja.service=sonarr-webninja"
+      - "traefik.http.services.sonarr-webninja.loadbalancer.server.port=8989"
+
 
   # Lidarr - Music
   lidarr:
@@ -140,17 +154,17 @@ services:
       - "traefik.http.routers.lidarr-rtr-bypass.service=lidarr-svc"
       - "traefik.http.services.lidarr-svc.loadbalancer.server.port=8686"
 
-      ## getHomepage Labels
-      - "homepage.group=Arrs"
-      - "homepage.name=Lidarr"
-      - "homepage.icon=lidarr"
-      - "homepage.instance.internal.href=http://lidarr:8686/"
-      - "homepage.href=https://lidarr.${EXTERNAL_DOMAIN}/"
-      - "homepage.description=Music management system"
-      - "homepage.color=#FFA500"
-      - "homepage.widget.type=lidarr"
-      - "homepage.widget.url=http://lidarr:8686"
-      - homepage.widget.key=e87d2a24e8894c108cc13b21180767d4
+      ### REDIRECT TO GITHUB ### Usefull for redirecting to github page easily
+      # add if lidarr.webninja.me/github is called, it will redirect to the github page
+      - "traefik.http.routers.lidarr-webninja.rule=Host(`lidarr.${DOMAIN}`) && Path(`/github`)"
+      - "traefik.http.routers.lidarr-webninja.entrypoints=https"
+      - "traefik.http.routers.lidarr-webninja.middlewares=redirect-to-github-lidarr@file"
+      - "traefik.http.routers.lidarr-webninja.tls=true"
+      # set priority to 1 so it will be checked first
+      - "traefik.http.routers.lidarr-webninja.priority=100"
+      # define service for the redirect
+      - "traefik.http.routers.lidarr-webninja.service=lidarr-webninja"
+      - "traefik.http.services.lidarr-webninja.loadbalancer.server.port=8686"
 
   # Prowlarr: Indexer manager
   prowlarr:
@@ -192,20 +206,24 @@ services:
       - "traefik.http.routers.prowlarr-rtr-bypass.service=prowlarr-svc"
       - "traefik.http.services.prowlarr-svc.loadbalancer.server.port=9696"
 
-      ## getHomepage Labels
-      - "homepage.group=Arrs"
-      - "homepage.name=Prowlarr"
-      - "homepage.icon=prowlarr"
-      - "homepage.href=https://prowlarr.${DOMAIN}/"
-      - "homepage.description=Indexer manager"
-      - "homepage.color=#FFA500"
-      - "homepage.widget.type=prowlarr"
-      - "homepage.widget.url=http://prowlarr:9696"
-      - "homepage.widget.key=bd0fe38fb06b4d5d93888a720c6b1f6e"
+      ### REDIRECT TO GITHUB ### Usefull for redirecting to github page easily
+      # add if prowlarr.webninja.me/github is called, it will redirect to the github page
+      - "traefik.http.routers.prowlarr-webninja.rule=Host(`prowlarr.${DOMAIN}`) && Path(`/github`)"
+      - "traefik.http.routers.prowlarr-webninja.entrypoints=https"
+      - "traefik.http.routers.prowlarr-webninja.middlewares=redirect-to-github-prowlarr@file"
+      - "traefik.http.routers.prowlarr-webninja.tls=true"
+      # set priority to 1 so it will be checked first
+      - "traefik.http.routers.prowlarr-webninja.priority=100"
+      # define service for the redirect
+      - "traefik.http.routers.prowlarr-webninja.service=prowlarr-webninja"
+      - "traefik.http.services.prowlarr-webninja.loadbalancer.server.port=9696"
+      
 
 networks:
   proxy_default:
     external: true
+
+    
 ### SAMPLE TRAEFIK LABELS WITH GOOGLE_OAUTH MIDDLEWARE
 # - "traefik.enable=true"
 # ## HTTP Routers Auth Bypass
@@ -226,3 +244,14 @@ networks:
 # - "traefik.http.routers.prowlarr-rtr.service=prowlarr-svc"
 # - "traefik.http.routers.prowlarr-rtr-bypass.service=prowlarr-svc"
 # - "traefik.http.services.prowlarr-svc.loadbalancer.server.port=9696"
+# ### REDIRECT TO GITHUB ### Usefull for redirecting to github page easily
+# # add if prowlarr.webninja.me/github is called, it will redirect to the github page
+# - "traefik.http.routers.prowlarr-webninja.rule=Host(`prowlarr.${DOMAIN}`) && Path(`/github`)"
+# - "traefik.http.routers.prowlarr-webninja.entrypoints=https"
+# - "traefik.http.routers.prowlarr-webninja.middlewares=redirect-to-github-prowlarr@file"
+# - "traefik.http.routers.prowlarr-webninja.tls=true"
+# # set priority to 1 so it will be checked first
+# - "traefik.http.routers.prowlarr-webninja.priority=100"
+# # define service for the redirect
+# - "traefik.http.routers.prowlarr-webninja.service=prowlarr-webninja"
+# - "traefik.http.services.prowlarr-webninja.loadbalancer.server.port=9696"
