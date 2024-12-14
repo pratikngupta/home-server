@@ -1,0 +1,209 @@
+---
+# For configuration options and examples, please see:
+# https://gethomepage.dev/latest/configs/services
+
+- Media:
+    - Plex:
+        href: http://192.168.2.55:32400/web
+        icon: plex
+        color: "#f9f9f9"
+        widget:
+          type: plex
+          url: http://192.168.2.55:32400
+          key: {{HOMEPAGE_VAR_PLEX_API_KEY}}
+        server: my-docker
+        container: plex
+- Arrs:
+    - Radarr:
+        href: https://radarr.{{HOMEPAGE_VAR_DOMAIN}}
+        icon: radarr
+        color: "#f9f9f9"
+        widget:
+          type: radarr
+          url: http://radarr:7878
+          key: {{HOMEPAGE_VAR_RADARR_API_KEY}}
+        server: my-docker
+        container: radarr
+
+    - Sonarr:
+        href: https://sonarr.{{HOMEPAGE_VAR_DOMAIN}}
+        icon: sonarr
+        color: "#FFA500"
+        widget:
+          type: sonarr
+          url: http://sonarr:8989
+          key: {{HOMEPAGE_VAR_SONARR_API_KEY}}
+        server: my-docker
+        container: sonarr
+
+    - Lidarr:
+        href: https://lidarr.{{HOMEPAGE_VAR_DOMAIN}}
+        icon: lidarr
+        color: "#FFA500"
+        widget:
+          type: lidarr
+          url: http://lidarr:8686
+          key: {{HOMEPAGE_VAR_LIDARR_API_KEY}}
+        server: my-docker
+        container: lidarr
+
+    - Prowlarr:
+        href: https://prowlarr.{{HOMEPAGE_VAR_DOMAIN}}
+        icon: prowlarr
+        color: "#FFA500"
+        widget:
+          type: prowlarr
+          url: http://prowlarr:9696
+          key: {{HOMEPAGE_VAR_PROWLARR_API_KEY}}
+        server: my-docker
+        container: prowlarr
+
+- Security:
+    - Traefik:
+        href: https://traefik-dashboard.{{HOMEPAGE_VAR_DOMAIN}}
+        icon: traefik
+        color: "#f9f9f9"
+        widget:
+          type: traefik
+          url: http://traefik:8080
+        server: my-docker
+        container: traefik
+
+    - NextDNS:
+        widget:
+          type: nextdns
+          profile: {{HOMEPAGE_VAR_NEXTDNS_PROFILE}}
+          key: {{HOMEPAGE_VAR_NEXTDNS_API_KEY}}
+
+        href: https://my.nextdns.io
+        icon: nextdns
+        color: "#f9f9f9"
+
+    - Homelab:
+        href: https://login.tailscale.com
+        icon: tailscale
+        color: "#f9f9f9"
+        widget:
+          type: tailscale
+          deviceid: {{HOMEPAGE_VAR_TAILSCALE_DEVICE_NAME_HOMELAB}}
+          key: {{HOMEPAGE_VAR_TAILSCALE_API_KEY}}
+          fields: ["address", "last_seen"]
+
+    - Nvidia:
+        href: https://login.tailscale.com
+        icon: tailscale
+        color: "#f9f9f9"
+        widget:
+          type: tailscale
+          deviceid: {{HOMEPAGE_VAR_TAILSCALE_DEVICE_NAME_NVIDIA}}
+          key: {{HOMEPAGE_VAR_TAILSCALE_API_KEY}}
+          fields: ["address", "last_seen"]
+
+    - CPU Usage:
+        widget:
+          type: glances
+          version: 4
+          url: http://glances:61208
+          metric: cpu
+    - Network Usage:
+        widget:
+          type: glances
+          version: 4
+          url: http://glances:61208
+          metric: network:eth0
+    - Memory Usage:
+        widget:
+          type: glances
+          version: 4
+          url: http://glances:61208
+          metric: memory
+    - Disk Usage:
+        widget:
+          type: glances
+          version: 4
+          url: http://glances:61208
+          metric: mnt_point:/mnt/main
+    - Info:
+        widget:
+          type: glances
+          version: 4
+          url: http://glances:61208
+          metric: info
+
+    # - External Disk Usage:
+    #     widget:
+    #       type: glances
+    #       version: 4
+    #       url: http://glances:61208
+    #       metric: disk:/mnt/main
+
+- Media Requests:
+    - Overseerr:
+        href: https://overseerr.{{HOMEPAGE_VAR_DOMAIN}}
+        icon: overseerr
+        color: "#f9f9f9"
+        widget:
+          type: overseerr
+          url: http://overseerr:5055
+          key: {{HOMEPAGE_VAR_OVERSEERR_API_KEY}}
+
+- Downloaders:
+    - qBittorrent:
+        href: https://qbittorrent.{{HOMEPAGE_VAR_DOMAIN}}
+        icon: qbittorrent
+        color: "#f9f9f9"
+        widget:
+          type: qbittorrent
+          url: http://qbittorrent:8080
+          username: {{HOMEPAGE_VAR_MEDIA_USERNAME}}
+          password: {{HOMEPAGE_VAR_MEDIA_PASSWORD}}
+        server: my-docker
+        container: qbittorrent
+
+- Monitoring:
+    - Tautulli:
+        href: https://tautulli.{{HOMEPAGE_VAR_DOMAIN}}
+        icon: tautulli
+        color: "#FFA500"
+        widget:
+          type: tautulli
+          url: http://tautulli:8181
+          key: {{HOMEPAGE_VAR_TAUTULLI_API_KEY}}
+        server: my-docker
+        container: tautulli
+
+    - Uptime Kuma:
+        href: https://kuma.{{HOMEPAGE_VAR_DOMAIN}}
+        icon: uptime-kuma
+        color: "#FFA500"
+        widget:
+          type: uptimekuma
+          url: http://uptime-kuma:3001
+          slug: media
+
+    - Dockge:
+        href: https://dockge.{{HOMEPAGE_VAR_DOMAIN}}
+        icon: dockge
+        color: "#FFA500"
+        description: Stack manager
+
+    - Dozzle:
+        href: https://logs.{{HOMEPAGE_VAR_DOMAIN}}
+        icon: dozzle
+        color: "#FFA500"
+        description: Real-time log viewer
+
+    - Watchtower:
+        icon: watchtower
+        color: "#FFA500"
+        description: Automated container updates
+        widget:
+          type: watchtower
+          url: http://watchtower:8080
+          key: {{HOMEPAGE_VAR_WATCHTOWER_HTTP_API_TOKEN}}
+
+    - Speedtest:
+        href: https://speedtest.{{HOMEPAGE_VAR_DOMAIN}}
+        icon: speedtest-tracker
+        color: "#FFA500"
+        description: Speedtest

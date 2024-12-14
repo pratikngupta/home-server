@@ -1,0 +1,91 @@
+[server]
+port = 8080
+hostname = "https://podsync.webninja.me:443"
+
+[storage]
+  type = "local"
+
+  [storage.local]
+  data_dir = "/app/data"
+
+[tokens]
+youtube = "AIzaSyCp0HLQ2wd0B8FEe2t2yiEIda4xk886G2w"
+
+[feeds]
+    [feeds.Ramayana-Mahabharata]
+    url = "https://youtube.com/playlist?list=PLwL1EbEwUxHI9kDW0AyluLdXaKXyz6fOz&si=Z8uz4hpt8RPa_zbw"
+    update_period = "15m"
+    quality = "high" # "high" or "low"
+    format = "video" # "audio", "video" or "custom"
+    opml = true
+    max_height = 1080
+    private_feed = true
+    cover_art = "https://m.media-amazon.com/images/I/51ceUFlwfJL._SL500_.jpg"
+    cover_art_quality = "high"
+
+    [feeds.Ramayana-Mahabharata.custom]
+    title = "Podsync - Ramayana and Mahabharata"
+    description = "Collection of best stories"
+    author = "Pratik Gupta"
+    
+    category = "TV"
+    lang = "en"
+    ownerName = "Pratik Gupta"
+    ownerEmail = "pratikngupta@outlook.com"
+
+    [feeds.watch-later]
+    url = "https://youtube.com/playlist?list=PLwL1EbEwUxHI55EngMmxo3ybDE9DRYBUZ&si=uQWZte_8rOWCKrJQ"
+    update_period = "15m"
+    quality = "high" # "high" or "low"
+    format = "video" # "audio", "video" or "custom"
+    opml = true
+    max_height = 1080
+    private_feed = true
+
+    [feeds.watch-later.custom]
+    title = "Podsync - Watch Later"
+    description = "Collection of watch later podcast"
+    author = "Pratik Gupta"
+    category = "Youtube"
+    lang = "en"
+    ownerName = "Pratik Gupta"
+    ownerEmail = "pratikngupta@outlook.com"
+
+    [feeds.watch-later-secondary]
+    url = "https://youtube.com/playlist?list=PLQr5rwcDMXDvF0E8Ki6c0DDILh__kIqVs&si=I6Wc27QDAkDr4shu"
+    update_period = "15m"
+    quality = "high" # "high" or "low"
+    format = "video" # "audio", "video" or "custom"
+    opml = true
+    max_height = 1080
+    private_feed = true
+
+    [feeds.watch-later-secondary.custom]
+    title = "Podsync - Watch Later - Secondary"
+    description = "Collection of watch later podcast from second account"
+    author = "Pratik Gupta"
+    category = "Youtube"
+    lang = "en"
+    ownerName = "Pratik Gupta"
+    ownerEmail = "pratikngupta@outlook.com"
+
+    [feeds.poem]
+    url = "https://youtube.com/playlist?list=PLwL1EbEwUxHKROJCcvRLyMG_KpqSjmSCj&si=0EoEWI5zmeuU7a_Y"
+    update_period = "15m"
+    quality = "high" # "high" or "low"
+    format = "video" # "audio", "video" or "custom"
+    opml = true
+    max_height = 1080
+    private_feed = true
+
+    [feeds.poem.custom]
+    title = "Podsync - Poem"
+    description = "Collection of Poem"
+    author = "Pratik Gupta"
+    category = "Youtube"
+    lang = "en"
+    ownerName = "Pratik Gupta"
+    ownerEmail = "pratikngupta@outlook.com"
+
+[log]
+debug = true

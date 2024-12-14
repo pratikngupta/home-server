@@ -15,12 +15,14 @@ services:
       - PGID=1000
       - VERSION=docker
       - HOSTNAME=plex.webninja.me
+      - DATA_DIR=${DATA_DIR}
+    env_file: .env
     volumes:
-      - ./data/plex:/config
+      - ${DATA_DIR}/plex:/config
       - ./content/media:/data/media
       - /mnt/main/Movie:/movies
       - "/home/pratik/Docker/onedrive/data/Movies (Homelab Upload):/onedrive"
-    # timezone 
+      # timezone
       - /etc/localtime:/etc/localtime:ro
 
     network_mode: host
@@ -64,7 +66,7 @@ services:
   #     - TZ=America/Toronto
   #     - DOCKER_MODS=linuxserver/mods:jellyfin-opencl-intel
   #   volumes:
-  #     - ./data/jellyfin:/config
+  #     - ${DATA_DIR}/jellyfin:/config
   #     - ./content/media:/data/movies
   #     - /mnt/main/Movie:/movies
   #     - /home/pratik/Docker/youtube/data:/youtube
@@ -98,7 +100,7 @@ services:
   #     - "traefik.http.routers.jellyfin-external.entrypoints=https"
   #     - "traefik.http.routers.jellyfin-external.tls=true"
   #     - "traefik.http.routers.jellyfin-external.service=jellyfin-svc@file"
-  #     - "traefik.http.routers.jellyfin-external.middlewares=chain-google-oauth@file,jellyfin-mw"
+  #     - "traefik.http.routers.jellyfin-external.middlewares=chain-github-oauth@file,jellyfin-mw"
 
   #     ## Internal Access
   #     - "traefik.http.routers.jellyfin-internal.rule=Host(`jellyfin.${INTERNAL_DOMAIN}`)"

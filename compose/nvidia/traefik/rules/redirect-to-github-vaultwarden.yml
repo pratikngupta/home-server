@@ -1,7 +1,0 @@
-http:
-  middlewares:
-    redirect-to-github-vaultwarden:
-      redirectRegex:
-        regex: "^https://vaultwarden\\..*/github$"
-        replacement: "https://github.com/dani-garcia/vaultwarden"
-        permanent: true

@@ -3,10 +3,10 @@ services:
     image: 2fauth/2fauth
     container_name: 2fauth
     volumes:
-      - ./data/2fauth:/2fauth
+      - ${DATA_DIR}/2fauth:/2fauth
     networks:
-      - proxy_default
-
+      - traefik_network
+    env_file: .env
     environment:
       # You can change the name of the app
       - APP_NAME=2FAuth
@@ -104,5 +104,5 @@ services:
       - "traefik.http.routers.2fauth-secure.middlewares=chain-no-auth@file"
 
 networks:
-  proxy_default:
+  traefik_network:
     external: true

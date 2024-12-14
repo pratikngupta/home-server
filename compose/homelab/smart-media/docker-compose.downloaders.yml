@@ -6,7 +6,6 @@
 #
 ######################################################
 
-
 services:
   # qBittorrent: Torrent client
   qbittorrent:
@@ -16,14 +15,15 @@ services:
       - PUID=1000
       - PGID=1000
       - DOCKER_MODS=ghcr.io/gabe565/linuxserver-mod-vuetorrent
+    env_file: .env
     volumes:
-      - ./data/qbittorrent:/config
+      - ${DATA_DIR}/qbittorrent:/config
       - ./content/torrents:/data/torrents
-      # timezone 
+      # timezone
       - /etc/localtime:/etc/localtime:ro
     restart: unless-stopped
     networks:
-      - proxy_default
+      - traefik_network
     labels:
       - "traefik.enable=true"
       ## Internal access
@@ -31,7 +31,7 @@ services:
       - "traefik.http.routers.qbittorrent.entrypoints=https"
       - "traefik.http.services.qbittorrent.loadbalancer.server.port=8080"
       ## add google oauth
-      - "traefik.http.routers.qbittorrent.middlewares=chain-google-oauth@file"
+      - "traefik.http.routers.qbittorrent.middlewares=chain-github-oauth@file"
       ## theme file for qBittorrent
       # enable tls
       - "traefik.http.routers.qbittorrent.tls=true"
@@ -44,13 +44,11 @@ services:
     restart: unless-stopped
     image: ghcr.io/flaresolverr/flaresolverr:latest
     networks:
-      - proxy_default
+      - traefik_network
 
 networks:
-  proxy_default:
+  traefik_network:
     external: true
-
-
 ### IMPORTANT ###
 # To use iQbit UI: `/config/iQbit/release`
 # to use vuetorrent UI: `/vuetorrent`

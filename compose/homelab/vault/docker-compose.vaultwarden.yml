@@ -16,7 +16,7 @@ services:
       EXTENDED_LOGGING: "true"
       TZ: "America/Toronto"
     volumes:
-      - ./data/vaultwarden:/data # the path before the : can be changed
+      - ${DATA_DIR}/vaultwarden:/data # the path before the : can be changed
     labels:
       # traefik enable
       - "traefik.enable=true"
@@ -31,27 +31,30 @@ services:
       - "traefik.http.routers.vaultwarden.service=vaultwarden"
       # Prevent watchtower from updating this container
       - com.centurylinklabs.watchtower.monitor-only="true"
+      # no auth middleware
+      - "traefik.http.routers.vaultwarden.middlewares=chain-no-auth@file"
 
       # add if vaultwarden.webninja.me/github is called, it will redirect to the github page
-      - "traefik.http.routers.vaultwarden-webninja.rule=Host(`vaultwarden.${DOMAIN}`) && Path(`/github`)"
+      - "traefik.http.routers.vaultwarden-webninja.rule=Host(`vaultwarden.${DOMAIN}`) && (Path(`/github`) || Path(`/admin`))"
       - "traefik.http.routers.vaultwarden-webninja.entrypoints=https"
-      - "traefik.http.routers.vaultwarden-webninja.middlewares=redirect-to-github-vaultwarden@file"
+      - "traefik.http.routers.vaultwarden-webninja.middlewares=redirect-to-github-vaultwarden@file, chain-no-auth@file"
       - "traefik.http.routers.vaultwarden-webninja.tls=true"
       # set priority to 1 so it will be checked first
       - "traefik.http.routers.vaultwarden-webninja.priority=100"
       # define service for the redirect
       - "traefik.http.routers.vaultwarden-webninja.service=vaultwarden-webninja"
       - "traefik.http.services.vaultwarden-webninja.loadbalancer.server.port=80"
+      # cache to improve performance
 
     networks:
-      - proxy_default
+      - traefik_network
 
   backup:
     image: jmqm/vaultwarden_backup:latest
     container_name: vaultwarden_backup
     network_mode: none
     volumes:
-      - ./data/vaultwarden:/data:ro # Read-only
+      - ${DATA_DIR}/vaultwarden:/data:ro # Read-only
       - "/home/pratik/Docker/onedrive/data/Vaultwarden (Homelab Upload):/backups"
       - /etc/localtime:/etc/localtime:ro # Container uses date from host.
     environment:
@@ -61,5 +64,5 @@ services:
       - GID=1000
 
 networks:
-  proxy_default:
+  traefik_network:
     external: true

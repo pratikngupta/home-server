@@ -1,0 +1,42 @@
+http:
+  middlewares:
+    redirect-to-github-vaultwarden:
+      redirectRegex:
+        regex: "^https://vaultwarden\\..*/(github|admin)$"
+        replacement: "https://github.com/dani-garcia/vaultwarden"
+        permanent: true
+    redirect-to-github-radarr:
+      redirectRegex:
+        regex: "^https://radarr\\..*/github$"
+        replacement: "https://github.com/Radarr/Radarr"
+        permanent: true
+    redirect-to-github-sonarr:
+      redirectRegex:
+        regex: "^https://sonarr\\..*/github$"
+        replacement: "https://github.com/Sonarr/Sonarr"
+        permanent: true
+    redirect-to-github-lidarr:
+      redirectRegex:
+        regex: "^https://lidarr\\..*/github$"
+        replacement: "https://github.com/Lidarr/Lidarr"
+        permanent: true
+    redirect-to-github-prowlarr:
+      redirectRegex:
+        regex: "^https://prowlarr\\..*/github$"
+        replacement: "https://github.com/Prowlarr/Prowlarr"
+        permanent: true
+    redirect-to-github-overseerr:
+      redirectRegex:
+        regex: "^https://overseerr\\..*/github$"
+        replacement: "https://github.com/sct/overseerr"
+        permanent: true
+    redirect-to-github-podify:
+      redirectRegex:
+        regex: "^https://podify\\..*/github$"
+        replacement: "https://github.com/podify-org/podify"
+        permanent: true
+    redirect-to-github-podsync:
+      redirectRegex:
+        regex: "^https://podsync\\..*/.*$"
+        replacement: "https://github.com/mxpv/podsync"
+        permanent: true

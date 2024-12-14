@@ -18,17 +18,18 @@ services:
       - TP_THEME=power
       - TP_ADDON=radarr-4k-logo|radarr-alt-calendar
       - TP_COMMUNITY_THEME=true
+    env_file: .env
     volumes:
-      - ./data/radarr:/config
+      - ${DATA_DIR}/radarr:/config
       - ./content:/data
       - /mnt/main/Movie:/movies
       - "/home/pratik/Docker/onedrive/data/Movies (Homelab Upload):/onedrive"
-    # timezone
+      # timezone
       - /etc/localtime:/etc/localtime:ro
 
     restart: unless-stopped
     networks:
-      - proxy_default
+      - traefik_network
     labels:
       - "traefik.enable=true"
       ## HTTP Routers Auth Bypass
@@ -44,12 +45,12 @@ services:
       - "traefik.http.routers.radarr-rtr-bypass.tls=true"
       ## Middlewares
       - "traefik.http.routers.radarr-rtr-bypass.middlewares=chain-no-auth@file"
-      - "traefik.http.routers.radarr-rtr.middlewares=chain-google-oauth@file"
+      - "traefik.http.routers.radarr-rtr.middlewares=chain-github-oauth@file"
       ## HTTP Services
       - "traefik.http.routers.radarr-rtr.service=radarr-svc"
       - "traefik.http.routers.radarr-rtr-bypass.service=radarr-svc"
       - "traefik.http.services.radarr-svc.loadbalancer.server.port=7878"
-      
+
       ### REDIRECT TO GITHUB ### Usefull for redirecting to github page easily
       # add if radarr.webninja.me/github is called, it will redirect to the github page
       - "traefik.http.routers.radarr-webninja.rule=Host(`radarr.${DOMAIN}`) && Path(`/github`)"
@@ -61,7 +62,6 @@ services:
       # define service for the redirect
       - "traefik.http.routers.radarr-webninja.service=radarr-webninja"
       - "traefik.http.services.radarr-webninja.loadbalancer.server.port=7878"
-      
 
   # Sonarr: TV management system
   sonarr:
@@ -76,14 +76,15 @@ services:
       - TP_COMMUNITY_THEME=true
     # ports:
     #   - 8989:8989
+    env_file: .env
     volumes:
-      - ./data/sonarr:/config
+      - ${DATA_DIR}/sonarr:/config
       - ./content:/data
-    # timezone 
+      # timezone
       - /etc/localtime:/etc/localtime:ro
     restart: unless-stopped
     networks:
-      - proxy_default
+      - traefik_network
 
     labels:
       - "traefik.enable=true"
@@ -100,7 +101,7 @@ services:
       - "traefik.http.routers.sonarr-rtr-bypass.tls=true"
       ## Middlewares
       - "traefik.http.routers.sonarr-rtr-bypass.middlewares=chain-no-auth@file"
-      - "traefik.http.routers.sonarr-rtr.middlewares=chain-google-oauth@file"
+      - "traefik.http.routers.sonarr-rtr.middlewares=chain-github-oauth@file"
       ## HTTP Services
       - "traefik.http.routers.sonarr-rtr.service=sonarr-svc"
       - "traefik.http.routers.sonarr-rtr-bypass.service=sonarr-svc"
@@ -118,7 +119,6 @@ services:
       - "traefik.http.routers.sonarr-webninja.service=sonarr-webninja"
       - "traefik.http.services.sonarr-webninja.loadbalancer.server.port=8989"
 
-
   # Lidarr - Music
   lidarr:
     image: lscr.io/linuxserver/lidarr:latest
@@ -129,13 +129,14 @@ services:
     # ports:
     #   - 8686:8686
     volumes:
-      - ./data/lidarr:/config
+      - ${DATA_DIR}/lidarr:/config
       - ./content:/data
-    # timezone 
+      # timezone
       - /etc/localtime:/etc/localtime:ro
     networks:
-      - proxy_default
+      - traefik_network
     restart: unless-stopped
+    env_file: .env
     labels:
       - "traefik.enable=true"
       ## HTTP Routers Auth Bypass
@@ -151,7 +152,7 @@ services:
       - "traefik.http.routers.lidarr-rtr-bypass.tls=true"
       ## Middlewares
       - "traefik.http.routers.lidarr-rtr-bypass.middlewares=chain-no-auth@file"
-      - "traefik.http.routers.lidarr-rtr.middlewares=chain-google-oauth@file"
+      - "traefik.http.routers.lidarr-rtr.middlewares=chain-github-oauth@file"
       ## HTTP Services
       - "traefik.http.routers.lidarr-rtr.service=lidarr-svc"
       - "traefik.http.routers.lidarr-rtr-bypass.service=lidarr-svc"
@@ -182,13 +183,14 @@ services:
       - TP_COMMUNITY_THEME=true
     # ports:
     #   - 9696:9696
+    env_file: .env
     volumes:
-      - ./data/prowlarr:/config
-    # timezone 
+      - ${DATA_DIR}/prowlarr:/config
+      # timezone
       - /etc/localtime:/etc/localtime:ro
     restart: unless-stopped
     networks:
-      - proxy_default
+      - traefik_network
     labels:
       - "traefik.enable=true"
       ## HTTP Routers Auth Bypass
@@ -204,7 +206,7 @@ services:
       - "traefik.http.routers.prowlarr-rtr-bypass.tls=true"
       ## Middlewares
       - "traefik.http.routers.prowlarr-rtr-bypass.middlewares=chain-no-auth@file"
-      - "traefik.http.routers.prowlarr-rtr.middlewares=chain-google-oauth@file"
+      - "traefik.http.routers.prowlarr-rtr.middlewares=chain-github-oauth@file"
       ## HTTP Services
       - "traefik.http.routers.prowlarr-rtr.service=prowlarr-svc"
       - "traefik.http.routers.prowlarr-rtr-bypass.service=prowlarr-svc"
@@ -221,13 +223,10 @@ services:
       # define service for the redirect
       - "traefik.http.routers.prowlarr-webninja.service=prowlarr-webninja"
       - "traefik.http.services.prowlarr-webninja.loadbalancer.server.port=9696"
-      
 
 networks:
-  proxy_default:
+  traefik_network:
     external: true
-
-    
 ### SAMPLE TRAEFIK LABELS WITH GOOGLE_OAUTH MIDDLEWARE
 # - "traefik.enable=true"
 # ## HTTP Routers Auth Bypass
@@ -243,7 +242,7 @@ networks:
 # - "traefik.http.routers.radarr-rtr-bypass.tls=true"
 # ## Middleware
 # - "traefik.http.routers.example-rtr-bypass.middlewares=chain-no-auth@file"
-# - "traefik.http.routers.example-rtr.middlewares=chain-google-oauth@file"
+# - "traefik.http.routers.example-rtr.middlewares=chain-github-oauth@file"
 # ## HTTP Services
 # - "traefik.http.routers.example-rtr.service=example-svc"
 # - "traefik.http.routers.example-rtr-bypass.service=example-svc"

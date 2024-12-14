@@ -6,7 +6,6 @@
 #
 ######################################################
 
-
 services:
   # jellyseerr:
   #   image: fallenbagel/jellyseerr:latest
@@ -17,9 +16,9 @@ services:
   #     - LOG_LEVEL=debug
   #     - TZ=America/Toronto
   #   networks:
-  #     - proxy_default
+  #     - traefik_network
   #   volumes:
-  #     - ./data/jellyseerr:/app/config
+  #     - ${DATA_DIR}/jellyseerr:/app/config
   #   restart: unless-stopped
   #   labels:
   #     - "traefik.enable=true"
@@ -28,7 +27,7 @@ services:
   #     - "traefik.http.routers.jellyseerr.tls=true"
   #     - "traefik.http.services.jellyseerr.loadbalancer.server.port=8096"
   #     ## Middlewares - Google OAuth
-  #     - "traefik.http.routers.jellyseerr.middlewares=chain-google-oauth-external@file"
+  #     - "traefik.http.routers.jellyseerr.middlewares=chain-github-oauth-external@file"
 
   overseerr:
     image: sctx/overseerr:develop
@@ -37,11 +36,12 @@ services:
       - PUID=1000
       - PGID=1000
       - LOG_LEVEL=debug
+    env_file: .env
     networks:
-      - proxy_default
+      - traefik_network
     volumes:
-      - ./data/overseerr:/app/config
-    # timezone 
+      - ${DATA_DIR}/overseerr:/app/config
+      # timezone
       - /etc/localtime:/etc/localtime:ro
     restart: unless-stopped
     labels:
@@ -59,7 +59,7 @@ services:
       - "traefik.http.routers.overseerr-rtr-bypass.tls=true"
       ## Middleware
       - "traefik.http.routers.overseerr-rtr-bypass.middlewares=chain-no-auth@file"
-      - "traefik.http.routers.overseerr-rtr.middlewares=chain-google-oauth@file"
+      - "traefik.http.routers.overseerr-rtr.middlewares=chain-github-oauth@file"
       ## HTTP Services
       - "traefik.http.routers.overseerr-rtr.service=overseerr-svc"
       - "traefik.http.routers.overseerr-rtr-bypass.service=overseerr-svc"
@@ -75,19 +75,20 @@ services:
       - "traefik.http.routers.overseerr-webninja.priority=100"
       # define service for the redirect
       - "traefik.http.routers.overseerr-webninja.service=overseerr-webninja"
-      - "traefik.http.services.overseerr-webninja.loadbalancer.server.port=5055"   
+      - "traefik.http.services.overseerr-webninja.loadbalancer.server.port=5055"
 
   requestrr:
     image: darkalfx/requestrr
     hostname: requestrr
     container_name: requestrr
     volumes:
-      - ./data/requestrr/config:/root/config
-    # timezone 
+      - ${DATA_DIR}/requestrr/config:/root/config
+      # timezone
       - /etc/localtime:/etc/localtime:ro
     restart: unless-stopped
     networks:
-      - proxy_default
+      - traefik_network
+    env_file: .env
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.requestrr.rule=Host(`requestrr.$DOMAIN`)"
@@ -95,8 +96,8 @@ services:
       - "traefik.http.routers.requestrr.tls=true"
       - "traefik.http.services.requestrr.loadbalancer.server.port=4545"
       ## Middlewares - No Auth
-      - "traefik.http.routers.requestrr.middlewares=chain-google-oauth@file"
+      - "traefik.http.routers.requestrr.middlewares=chain-github-oauth@file"
 
 networks:
-  proxy_default:
+  traefik_network:
     external: true

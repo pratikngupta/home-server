@@ -1,0 +1,43 @@
+services:
+  podsync:
+    image: ghcr.io/mxpv/podsync:nightly
+    container_name: podsync
+    networks:
+      - traefik_network
+    environment:
+      - timzezone=america/new_york
+    volumes:
+      - ${DATA_DIR}/podsync/data:/app/data
+      - ./config/config.toml:/app/config.toml
+      # attach volume for system time
+      - /etc/localtime:/etc/localtime:ro
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.podsync.rule=Host(`podsync.webninja.me`) && PathRegexp(`.(jpeg|jpg|png|xml|opml)$`)"
+      - "traefik.http.routers.podsync.entrypoints=https"
+      - "traefik.http.routers.podsync.tls=true"
+      - "traefik.http.routers.podsync.middlewares=chain-basic-auth@file"
+      - "traefik.http.routers.podsync.priority=100"
+      - "traefik.http.routers.podsync.service=podsync"
+      - "traefik.http.services.podsync.loadbalancer.server.port=8080"
+
+      - "traefik.http.routers.podsync-mp4.rule=Host(`podsync.webninja.me`) && PathRegexp(`.mp4$`)"
+      - "traefik.http.routers.podsync-mp4.entrypoints=https"
+      - "traefik.http.routers.podsync-mp4.tls=true"
+      - "traefik.http.routers.podsync-mp4.priority=100"
+      - "traefik.http.routers.podsync-mp4.service=podsync"
+      - "traefik.http.services.podsync-mp4.loadbalancer.server.port=8080"
+      - "traefik.http.routers.podsync-mp4.middlewares=chain-no-auth@file"
+
+      # create a catch all rule for podsync to redirect to github page
+      - "traefik.http.routers.podsync-redirect.rule=Host(`podsync.webninja.me`)"
+      - "traefik.http.routers.podsync-redirect.entrypoints=https"
+      - "traefik.http.routers.podsync-redirect.middlewares=redirect-to-github-podsync@file"
+      - "traefik.http.routers.podsync-redirect.tls=true"
+      - "traefik.http.routers.podsync-redirect.priority=90"
+      - "traefik.http.routers.podsync-redirect.service=podsync-redirect"
+      - "traefik.http.services.podsync-redirect.loadbalancer.server.port=8080"
+
+networks:
+  traefik_network:
+    external: true

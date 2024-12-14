@@ -13,13 +13,14 @@ services:
     environment:
       - PUID=1000
       - PGID=1000
+      - DATA_DIR${DATA_DIR}
     volumes:
-      - ./data/tautulli/config:/config
-    # timezone 
+      - ${DATA_DIR}/tautulli/config:/config
+      # timezone
       - /etc/localtime:/etc/localtime:ro
     restart: unless-stopped
     networks:
-      - proxy_default
+      - traefik_network
     labels:
       - "traefik.enable=true"
       ## HTTP Routers Auth Bypass
@@ -35,52 +36,42 @@ services:
       - "traefik.http.routers.tautulli-rtr-bypass.tls=true"
       ## Middleware
       - "traefik.http.routers.tautulli-rtr-bypass.middlewares=chain-no-auth@file"
-      - "traefik.http.routers.tautulli-rtr.middlewares=chain-google-oauth@file"
+      - "traefik.http.routers.tautulli-rtr.middlewares=chain-github-oauth@file"
       ## HTTP Services
       - "traefik.http.routers.tautulli-rtr.service=tautulli-svc"
       - "traefik.http.routers.tautulli-rtr-bypass.service=tautulli-svc"
       - "traefik.http.services.tautulli-svc.loadbalancer.server.port=8181"
 
-      ## Homepage
-      - "homepage.group=Monitoring"
-      - "homepage.name=Tautulli"
-      - "homepage.icon=tautulli"
-      - "homepage.href=https://tautulli.${DOMAIN}/"
-      - "homepage.description=Media monitoring"
-      - "homepage.color=#FFA500"
-      - "homepage.widget.type=tautulli"
-      - "homepage.widget.url=http://tautulli:8181"
-      - "homepage.widget.key=${TAUTULLI_API_KEY}"
-
   recyclarr:
     image: ghcr.io/recyclarr/recyclarr
     container_name: recyclarr
     user: 1000:1000
+    env_file: .env
     networks:
-      - proxy_default
+      - traefik_network
     volumes:
-      - ./data/recyclarr:/config
-    # timezone 
+      - ${DATA_DIR}/recyclarr:/config
+      # timezone
       - /etc/localtime:/etc/localtime:ro
 
 #  kometa:
 #    image: kometateam/kometa
 #    container_name: kometa
 #    volumes:
-#      - ./data/kometa/config:/config
+#      - ${DATA_DIR}/kometa/config:/config
 #    restart: unless-stopped
 #    networks:
-#      - proxy_default
+#      - traefik_network
 #    command: --run  kometa:
 #    image: kometateam/kometa
 #    container_name: kometa
 #    volumes:
-#      - ./data/kometa/config:/config
+#      - ${DATA_DIR}/kometa/config:/config
 #    restart: unless-stopped
 #    networks:
-#      - proxy_default
+#      - traefik_network
 #    command: --run
 
 networks:
-  proxy_default:
+  traefik_network:
     external: true
