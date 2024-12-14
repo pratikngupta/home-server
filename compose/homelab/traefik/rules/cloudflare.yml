@@ -3,5 +3,8 @@ http:
     cloudflare:
       plugin:
         cloudflare:
-          trustedCIDRs: []
+          trustedCIDRs:
+            - 100.64.0.0/10 # Cloudflare
+            - 192.168.0.0/16 # internal network
+            - 172.16.0.0/12 # docker network
           overwriteForwardedFor: true

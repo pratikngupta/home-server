@@ -3,6 +3,5 @@ http:
     middlewares-basic-auth:
       basicAuth:
         # users:
-        #   - "user:$apsdfswWvC/6.$E3FtsfTntPC0wVJ7IUVtX1"
-        usersFile: "/run/secrets/basic_auth_credentials" 
-        realm: "Traefik 3 Basic Auth"
+          # - "pratik:$apr1$jlbHlOJa$dKNPV3d04SBTz7Y9b6bxP1"
+        usersFile: "/data/usersfile"

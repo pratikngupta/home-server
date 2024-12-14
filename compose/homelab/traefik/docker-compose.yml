@@ -10,7 +10,7 @@ services:
     security_opt:
       - no-new-privileges:true
     networks:
-      - proxy_default
+      - traefik_network
     ports:
       - 80:80
       - 443:443
@@ -25,13 +25,15 @@ services:
       - ./data/traefik.yml:/traefik.yml:ro
       - ./data/acme.json:/acme.json
       - ./rules:/rules
+      - ./data/usersfile:/data/usersfile
+      - /home/pratik/appData/logs/traefik:/logs
       # - ./data/config.yml:/config.yml:ro
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.traefik.entrypoints=http"
       - "traefik.http.routers.traefik.rule=Host(`traefik-dashboard.${DOMAIN}`)"
-      - "traefik.http.routers.traefik.middlewares=chain-google-oauth@file"
-      - "traefik.http.routers.traefik-secure.middlewares=chain-google-oauth@file"
+      - "traefik.http.routers.traefik.middlewares=chain-github-oauth@file"
+      - "traefik.http.routers.traefik-secure.middlewares=chain-github-oauth@file"
       - "traefik.http.middlewares.traefik-https-redirect.redirectscheme.scheme=https"
       - "traefik.http.middlewares.sslheader.headers.customrequestheaders.X-Forwarded-Proto=https"
       - "traefik.http.routers.traefik.middlewares=traefik-https-redirect"
@@ -60,7 +62,7 @@ services:
     env_file:
       - .env
     networks:
-      - proxy_default
+      - traefik_network
     labels:
       - "traefik.enable=true"
       # HTTP Routers
@@ -73,6 +75,36 @@ services:
       - "traefik.http.routers.oauth-rtr.service=oauth-svc"
       - "traefik.http.services.oauth-svc.loadbalancer.server.port=4181"
 
+  crowdsec:
+    image: crowdsecurity/crowdsec
+    container_name: crowdsec
+    restart: unless-stopped
+    networks:
+      - traefik_network
+    ports:
+      - 8080:8080
+    environment:
+      COLLECTIONS: "crowdsecurity/traefik crowdsecurity/http-cve crowdsecurity/whitelist-good-actors crowdsecurity/iptables crowdsecurity/linux crowdsecurity/nginx crowdsecurity/sshd"
+      GID: 1000
+    volumes:
+      - ./appdata/crowdsec/logs/web:/logs/web:ro
+      - /var/log:/var/log:ro
+      - ./appdata/crowdsec/data:/var/lib/crowdsec/data
+      - ./appdata/crowdsec/config:/etc/crowdsec
+      - /home/pratik/appData/logs/traefik:/logs/traefik:ro
+
+  traefik-bouncer:
+    restart: unless-stopped
+    networks:
+      - traefik_network
+    image: fbonalair/traefik-crowdsec-bouncer
+    container_name: traefik-bouncer
+    env_file: .env
+    environment:
+      GIN_MODE: release # default is debug (more logs)
+      CROWDSEC_AGENT_HOST: crowdsec:8080 # CrowdSec host and port
+      CROWDSEC_BOUNCER_LOG_LEVEL: 2 # https://pkg.go.dev/github.com/rs/zerolog#readme-leveled-logging
+
 networks:
-  proxy_default:
+  traefik_network:
     external: true

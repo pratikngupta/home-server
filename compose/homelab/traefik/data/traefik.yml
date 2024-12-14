@@ -1,5 +1,6 @@
 api:
   dashboard: true
+  insecure: true
 
 entryPoints:
   http:
@@ -28,9 +29,18 @@ providers:
     directory: "/rules"
     watch: true
 
+log:
+  level: TRACE
+  filePath: "/logs/traefik.log"
+
 accessLog:
-  filePath: "./data/access.log"
+  filePath: "/logs/access.log"
   bufferingSize: 100
+  filters:
+    statusCodes:
+      - "204-299"
+      - "400-499"
+      - "500-599"
 
 certificatesResolvers:
   cloudflare:
@@ -62,7 +72,6 @@ experimental:
     # redirectRegex:
     #   moduleName: github.com/traefik/traefik/v2@v2.5.0
     #   version: v2.5.0
-
 # metrics:
 #   prometheus:
 #     buckets:

@@ -1,0 +1,26 @@
+http:
+  middlewares:
+    # ip-whitelist:
+    #   ipWhiteList:
+    #     sourceRange:
+    #       - 100.64.0.0/10
+    #       - 172.20.0.0/24 # 172.20.0.23
+    #       - 192.168.0.0/16
+
+    chain-google-oauth:
+      chain:
+        middlewares:
+          - middlewares-traefik-bouncer # leave this out if you are not using CrowdSec
+          - middlewares-rate-limit
+          - middlewares-secure-headers
+          - middlewares-oauth
+          # - cloudflare
+
+    chain-github-oauth:
+      chain:
+        middlewares:
+          # - ip-whitelist
+          - middlewares-traefik-bouncer # leave this out if you are not using CrowdSec
+          - middlewares-rate-limit
+          - middlewares-secure-headers
+          - middlewares-oauth
