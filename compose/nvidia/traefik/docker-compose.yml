@@ -42,7 +42,7 @@ services:
       - "traefik.http.routers.traefik-secure.tls=true"
       - "traefik.http.routers.traefik-secure.tls.certresolver=cloudflare"
       - "traefik.http.routers.traefik-secure.tls.domains[0].main=${DOMAIN}"
-      - "traefik.http.routers.traefik-secure.tls.domains[0].sans=*.${DOMAIN}, lan.${DOMAIN}, *.lan.${DOMAIN}, secure.${DOMAIN}, *.secure.${DOMAIN}"
+      - "traefik.http.routers.traefik-secure.tls.domains[0].sans=*.${DOMAIN}"
 
       # ## Internal Traefik Dashboard
       # - "traefik.http.routers.traefik-internal.rule=Host(`traefik-dashboard.lan.${DOMAIN}`)"
@@ -54,8 +54,8 @@ services:
 
   oauth:
     container_name: oauth
-    # image: thomseddon/traefik-forward-auth:latest
-    image: ghcr.io/jordemort/traefik-forward-auth:latest
+    image: thomseddon/traefik-forward-auth:latest
+    # image: ghcr.io/jordemort/traefik-forward-auth:latest
     security_opt:
       - no-new-privileges:true
     restart: unless-stopped
@@ -75,36 +75,65 @@ services:
       - "traefik.http.routers.oauth-rtr.service=oauth-svc"
       - "traefik.http.services.oauth-svc.loadbalancer.server.port=4181"
 
-  crowdsec:
-    image: crowdsecurity/crowdsec
-    container_name: crowdsec
-    restart: unless-stopped
-    networks:
-      - traefik_network
-    ports:
-      - 8080:8080
-    environment:
-      COLLECTIONS: "crowdsecurity/traefik crowdsecurity/http-cve crowdsecurity/whitelist-good-actors crowdsecurity/iptables crowdsecurity/linux crowdsecurity/nginx crowdsecurity/sshd"
-      GID: 1000
+  dozzle-traefik-logs:
+    container_name: dozzle-traefik-logs
+    image: alpine
     volumes:
-      - ./appdata/crowdsec/logs/web:/logs/web:ro
-      - /var/log:/var/log:ro
-      - ./appdata/crowdsec/data:/var/lib/crowdsec/data
-      - ./appdata/crowdsec/config:/etc/crowdsec
-      - /home/pratik/appData/logs/traefik:/logs/traefik:ro
-
-  traefik-bouncer:
+      - /home/pratik/appData/logs/traefik/traefik.log:/log/traefik.log:ro
+    command:
+      - tail
+      - -f
+      - /log/traefik.log
+    network_mode: none
     restart: unless-stopped
-    networks:
-      - traefik_network
-    image: fbonalair/traefik-crowdsec-bouncer
-    container_name: traefik-bouncer
-    env_file: .env
-    environment:
-      GIN_MODE: release # default is debug (more logs)
-      CROWDSEC_AGENT_HOST: crowdsec:8080 # CrowdSec host and port
-      CROWDSEC_BOUNCER_LOG_LEVEL: 2 # https://pkg.go.dev/github.com/rs/zerolog#readme-leveled-logging
+    labels:
+      - dev.dozzle.group=Logs
+
+  dozzle-traefik-access-logs:
+    container_name: dozzle-traefik-access-logs
+    image: alpine
+    volumes:
+      - /home/pratik/appData/logs/traefik/access.log:/log/access.log:ro
+    command:
+      - tail
+      - -f
+      - /log/access.log
+    network_mode: none
+    restart: unless-stopped
+    labels:
+      - dev.dozzle.group=Logs
+
+  # crowdsec:
+  #   image: crowdsecurity/crowdsec
+  #   container_name: crowdsec
+  #   restart: unless-stopped
+  #   networks:
+  #     - traefik_network
+  #   ports:
+  #     - 8080:8080
+  #   environment:
+  #     COLLECTIONS: "crowdsecurity/traefik crowdsecurity/http-cve crowdsecurity/whitelist-good-actors crowdsecurity/iptables crowdsecurity/linux crowdsecurity/nginx crowdsecurity/sshd"
+  #     GID: 1000
+  #   volumes:
+  #     - ./appdata/crowdsec/logs/web:/logs/web:ro
+  #     - /var/log:/var/log:ro
+  #     - ./appdata/crowdsec/data:/var/lib/crowdsec/data
+  #     - ./appdata/crowdsec/config:/etc/crowdsec
+  #     - /home/pratik/appData/logs/traefik:/logs/traefik:ro
+
+  # traefik-bouncer:
+  #   restart: unless-stopped
+  #   networks:
+  #     - traefik_network
+  #   image: fbonalair/traefik-crowdsec-bouncer
+  #   container_name: traefik-bouncer
+  #   env_file: .env
+  #   environment:
+  #     GIN_MODE: release # default is debug (more logs)
+  #     CROWDSEC_AGENT_HOST: crowdsec:8080 # CrowdSec host and port
+  #     CROWDSEC_BOUNCER_LOG_LEVEL: 2 # https://pkg.go.dev/github.com/rs/zerolog#readme-leveled-logging
 
 networks:
   traefik_network:
-    external: true
+    name: traefik_network
+    driver: bridge

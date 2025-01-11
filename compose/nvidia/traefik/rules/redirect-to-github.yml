@@ -40,3 +40,8 @@ http:
         regex: "^https://podsync\\..*/.*$"
         replacement: "https://github.com/mxpv/podsync"
         permanent: true
+    redirect-to-docs-traefik:
+      redirectRegex:
+        regex: "^https://traefik\\..*/github$"
+        replacement: "https://doc.traefik.io/traefik/"
+        permanent: true

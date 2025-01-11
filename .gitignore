@@ -3,3 +3,6 @@
 data/
 
 .DS_Store
+userfile
+acme.json
+oauth_secrets
