@@ -46,7 +46,7 @@ services:
             # "/dev/bus/usb:/dev/bus/usb",
 
             # hardware accelerated video decoding, opencl, etc.
-            # "/dev/dri:/dev/dri",
+            "/dev/dri:/dev/dri"
 
             # uncomment below as necessary.
             # zwave usb serial device
@@ -72,11 +72,12 @@ services:
             #     max-size: "10m"
             #     max-file: "10"
         labels:
-            - "com.centurylinklabs.watchtower.scope=scrypted"
             - "traefik.enable=true"
             - "traefik.http.routers.camera.rule=Host(`camera.${DOMAIN}`)"
             - "traefik.http.routers.camera.entrypoints=https"
             - "traefik.http.routers.camera.tls=true"
+            - "traefik.http.services.camera.loadbalancer.server.port=10444"
+            - "traefik.http.routers.camera.service=camera-server@file"
             ## Middlewares
             # - "traefik.http.routers.camera.middlewares=chain-google-oauth@file"
             - "traefik.http.routers.camera.middlewares=chain-no-auth@file"

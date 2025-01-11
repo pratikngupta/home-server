@@ -1,0 +1,50 @@
+services:
+  # filebrowser:
+  #   volumes:
+  #     - /mnt/:/srv
+  #     - ${DATA_DIR}/file/filebrowser.db:/database/filebrowser.db
+  #     - ${DATA_DIR}/file/settings.json:/config/settings.json
+  #   environment:
+  #     - PUID=1000
+  #     - PGID=1000
+  #   networks:
+  #     - traefik_network
+  #   env_file: .env
+  #   # ports:
+  #   #   - 8080:80
+  #   image: filebrowser/filebrowser:s6
+  #   labels:
+  #     - "traefik.enable=true"
+  #     - "traefik.http.routers.file-browser.rule=Host(`file-browser.${DOMAIN}`)"
+  #     - "traefik.http.routers.file-browser.entrypoints=https"
+  #     - "traefik.http.routers.file-browser.tls=true"
+  #     - "traefik.http.services.file-browser.loadbalancer.server.port=80"
+  #     ## Middlewares
+  #     # - "traefik.http.routers.file-browser.middlewares=chain-google-oauth@file"
+  #     - "traefik.http.routers.file-browser.middlewares=chain-no-auth@file"
+
+  samba:
+    image: crazymax/samba
+    network_mode: host
+    env_file: .env
+    volumes:
+      - ${DATA_DIR}/samba:/data
+      - /mnt/photo:/samba/photo
+      - /mnt/storage:/samba/storage
+    environment:
+      - "BROWSABLE=yes"
+      - SAMBA_LOG_LEVEL=0
+    restart: always
+
+  avahi:
+    image: ydkn/avahi
+    hostname: $HOSTNAME
+    network_mode: host
+    env_file: .env
+    volumes:
+      - ${DATA_DIR}/avahi:/etc/avahi/services:ro
+    restart: always
+
+networks:
+  traefik_network:
+    external: true
