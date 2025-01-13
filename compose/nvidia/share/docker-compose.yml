@@ -45,6 +45,13 @@ services:
       - ${DATA_DIR}/avahi:/etc/avahi/services:ro
     restart: always
 
+  minidlna:
+    container_name: minidlna
+    network_mode: host
+    volumes:
+      - /mnt/storage/Movie:/opt/Videos
+    image: geekduck/minidlna
+
 networks:
   traefik_network:
     external: true

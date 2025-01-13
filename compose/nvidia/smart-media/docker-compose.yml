@@ -1,0 +1,15 @@
+include:
+  # Plex and jellyfin
+  - docker-compose.server.yml
+
+  # # Heimdall, Tautulli, and Homarr
+  - docker-compose.utility.yml
+
+  # # Radarr, Sonarr, and Lidarr
+  # - docker-compose.manager.yml
+
+  # # qBittorrent, flaresolverr
+  # - docker-compose.downloaders.yml
+
+  # # Overseerr, Jellyseer, requesterr
+  # - docker-compose.requester.yml

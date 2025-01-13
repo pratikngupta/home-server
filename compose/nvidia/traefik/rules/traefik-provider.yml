@@ -8,7 +8,7 @@ http:
     plex-media-server:
       loadBalancer:
         servers:
-          - url: "http://192.168.2.55:32400"
+          - url: "http://192.168.4.70:32400"
 
     camera-server:
       loadBalancer:

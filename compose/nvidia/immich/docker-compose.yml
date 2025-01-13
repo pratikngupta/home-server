@@ -41,7 +41,7 @@ services:
       - "traefik.http.services.immich.loadbalancer.server.port=2283"
       # define network for traefik
       - "traefik.docker.network=traefik_network"
-      - "traefik.http.routers.immich.middlewares=chain-github-oauth@file"
+      - "traefik.http.routers.immich.middlewares=chain-no-auth@file"
 
   immich-machine-learning:
     container_name: immich_machine_learning

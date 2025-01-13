@@ -14,14 +14,14 @@ services:
       - PUID=1000
       - PGID=1000
       - VERSION=docker
-      - HOSTNAME=plex.webninja.me
+      - HOSTNAME=plex.${DOMAIN}.me
       - DATA_DIR=${DATA_DIR}
     env_file: .env
     volumes:
       - ${DATA_DIR}/plex:/config
-      - ./content/media:/data/media
-      - /mnt/main/Movie:/movies
-      - "/home/pratik/Docker/onedrive/data/Movies (Homelab Upload):/onedrive"
+      # - ./content/media:/data/media
+      - /mnt/storage/Movie:/movies
+      # - "/home/pratik/Docker/onedrive/data/Movies (Homelab Upload):/onedrive"
       # timezone
       - /etc/localtime:/etc/localtime:ro
 
@@ -34,8 +34,8 @@ services:
       - /dev/dri:/dev/dri
     labels:
       - "traefik.enable=true"
-      # - "traefik.http.routers.plex.rule=Host(`playninja.${DOMAIN}`)"
-      - "traefik.http.routers.playninja.rule=(Host(`playninja.webninja.me`) && (Path(`/prefs`) || Path(`/actions/removeFromContinueWatching`) || Path(`/library/clean/bundles`) || Path(`/library/optimize`) || Path(`/media/grabbers/devices/discover`) || Path(`/myplex/refreshReachability`) || Path(`/playQueues`) || Path(`/playlists`) || PathRegexp(`^/accounts/[0-9]+$`) || PathRegexp(`^/library/metadata/[0-9]+/[a-z]+$`) || PathRegexp(`^/library/parts/[0-9]+$`) || PathRegexp(`^/playQueues/[0-9]+/(unshuffle|shuffle)$`) || PathRegexp(`^/[a-z]+/sections$`) || PathRegexp(`^/hubs/sections/[0-9]+/manage$`) || Path(`/updater/check`) || PathRegexp(`^/system/agents/`) || PathRegexp(`^/library/metadata/[0-9]+/related$`) || PathRegexp(`^/[a-z]+/sections$`) || PathRegexp(`^/[a-z]+/$`) || PathRegexp(`^/hubs/$`) || PathRegexp(`^/library/metadata/plex:/`) || Path(`/library/all`) || Path(`/library/all/top`) || Path(`/statistics/media`) || Path(`/status/sessions/history/all`)))"
+      - "traefik.http.routers.plex.rule=Host(`playninja.${DOMAIN}`)"
+      # - "traefik.http.routers.playninja.rule=(Host(`playninja.${DOMAIN}.me`) && (Path(`/prefs`) || Path(`/actions/removeFromContinueWatching`) || Path(`/library/clean/bundles`) || Path(`/library/optimize`) || Path(`/media/grabbers/devices/discover`) || Path(`/myplex/refreshReachability`) || Path(`/playQueues`) || Path(`/playlists`) || PathRegexp(`^/accounts/[0-9]+$`) || PathRegexp(`^/library/metadata/[0-9]+/[a-z]+$`) || PathRegexp(`^/library/parts/[0-9]+$`) || PathRegexp(`^/playQueues/[0-9]+/(unshuffle|shuffle)$`) || PathRegexp(`^/[a-z]+/sections$`) || PathRegexp(`^/hubs/sections/[0-9]+/manage$`) || Path(`/updater/check`) || PathRegexp(`^/system/agents/`) || PathRegexp(`^/library/metadata/[0-9]+/related$`) || PathRegexp(`^/[a-z]+/sections$`) || PathRegexp(`^/[a-z]+/$`) || PathRegexp(`^/hubs/$`) || PathRegexp(`^/library/metadata/plex:/`) || Path(`/library/all`) || Path(`/library/all/top`) || Path(`/statistics/media`) || Path(`/status/sessions/history/all`)))"
       - "traefik.http.routers.plex.entrypoints=https"
       - "traefik.http.routers.plex.tls=true"
       - "traefik.http.routers.plex.service=plex-media-server@file"
@@ -58,7 +58,6 @@ services:
       - "traefik.http.middlewares.jellyfin-mw.headers.customResponseHeaders.X-XSS-PROTECTION=1"
       - "traefik.http.middlewares.jellyfin-mw.headers.customFrameOptionsValue='allow-from https://${DOMAIN}'"
       - "dev.dozzle.group=Smart Media"
-
   # jellyfin:
   #   image: lscr.io/linuxserver/jellyfin:latest
   #   container_name: jellyfin
