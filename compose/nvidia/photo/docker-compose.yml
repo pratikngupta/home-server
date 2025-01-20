@@ -7,7 +7,7 @@ services:
       - /home/pratik/appData/data/icloud/:/home/auth
     environment:
       - TZ=America/Los_Angeles
-    command: icloudpd --directory /data --mfa-provider webui --watch-with-interval 3600 --username ${username} --password ${password} --library SharedSync-E9C7BAB7-9F17-424C-A918-9FFB068EC5F7 --cookie-directory /home/auth
+    command: icloudpd --directory /data --mfa-provider webui --watch-with-interval 3600 --username ${username} --password ${password} --library SharedSync-E9C7BAB7-9F17-424C-A918-9FFB068EC5F7 --cookie-directory /home/auth --auto-delete
     networks:
       - traefik_network
     restart: unless-stopped

@@ -43,6 +43,50 @@ services:
       - "traefik.docker.network=traefik_network"
       - "traefik.http.routers.immich.middlewares=chain-no-auth@file"
 
+  immichframe:
+    container_name: immichframe
+    image: ghcr.io/immichframe/immichframe:latest
+    restart: on-failure
+    volumes:
+      - ${DATA_DIR}/immich/frame:/app/Config
+    #   - PATH/TO/CUSTOMCSS/custom.css:/app/wwwroot/static/custom.css
+    # ports:
+    #   - "8080:8080"
+    env_file: .env
+    environment:
+      TZ: America/Toronto
+    networks:
+      - immich_internal
+      - traefik_network
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.immich-frame.rule=Host(`immich-frame.${DOMAIN}`)"
+      - "traefik.http.routers.immich-frame.entrypoints=https"
+      - "traefik.http.routers.immich-frame.tls=true"
+      - "traefik.http.services.immich-frame.loadbalancer.server.port=8080"
+      # define network for traefik
+      - "traefik.docker.network=traefik_network"
+      - "traefik.http.routers.immich-frame.middlewares=chain-no-auth@file"
+
+  immich_power_tools:
+    container_name: immich_power_tools
+    image: ghcr.io/varun-raj/immich-power-tools:latest
+    ports:
+      - "3000:3000"
+    env_file: .env
+    networks:
+      - traefik_network
+      - immich_internal
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.immich-tools.rule=Host(`immich-tools.${DOMAIN}`)"
+      - "traefik.http.routers.immich-tools.entrypoints=https"
+      - "traefik.http.routers.immich-tools.tls=true"
+      - "traefik.http.services.immich-tools.loadbalancer.server.port=3000"
+      # define network for traefik
+      - "traefik.docker.network=traefik_network"
+      - "traefik.http.routers.immich-tools.middlewares=chain-no-auth@file"
+
   immich-machine-learning:
     container_name: immich_machine_learning
     # For hardware acceleration, add one of -[armnn, cuda, openvino] to the image tag.
@@ -57,7 +101,6 @@ services:
     env_file:
       - .env
     networks:
-      - traefik_network
       - immich_internal
     restart: always
     healthcheck:
@@ -70,7 +113,6 @@ services:
       test: redis-cli ping || exit 1
     restart: always
     networks:
-      - traefik_network
       - immich_internal
 
   database:
@@ -94,8 +136,9 @@ services:
       postgres -c shared_preload_libraries=vectors.so -c 'search_path="$$user", public, vectors' -c logging_collector=on -c max_wal_size=2GB -c shared_buffers=512MB -c wal_compression=on
     restart: always
     networks:
-      - traefik_network
       - immich_internal
+    # ports:
+    #   - 5432:5432
 
 volumes:
   model-cache:
