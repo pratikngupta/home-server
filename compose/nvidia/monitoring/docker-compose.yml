@@ -66,9 +66,9 @@ services:
       - "traefik.http.routers.dozzle.rule=Host(`logs.${EXTERNAL_DOMAIN}`)"
       - "traefik.http.routers.dozzle.entrypoints=https"
       - "traefik.http.routers.dozzle.tls=true"
-      ## Middlewares
-      # - "traefik.http.routers.dozzle.middlewares=chain-google-oauth@file"
-      - "traefik.http.routers.dozzle.middlewares=chain-no-auth@file"
+      ## Middlewaress
+      - "traefik.http.routers.dozzle.middlewares=chain-google-oauth@file"
+      # - "traefik.http.routers.dozzle.middlewares=chain-no-auth@file"
 
   # watchtower:
   #   container_name: watchtower

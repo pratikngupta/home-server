@@ -10,11 +10,6 @@ http:
         servers:
           - url: "http://192.168.4.70:32400"
 
-    camera-server:
-      loadBalancer:
-        servers:
-          - url: "http://192.168.4.70:10443"
-
     # podify-media-server:
     #   loadBalancer:
     #     servers:
