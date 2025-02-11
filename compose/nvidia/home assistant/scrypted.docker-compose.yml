@@ -30,7 +30,9 @@ services:
     restart: unless-stopped
     networks:
       - traefik_network
+          # ipv4_address: 172.18.0.7
       - camera_internal
+          # ipv4_address: 172.21.0.2
 
     # logging is noisy and will unnecessarily wear on flash storage.
     # scrypted has per device in memory logging that is preferred.
@@ -50,3 +52,18 @@ services:
 networks:
   traefik_network:
     external: true
+  #   ipam:
+  #     config:
+  #       - subnet: 172.18.0.0/24
+  #         gateway: 172.18.0.1
+  #         auxiliary_addresses:
+  #           scrypted: 172.18.0.7
+            
+  # camera_internal:
+  #   external: true
+  # #   ipam:
+  # #     config:
+  # #       - subnet: 172.21.0.0/24
+  # #         gateway: 172.21.0.1
+  # #         auxiliary_addresses:
+  # #           scrypted: 172.21.0.2

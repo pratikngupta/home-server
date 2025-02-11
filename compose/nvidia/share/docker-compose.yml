@@ -31,6 +31,7 @@ services:
       - ${DATA_DIR}/samba:/data
       - /mnt/photo:/samba/photo
       - /mnt/storage:/samba/storage
+      - /mnt/camera:/samba/camera
     environment:
       - "BROWSABLE=yes"
       - SAMBA_LOG_LEVEL=0

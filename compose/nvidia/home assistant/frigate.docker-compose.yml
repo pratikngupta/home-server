@@ -22,6 +22,8 @@ services:
       - /mnt/camera/frigate/storage:/media/frigate
     networks:
       - traefik_network
+          # ipv4_address: 172.18.0.4
+
     ports:
       - "8971:8971"
       - "5000:5000" # Internal unauthenticated access. Expose carefully.
@@ -42,3 +44,18 @@ services:
 networks:
   traefik_network:
     external: true
+    # ipam:
+    #   config:
+    #     - subnet: 172.18.0.0/24
+    #       gateway: 172.18.0.1
+    #       auxiliary_addresses:
+    #         scrypted: 172.18.0.7
+            
+  # camera_internal:
+  #   external: true
+  #   # ipam:
+  #   #   config:
+  #   #     - subnet: 172.21.0.0/24
+  #   #       gateway: 172.21.0.1
+  #   #       auxiliary_addresses:
+  #   #         scrypted: 172.21.0.2

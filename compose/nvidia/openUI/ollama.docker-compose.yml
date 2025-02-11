@@ -1,0 +1,17 @@
+services:
+  ollama:
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities:
+                - gpu
+    volumes:
+      - ${DATA_DIR}/ollama:/root/.ollama
+    ports:
+      - 11434:11434
+    container_name: ollama
+    image: ollama/ollama
+    env_file: .env

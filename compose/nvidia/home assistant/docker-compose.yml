@@ -1,11 +1,14 @@
 networks:
-  camera_internal:
-    name: camera_internal
-    driver: bridge
+  # camera_internal:
+  #   name: camera_internal
+  #   driver: bridge
 
 include:
-  # scrypted
-  - scrypted.docker-compose.yml
+  # # scrypted
+  # - scrypted.docker-compose.yml
 
-  # frigate
-  - frigate.docker-compose.yml
+  # # frigate
+  # - frigate.docker-compose.yml
+
+  # Home assistant
+  - home-assistant.docker-compose.yml
