@@ -1,15 +1,10 @@
 http:
   middlewares:
-    # ip-whitelist:
-    #   ipWhiteList:
-    #     sourceRange:
-    #       - 100.64.0.0/10
-    #       - 192.168.0.0/16
-
     chain-no-auth:
       chain:
         middlewares:
           # - internal-ip-whitelist
+          # - middlewares-traefik-bouncer # leave this out if you are not using CrowdSec
           - internal-cloudflare-whitelist
           - middlewares-rate-limit
           - middlewares-secure-headers

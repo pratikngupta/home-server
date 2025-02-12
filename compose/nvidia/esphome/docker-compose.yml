@@ -12,7 +12,7 @@ services:
     env_file: .env
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.esphome.rule=Host(`esphome.${EXTERNAL_DOMAIN}`)"
+      # - "traefik.http.routers.esphome.rule=Host(`esphome.${EXTERNAL_DOMAIN}`)"
       - "traefik.http.routers.esphome.entrypoints=https"
       - "traefik.http.routers.esphome.tls=true"
       ## Middlewaress

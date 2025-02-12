@@ -102,7 +102,6 @@ services:
     restart: unless-stopped
     labels:
       - dev.dozzle.group=Logs
-
   # crowdsec:
   #   image: crowdsecurity/crowdsec
   #   container_name: crowdsec

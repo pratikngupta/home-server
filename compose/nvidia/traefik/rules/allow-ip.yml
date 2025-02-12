@@ -4,7 +4,7 @@ http:
       ipAllowList:
         sourceRange:
           - 100.64.0.0/10
-          - 172.20.0.0/24 # 172.20.0.23
+          - 172.16.0.0/12 # 172.20.0.23
           - 192.168.0.0/16
 
     internal-cloudflare-whitelist:
@@ -12,7 +12,7 @@ http:
         sourceRange:
           # internal
           - 100.64.0.0/10
-          - 172.20.0.0/24 # 172.20.0.23
+          - 172.16.0.0/12 # 172.20.0.23
           - 192.168.0.0/16
 
           # Cloudflare
@@ -31,3 +31,5 @@ http:
           - 104.24.0.0/14
           - 172.64.0.0/13
           - 131.0.72.0/22
+        # ipstrategy: # enable this when cloudflare proxy in use
+        #   depth: 1 # depth 1 when cloudflare proxy in use

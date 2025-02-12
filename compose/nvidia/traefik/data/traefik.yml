@@ -26,6 +26,8 @@ providers:
   docker:
     endpoint: "unix:///var/run/docker.sock"
     exposedByDefault: false
+    defaultRule: "Host(`{{ index (splitList \"-\" .Name) (sub (len (splitList \"-\" .Name)) 1) }}.techsanctuary.me`)"
+
   file:
     # Load dynamic configuration .yml files in this directory
     directory: "/rules"
