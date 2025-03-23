@@ -13,9 +13,9 @@ services:
     environment:
       - PUID=1000
       - PGID=1000
-      - DATA_DIR${DATA_DIR}
+    env_file: .env
     volumes:
-      - ${DATA_DIR}/tautulli/config:/config
+      - ${DATA_DIR}/media-server/tautulli/config:/config
       # timezone
       - /etc/localtime:/etc/localtime:ro
     restart: unless-stopped
@@ -43,37 +43,87 @@ services:
       - "traefik.http.services.tautulli-svc.loadbalancer.server.port=8181"
       - "dev.dozzle.group=Smart Media"
 
-  recyclarr:
-    image: ghcr.io/recyclarr/recyclarr
-    container_name: recyclarr
-    user: 1000:1000
+  notifiarr:
+    container_name: notifiarr
+    hostname: notifiarr
+    image: golift/notifiarr
+    restart: unless-stopped
+    privileged: true # Enables privileged mode
     env_file: .env
+    environment:
+      - DN_SNAPSHOT_NVIDIA_SMI_PATH=/usr/bin/nvidia-smi
     networks:
       - traefik_network
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities:
+                - gpu
+    # ports:
+    #   - "5454:5454"
     volumes:
-      - ${DATA_DIR}/recyclarr:/config
-      # timezone
-      - /etc/localtime:/etc/localtime:ro
-    labels:
-      - "dev.dozzle.group=Smart Media"
+      - ${DATA_DIR}/media-server/notifiarr:/config
+      - /var/run/utmp:/var/run/utmp
+      - /etc/machine-id:/etc/machine-id
+      - /mnt/movie:/movie
+      - /usr/bin/nvidia-smi:/usr/bin/nvidia-smi:rw
 
-#  kometa:
-#    image: kometateam/kometa
-#    container_name: kometa
-#    volumes:
-#      - ${DATA_DIR}/kometa/config:/config
-#    restart: unless-stopped
-#    networks:
-#      - traefik_network
-#    command: --run  kometa:
-#    image: kometateam/kometa
-#    container_name: kometa
-#    volumes:
-#      - ${DATA_DIR}/kometa/config:/config
-#    restart: unless-stopped
-#    networks:
-#      - traefik_network
-#    command: --run
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.notifiarr.rule=Host(`notifiarr.${DOMAIN}`)"
+      - "traefik.http.routers.notifiarr.entrypoints=https"
+      - "traefik.http.routers.notifiarr.tls=true"
+      ## Middlewares
+      # - "traefik.http.routers.notifiarr.middlewares=chain-google-oauth@file"
+      - "traefik.http.routers.notifiarr.middlewares=chain-no-auth@file"
+    # configarr:
+    #   image: ghcr.io/raydak-labs/configarr:latest
+    #   container_name: configarr
+    #   environment:
+    #     - TZ=Etc/UTC
+    #   env_file: .env
+    #   networks:
+    #     - traefik_network
+    #   volumes:
+    #     - ${DATA_DIR}/media-server/configarr/config:/app/config # Contains the config.yml and secrets.yml
+    #     - ${DATA_DIR}/media-server/configarr/dockerrepos:/app/repos # Cache repositories
+    #     # - ${DATA_DIR}/media-server/configarr/custom/cfs:/app/cfs # Optional if custom formats locally provided
+    #     # - ${DATA_DIR}/media-server/configarr/custom/templates:/app/templates # Optional if custom templates
+    #   restart: "always" # optional make sure this is set to no or removed. Default is no
+
+    # recyclarr:
+    #   image: ghcr.io/recyclarr/recyclarr
+    #   container_name: recyclarr
+    #   user: 1000:1000
+    #   env_file: .env
+    #   networks:
+    #     - traefik_network
+    #   volumes:
+    #     - ${DATA_DIR}/media-server/recyclarr:/config
+    #     # # timezone
+    #     # - /etc/localtime:/etc/localtime:ro
+    # labels:
+    #   - "dev.dozzle.group=Smart Media"
+    #   #  kometa:
+    #   #    image: kometateam/kometa
+    #   #    container_name: kometa
+    #   #    volumes:
+    #   #      - ${DATA_DIR}/kometa/config:/config
+    #   #    restart: unless-stopped
+    #   #    networks:
+    #   #      - traefik_network
+    #   #    command: --run  kometa:
+    #   #    image: kometateam/kometa
+    #   #    container_name: kometa
+    #   #    volumes:
+    #   #      - ${DATA_DIR}/kometa/config:/config
+    #   #    restart: unless-stopped
+    #   #    networks:
+    #   #      - traefik_network
+    #   #    command: --run
 
 networks:
   traefik_network:

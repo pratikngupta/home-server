@@ -16,9 +16,11 @@ services:
       - PGID=1000
       - DOCKER_MODS=ghcr.io/gabe565/linuxserver-mod-vuetorrent
     env_file: .env
+    ports:
+      - 8080:8080
     volumes:
-      - ${DATA_DIR}/qbittorrent:/config
-      - ./content/torrents:/data/torrents
+      - ${DATA_DIR}/media-server/qbittorrent:/config
+      - ${MEDIA_DIR}/torrents:/data/torrents
       # timezone
       - /etc/localtime:/etc/localtime:ro
     restart: unless-stopped
@@ -52,6 +54,7 @@ services:
 networks:
   traefik_network:
     external: true
+
 ### IMPORTANT ###
 # To use iQbit UI: `/config/iQbit/release`
 # to use vuetorrent UI: `/vuetorrent`

@@ -14,16 +14,14 @@ services:
     environment:
       - PUID=1000
       - PGID=1000
-      - DOCKER_MODS=ghcr.io/themepark-dev/theme.park:radarr
+      - DOCKER_MODS=ghcr.io/themepark-dev/theme.park:radarr|linuxserver/mods:radarr-striptracks
       - TP_THEME=power
       - TP_ADDON=radarr-4k-logo|radarr-alt-calendar
       - TP_COMMUNITY_THEME=true
     env_file: .env
     volumes:
-      - ${DATA_DIR}/radarr:/config
-      - ./content:/data
-      - /mnt/main/Movie:/movies
-      - "/home/pratik/Docker/onedrive/data/Movies (Homelab Upload):/onedrive"
+      - ${DATA_DIR}/media-server/radarr:/config
+      - ${MEDIA_DIR}:/data
       # timezone
       - /etc/localtime:/etc/localtime:ro
 
@@ -53,125 +51,177 @@ services:
       - "dev.dozzle.group=Smart Media"
 
       ### REDIRECT TO GITHUB ### Usefull for redirecting to github page easily
-      # add if radarr.webninja.me/github is called, it will redirect to the github page
-      - "traefik.http.routers.radarr-webninja.rule=Host(`radarr.${DOMAIN}`) && Path(`/github`)"
-      - "traefik.http.routers.radarr-webninja.entrypoints=https"
-      - "traefik.http.routers.radarr-webninja.middlewares=redirect-to-github-radarr@file"
-      - "traefik.http.routers.radarr-webninja.tls=true"
+      # add if radarr.techsanctuary.me/github is called, it will redirect to the github page
+      - "traefik.http.routers.radarr-techsanctuary.rule=Host(`radarr.${DOMAIN}`) && Path(`/github`)"
+      - "traefik.http.routers.radarr-techsanctuary.entrypoints=https"
+      - "traefik.http.routers.radarr-techsanctuary.middlewares=redirect-to-github-radarr@file"
+      - "traefik.http.routers.radarr-techsanctuary.tls=true"
       # set priority to 1 so it will be checked first
-      - "traefik.http.routers.radarr-webninja.priority=100"
+      - "traefik.http.routers.radarr-techsanctuary.priority=100"
       # define service for the redirect
-      - "traefik.http.routers.radarr-webninja.service=radarr-webninja"
-      - "traefik.http.services.radarr-webninja.loadbalancer.server.port=7878"
+      - "traefik.http.routers.radarr-techsanctuary.service=radarr-techsanctuary"
+      - "traefik.http.services.radarr-techsanctuary.loadbalancer.server.port=7878"
 
-  # Sonarr: TV management system
-  sonarr:
-    image: linuxserver/sonarr:latest
-    container_name: sonarr
+  bazarr:
+    image: lscr.io/linuxserver/bazarr:latest
+    container_name: bazarr
     environment:
       - PUID=1000
       - PGID=1000
-      - DOCKER_MODS=ghcr.io/themepark-dev/theme.park:sonarr
-      - TP_THEME=mind
-      - TP_ADDON=sonarr-4k-text-logo
-      - TP_COMMUNITY_THEME=true
-    # ports:
-    #   - 8989:8989
+      - TZ=Etc/UTC
     env_file: .env
-    volumes:
-      - ${DATA_DIR}/sonarr:/config
-      - ./content:/data
-      # timezone
-      - /etc/localtime:/etc/localtime:ro
-    restart: unless-stopped
     networks:
       - traefik_network
-
+    volumes:
+      - ${DATA_DIR}/media-server/bazarr:/config
+      - ${MEDIA_DIR}:/data
+      # timezone
+      - /etc/localtime:/etc/localtime:ro
+    # ports:
+    #   - 6767:6767
+    restart: unless-stopped
     labels:
       - "traefik.enable=true"
       ## HTTP Routers Auth Bypass
-      - "traefik.http.routers.sonarr-rtr-bypass.entrypoints=https"
-      - "traefik.http.routers.sonarr-rtr-bypass.rule=Host(`sonarr.$DOMAIN`) && Header(`traefik-auth-bypass-key`, `$TRAEFIK_AUTH_BYPASS_KEY`)" # Bypass Auth for LunaSea on iOS
-      - "traefik.http.routers.sonarr-rtr-bypass.priority=100"
+      - "traefik.http.routers.bazarr-rtr-bypass.entrypoints=https"
+      - "traefik.http.routers.bazarr-rtr-bypass.rule=Host(`bazarr.$DOMAIN`) && Header(`traefik-auth-bypass-key`, `$TRAEFIK_AUTH_BYPASS_KEY`)" # Bypass Auth for LunaSea on iOS
+      - "traefik.http.routers.bazarr-rtr-bypass.priority=100"
       ## HTTP Routers Auth
-      - "traefik.http.routers.sonarr-rtr.entrypoints=https"
-      - "traefik.http.routers.sonarr-rtr.rule=Host(`sonarr.$DOMAIN`)"
-      - "traefik.http.routers.sonarr-rtr.priority=99"
+      - "traefik.http.routers.bazarr-rtr.entrypoints=https"
+      - "traefik.http.routers.bazarr-rtr.rule=Host(`bazarr.$DOMAIN`)"
+      - "traefik.http.routers.bazarr-rtr.priority=99"
       ## Enable tls
-      - "traefik.http.routers.sonarr-rtr.tls=true"
-      - "traefik.http.routers.sonarr-rtr-bypass.tls=true"
+      - "traefik.http.routers.bazarr-rtr.tls=true"
+      - "traefik.http.routers.bazarr-rtr-bypass.tls=true"
       ## Middlewares
-      - "traefik.http.routers.sonarr-rtr-bypass.middlewares=chain-no-auth@file"
-      - "traefik.http.routers.sonarr-rtr.middlewares=chain-github-oauth@file"
+      - "traefik.http.routers.bazarr-rtr-bypass.middlewares=chain-no-auth@file"
+      - "traefik.http.routers.bazarr-rtr.middlewares=chain-github-oauth@file"
       ## HTTP Services
-      - "traefik.http.routers.sonarr-rtr.service=sonarr-svc"
-      - "traefik.http.routers.sonarr-rtr-bypass.service=sonarr-svc"
-      - "traefik.http.services.sonarr-svc.loadbalancer.server.port=8989"
+      - "traefik.http.routers.bazarr-rtr.service=bazarr-svc"
+      - "traefik.http.routers.bazarr-rtr-bypass.service=bazarr-svc"
+      - "traefik.http.services.bazarr-svc.loadbalancer.server.port=6767"
       - "dev.dozzle.group=Smart Media"
 
       ### REDIRECT TO GITHUB ### Usefull for redirecting to github page easily
-      # add if sonarr.webninja.me/github is called, it will redirect to the github page
-      - "traefik.http.routers.sonarr-webninja.rule=Host(`sonarr.${DOMAIN}`) && Path(`/github`)"
-      - "traefik.http.routers.sonarr-webninja.entrypoints=https"
-      - "traefik.http.routers.sonarr-webninja.middlewares=redirect-to-github-sonarr@file"
-      - "traefik.http.routers.sonarr-webninja.tls=true"
+      # add if bazarr.techsanctuary.me/github is called, it will redirect to the github page
+      - "traefik.http.routers.bazarr-techsanctuary.rule=Host(`bazarr.${DOMAIN}`) && Path(`/github`)"
+      - "traefik.http.routers.bazarr-techsanctuary.entrypoints=https"
+      - "traefik.http.routers.bazarr-techsanctuary.middlewares=redirect-to-github-bazarr@file"
+      - "traefik.http.routers.bazarr-techsanctuary.tls=true"
       # set priority to 1 so it will be checked first
-      - "traefik.http.routers.sonarr-webninja.priority=100"
+      - "traefik.http.routers.bazarr-techsanctuary.priority=100"
       # define service for the redirect
-      - "traefik.http.routers.sonarr-webninja.service=sonarr-webninja"
-      - "traefik.http.services.sonarr-webninja.loadbalancer.server.port=8989"
+      - "traefik.http.routers.bazarr-techsanctuary.service=bazarr-techsanctuary"
+      - "traefik.http.services.bazarr-techsanctuary.loadbalancer.server.port=6767"
 
-  # Lidarr - Music
-  lidarr:
-    image: lscr.io/linuxserver/lidarr:latest
-    container_name: lidarr
-    environment:
-      - PUID=1000
-      - PGID=1000
-    # ports:
-    #   - 8686:8686
-    volumes:
-      - ${DATA_DIR}/lidarr:/config
-      - ./content:/data
-      # timezone
-      - /etc/localtime:/etc/localtime:ro
-    networks:
-      - traefik_network
-    restart: unless-stopped
-    env_file: .env
-    labels:
-      - "traefik.enable=true"
-      ## HTTP Routers Auth Bypass
-      - "traefik.http.routers.lidarr-rtr-bypass.entrypoints=https"
-      - "traefik.http.routers.lidarr-rtr-bypass.rule=Host(`lidarr.$DOMAIN`) && Header(`traefik-auth-bypass-key`, `$TRAEFIK_AUTH_BYPASS_KEY`)" # Bypass Auth for LunaSea on iOS
-      - "traefik.http.routers.lidarr-rtr-bypass.priority=100"
-      ## HTTP Routers Auth
-      - "traefik.http.routers.lidarr-rtr.entrypoints=https"
-      - "traefik.http.routers.lidarr-rtr.rule=Host(`lidarr.$DOMAIN`)"
-      - "traefik.http.routers.lidarr-rtr.priority=99"
-      ## Enable tls
-      - "traefik.http.routers.lidarr-rtr.tls=true"
-      - "traefik.http.routers.lidarr-rtr-bypass.tls=true"
-      ## Middlewares
-      - "traefik.http.routers.lidarr-rtr-bypass.middlewares=chain-no-auth@file"
-      - "traefik.http.routers.lidarr-rtr.middlewares=chain-github-oauth@file"
-      ## HTTP Services
-      - "traefik.http.routers.lidarr-rtr.service=lidarr-svc"
-      - "traefik.http.routers.lidarr-rtr-bypass.service=lidarr-svc"
-      - "traefik.http.services.lidarr-svc.loadbalancer.server.port=8686"
-      - "dev.dozzle.group=Smart Media"
+  # # Sonarr: TV management system
+  # sonarr:
+  #   image: linuxserver/sonarr:latest
+  #   container_name: sonarr
+  #   environment:
+  #     - PUID=1000
+  #     - PGID=1000
+  #     - DOCKER_MODS=ghcr.io/themepark-dev/theme.park:sonarr
+  #     - TP_THEME=mind
+  #     - TP_ADDON=sonarr-4k-text-logo
+  #     - TP_COMMUNITY_THEME=true
+  #   # ports:
+  #   #   - 8989:8989
+  #   env_file: .env
+  #   volumes:
+  #     - ${DATA_DIR}/sonarr:/config
+  #     - ./content:/data
+  #     # timezone
+  #     - /etc/localtime:/etc/localtime:ro
+  #   restart: unless-stopped
+  #   networks:
+  #     - traefik_network
 
-      ### REDIRECT TO GITHUB ### Usefull for redirecting to github page easily
-      # add if lidarr.webninja.me/github is called, it will redirect to the github page
-      - "traefik.http.routers.lidarr-webninja.rule=Host(`lidarr.${DOMAIN}`) && Path(`/github`)"
-      - "traefik.http.routers.lidarr-webninja.entrypoints=https"
-      - "traefik.http.routers.lidarr-webninja.middlewares=redirect-to-github-lidarr@file"
-      - "traefik.http.routers.lidarr-webninja.tls=true"
-      # set priority to 1 so it will be checked first
-      - "traefik.http.routers.lidarr-webninja.priority=100"
-      # define service for the redirect
-      - "traefik.http.routers.lidarr-webninja.service=lidarr-webninja"
-      - "traefik.http.services.lidarr-webninja.loadbalancer.server.port=8686"
+  #   labels:
+  #     - "traefik.enable=true"
+  #     ## HTTP Routers Auth Bypass
+  #     - "traefik.http.routers.sonarr-rtr-bypass.entrypoints=https"
+  #     - "traefik.http.routers.sonarr-rtr-bypass.rule=Host(`sonarr.$DOMAIN`) && Header(`traefik-auth-bypass-key`, `$TRAEFIK_AUTH_BYPASS_KEY`)" # Bypass Auth for LunaSea on iOS
+  #     - "traefik.http.routers.sonarr-rtr-bypass.priority=100"
+  #     ## HTTP Routers Auth
+  #     - "traefik.http.routers.sonarr-rtr.entrypoints=https"
+  #     - "traefik.http.routers.sonarr-rtr.rule=Host(`sonarr.$DOMAIN`)"
+  #     - "traefik.http.routers.sonarr-rtr.priority=99"
+  #     ## Enable tls
+  #     - "traefik.http.routers.sonarr-rtr.tls=true"
+  #     - "traefik.http.routers.sonarr-rtr-bypass.tls=true"
+  #     ## Middlewares
+  #     - "traefik.http.routers.sonarr-rtr-bypass.middlewares=chain-no-auth@file"
+  #     - "traefik.http.routers.sonarr-rtr.middlewares=chain-github-oauth@file"
+  #     ## HTTP Services
+  #     - "traefik.http.routers.sonarr-rtr.service=sonarr-svc"
+  #     - "traefik.http.routers.sonarr-rtr-bypass.service=sonarr-svc"
+  #     - "traefik.http.services.sonarr-svc.loadbalancer.server.port=8989"
+  #     - "dev.dozzle.group=Smart Media"
+
+  #     ### REDIRECT TO GITHUB ### Usefull for redirecting to github page easily
+  #     # add if sonarr.techsanctuary.me/github is called, it will redirect to the github page
+  #     - "traefik.http.routers.sonarr-techsanctuary.rule=Host(`sonarr.${DOMAIN}`) && Path(`/github`)"
+  #     - "traefik.http.routers.sonarr-techsanctuary.entrypoints=https"
+  #     - "traefik.http.routers.sonarr-techsanctuary.middlewares=redirect-to-github-sonarr@file"
+  #     - "traefik.http.routers.sonarr-techsanctuary.tls=true"
+  #     # set priority to 1 so it will be checked first
+  #     - "traefik.http.routers.sonarr-techsanctuary.priority=100"
+  #     # define service for the redirect
+  #     - "traefik.http.routers.sonarr-techsanctuary.service=sonarr-techsanctuary"
+  #     - "traefik.http.services.sonarr-techsanctuary.loadbalancer.server.port=8989"
+
+  # # Lidarr - Music
+  # lidarr:
+  #   image: lscr.io/linuxserver/lidarr:latest
+  #   container_name: lidarr
+  #   environment:
+  #     - PUID=1000
+  #     - PGID=1000
+  #   # ports:
+  #   #   - 8686:8686
+  #   volumes:
+  #     - ${DATA_DIR}/lidarr:/config
+  #     - ./content:/data
+  #     # timezone
+  #     - /etc/localtime:/etc/localtime:ro
+  #   networks:
+  #     - traefik_network
+  #   restart: unless-stopped
+  #   env_file: .env
+  #   labels:
+  #     - "traefik.enable=true"
+  #     ## HTTP Routers Auth Bypass
+  #     - "traefik.http.routers.lidarr-rtr-bypass.entrypoints=https"
+  #     - "traefik.http.routers.lidarr-rtr-bypass.rule=Host(`lidarr.$DOMAIN`) && Header(`traefik-auth-bypass-key`, `$TRAEFIK_AUTH_BYPASS_KEY`)" # Bypass Auth for LunaSea on iOS
+  #     - "traefik.http.routers.lidarr-rtr-bypass.priority=100"
+  #     ## HTTP Routers Auth
+  #     - "traefik.http.routers.lidarr-rtr.entrypoints=https"
+  #     - "traefik.http.routers.lidarr-rtr.rule=Host(`lidarr.$DOMAIN`)"
+  #     - "traefik.http.routers.lidarr-rtr.priority=99"
+  #     ## Enable tls
+  #     - "traefik.http.routers.lidarr-rtr.tls=true"
+  #     - "traefik.http.routers.lidarr-rtr-bypass.tls=true"
+  #     ## Middlewares
+  #     - "traefik.http.routers.lidarr-rtr-bypass.middlewares=chain-no-auth@file"
+  #     - "traefik.http.routers.lidarr-rtr.middlewares=chain-github-oauth@file"
+  #     ## HTTP Services
+  #     - "traefik.http.routers.lidarr-rtr.service=lidarr-svc"
+  #     - "traefik.http.routers.lidarr-rtr-bypass.service=lidarr-svc"
+  #     - "traefik.http.services.lidarr-svc.loadbalancer.server.port=8686"
+  #     - "dev.dozzle.group=Smart Media"
+
+  #     ### REDIRECT TO GITHUB ### Usefull for redirecting to github page easily
+  #     # add if lidarr.techsanctuary.me/github is called, it will redirect to the github page
+  #     - "traefik.http.routers.lidarr-techsanctuary.rule=Host(`lidarr.${DOMAIN}`) && Path(`/github`)"
+  #     - "traefik.http.routers.lidarr-techsanctuary.entrypoints=https"
+  #     - "traefik.http.routers.lidarr-techsanctuary.middlewares=redirect-to-github-lidarr@file"
+  #     - "traefik.http.routers.lidarr-techsanctuary.tls=true"
+  #     # set priority to 1 so it will be checked first
+  #     - "traefik.http.routers.lidarr-techsanctuary.priority=100"
+  #     # define service for the redirect
+  #     - "traefik.http.routers.lidarr-techsanctuary.service=lidarr-techsanctuary"
+  #     - "traefik.http.services.lidarr-techsanctuary.loadbalancer.server.port=8686"
 
   # Prowlarr: Indexer manager
   prowlarr:
@@ -188,7 +238,7 @@ services:
     #   - 9696:9696
     env_file: .env
     volumes:
-      - ${DATA_DIR}/prowlarr:/config
+      - ${DATA_DIR}/media-server/prowlarr:/config
       # timezone
       - /etc/localtime:/etc/localtime:ro
     restart: unless-stopped
@@ -217,20 +267,21 @@ services:
       - "dev.dozzle.group=Smart Media"
 
       ### REDIRECT TO GITHUB ### Usefull for redirecting to github page easily
-      # add if prowlarr.webninja.me/github is called, it will redirect to the github page
-      - "traefik.http.routers.prowlarr-webninja.rule=Host(`prowlarr.${DOMAIN}`) && Path(`/github`)"
-      - "traefik.http.routers.prowlarr-webninja.entrypoints=https"
-      - "traefik.http.routers.prowlarr-webninja.middlewares=redirect-to-github-prowlarr@file"
-      - "traefik.http.routers.prowlarr-webninja.tls=true"
+      # add if prowlarr.techsanctuary.me/github is called, it will redirect to the github page
+      - "traefik.http.routers.prowlarr-techsanctuary.rule=Host(`prowlarr.${DOMAIN}`) && Path(`/github`)"
+      - "traefik.http.routers.prowlarr-techsanctuary.entrypoints=https"
+      - "traefik.http.routers.prowlarr-techsanctuary.middlewares=redirect-to-github-prowlarr@file"
+      - "traefik.http.routers.prowlarr-techsanctuary.tls=true"
       # set priority to 1 so it will be checked first
-      - "traefik.http.routers.prowlarr-webninja.priority=100"
+      - "traefik.http.routers.prowlarr-techsanctuary.priority=100"
       # define service for the redirect
-      - "traefik.http.routers.prowlarr-webninja.service=prowlarr-webninja"
-      - "traefik.http.services.prowlarr-webninja.loadbalancer.server.port=9696"
+      - "traefik.http.routers.prowlarr-techsanctuary.service=prowlarr-techsanctuary"
+      - "traefik.http.services.prowlarr-techsanctuary.loadbalancer.server.port=9696"
 
 networks:
   traefik_network:
     external: true
+
 ### SAMPLE TRAEFIK LABELS WITH GOOGLE_OAUTH MIDDLEWARE
 # - "traefik.enable=true"
 # ## HTTP Routers Auth Bypass
@@ -252,13 +303,13 @@ networks:
 # - "traefik.http.routers.example-rtr-bypass.service=example-svc"
 # - "traefik.http.services.example-svc.loadbalancer.server.port=9696"
 # ### REDIRECT TO GITHUB ### Usefull for redirecting to github page easily
-# # add if example.webninja.me/github is called, it will redirect to the github page
-# - "traefik.http.routers.example-webninja.rule=Host(`example.${DOMAIN}`) && Path(`/github`)"
-# - "traefik.http.routers.example-webninja.entrypoints=https"
-# - "traefik.http.routers.example-webninja.middlewares=redirect-to-github-example@file"
-# - "traefik.http.routers.example-webninja.tls=true"
+# # add if example.techsanctuary.me/github is called, it will redirect to the github page
+# - "traefik.http.routers.example-techsanctuary.rule=Host(`example.${DOMAIN}`) && Path(`/github`)"
+# - "traefik.http.routers.example-techsanctuary.entrypoints=https"
+# - "traefik.http.routers.example-techsanctuary.middlewares=redirect-to-github-example@file"
+# - "traefik.http.routers.example-techsanctuary.tls=true"
 # # set priority to 1 so it will be checked first
-# - "traefik.http.routers.example-webninja.priority=100"
+# - "traefik.http.routers.example-techsanctuary.priority=100"
 # # define service for the redirect
-# - "traefik.http.routers.example-webninja.service=example-webninja"
-# - "traefik.http.services.example-webninja.loadbalancer.server.port=9696"
+# - "traefik.http.routers.example-techsanctuary.service=example-techsanctuary"
+# - "traefik.http.services.example-techsanctuary.loadbalancer.server.port=9696"

@@ -5,11 +5,11 @@ include:
   # # Heimdall, Tautulli, and Homarr
   - docker-compose.utility.yml
 
-  # # Radarr, Sonarr, and Lidarr
-  # - docker-compose.manager.yml
+  # Radarr, Sonarr, and Lidarr
+  - docker-compose.manager.yml
 
-  # # qBittorrent, flaresolverr
-  # - docker-compose.downloaders.yml
+  # qBittorrent, flaresolverr
+  - docker-compose.downloaders.yml
 
-  # # Overseerr, Jellyseer, requesterr
-  # - docker-compose.requester.yml
+  # Overseerr, Jellyseer, requesterr
+  - docker-compose.requester.yml

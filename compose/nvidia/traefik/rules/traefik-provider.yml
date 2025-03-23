@@ -1,9 +1,9 @@
 http:
   services:
-    # jellyfin-svc:
-    #   loadBalancer:
-    #     servers:
-    #       - url: "http://192.168.2.55:8096"
+    jellyfin-svc:
+      loadBalancer:
+        servers:
+          - url: "http://192.168.4.70:8096"
 
     plex-media-server:
       loadBalancer:

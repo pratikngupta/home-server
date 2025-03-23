@@ -40,7 +40,7 @@ services:
     networks:
       - traefik_network
     volumes:
-      - ${DATA_DIR}/overseerr:/app/config
+      - ${DATA_DIR}/media-server/overseerr:/app/config
       # timezone
       - /etc/localtime:/etc/localtime:ro
     restart: unless-stopped
@@ -66,39 +66,39 @@ services:
       - "traefik.http.services.overseerr-svc.loadbalancer.server.port=5055"
 
       ### REDIRECT TO GITHUB ### Usefull for redirecting to github page easily
-      # add if overseerr.webninja.me/github is called, it will redirect to the github page
-      - "traefik.http.routers.overseerr-webninja.rule=Host(`overseerr.${DOMAIN}`) && Path(`/github`)"
-      - "traefik.http.routers.overseerr-webninja.entrypoints=https"
-      - "traefik.http.routers.overseerr-webninja.middlewares=redirect-to-github-overseerr@file"
-      - "traefik.http.routers.overseerr-webninja.tls=true"
+      # add if overseerr.techsanctuary.me/github is called, it will redirect to the github page
+      - "traefik.http.routers.overseerr-techsanctuary.rule=Host(`overseerr.${DOMAIN}`) && Path(`/github`)"
+      - "traefik.http.routers.overseerr-techsanctuary.entrypoints=https"
+      - "traefik.http.routers.overseerr-techsanctuary.middlewares=redirect-to-github-overseerr@file"
+      - "traefik.http.routers.overseerr-techsanctuary.tls=true"
       # set priority to 1 so it will be checked first
-      - "traefik.http.routers.overseerr-webninja.priority=100"
+      - "traefik.http.routers.overseerr-techsanctuary.priority=100"
       # define service for the redirect
-      - "traefik.http.routers.overseerr-webninja.service=overseerr-webninja"
-      - "traefik.http.services.overseerr-webninja.loadbalancer.server.port=5055"
+      - "traefik.http.routers.overseerr-techsanctuary.service=overseerr-techsanctuary"
+      - "traefik.http.services.overseerr-techsanctuary.loadbalancer.server.port=5055"
       - "dev.dozzle.group=Smart Media"
 
-  requestrr:
-    image: darkalfx/requestrr
-    hostname: requestrr
-    container_name: requestrr
-    volumes:
-      - ${DATA_DIR}/requestrr/config:/root/config
-      # timezone
-      - /etc/localtime:/etc/localtime:ro
-    restart: unless-stopped
-    networks:
-      - traefik_network
-    env_file: .env
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.requestrr.rule=Host(`requestrr.$DOMAIN`)"
-      - "traefik.http.routers.requestrr.entrypoints=https"
-      - "traefik.http.routers.requestrr.tls=true"
-      - "traefik.http.services.requestrr.loadbalancer.server.port=4545"
-      ## Middlewares - No Auth
-      - "traefik.http.routers.requestrr.middlewares=chain-github-oauth@file"
-      - "dev.dozzle.group=Smart Media"
+  # requestrr:
+  #   image: darkalfx/requestrr
+  #   hostname: requestrr
+  #   container_name: requestrr
+  #   volumes:
+  #     - ${DATA_DIR}/requestrr/config:/root/config
+  #     # timezone
+  #     - /etc/localtime:/etc/localtime:ro
+  #   restart: unless-stopped
+  #   networks:
+  #     - traefik_network
+  #   env_file: .env
+  #   labels:
+  #     - "traefik.enable=true"
+  #     - "traefik.http.routers.requestrr.rule=Host(`requestrr.$DOMAIN`)"
+  #     - "traefik.http.routers.requestrr.entrypoints=https"
+  #     - "traefik.http.routers.requestrr.tls=true"
+  #     - "traefik.http.services.requestrr.loadbalancer.server.port=4545"
+  #     ## Middlewares - No Auth
+  #     - "traefik.http.routers.requestrr.middlewares=chain-github-oauth@file"
+  #     - "dev.dozzle.group=Smart Media"
 
 networks:
   traefik_network:
