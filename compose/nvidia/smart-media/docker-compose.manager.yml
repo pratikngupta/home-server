@@ -18,6 +18,7 @@ services:
       - TP_THEME=power
       - TP_ADDON=radarr-4k-logo|radarr-alt-calendar
       - TP_COMMUNITY_THEME=true
+      - STRIPTRACKS_ARGS=--audio :org:hin:eng --subs :eng
     env_file: .env
     volumes:
       - ${DATA_DIR}/media-server/radarr:/config

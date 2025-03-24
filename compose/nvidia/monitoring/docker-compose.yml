@@ -70,23 +70,24 @@ services:
       - "traefik.http.routers.dozzle.middlewares=chain-google-oauth@file"
       # - "traefik.http.routers.dozzle.middlewares=chain-no-auth@file"
 
-  # watchtower:
-  #   container_name: watchtower
-  #   image: containrrr/watchtower
-  #   networks:
-  #     - traefik_network
-  #   volumes:
-  #     - /var/run/docker.sock:/var/run/docker.sock
-  #   env_file: .env
-  #   environment:
-  #     - WATCHTOWER_SCHEDULE=0 0 8 * * *
-  #     - WATCHTOWER_NOTIFICATIONS=shoutrrr
-  #     - WATCHTOWER_HTTP_API_TOKEN=${WATCHTOWER_HTTP_API_TOKEN}
-  #     - WATCHTOWER_HTTP_API_METRICS=true
-  #     - WATCHTOWER_CLEANUP=true
+  watchtower:
+    container_name: watchtower
+    image: containrrr/watchtower
+    networks:
+      - traefik_network
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    env_file: .env
+    environment:
+      - WATCHTOWER_SCHEDULE=0 0 8 * * *
+      - WATCHTOWER_NOTIFICATIONS=shoutrrr
+      - WATCHTOWER_HTTP_API_TOKEN=${WATCHTOWER_HTTP_API_TOKEN}
+      - WATCHTOWER_HTTP_API_METRICS=true
+      - WATCHTOWER_CLEANUP=true
+      - WATCHTOWER_NOTIFICATION_URL=${WATCHTOWER_NOTIFICATION_URL}
 
-  #   labels:
-  #     - "traefik.enable=false"
+    labels:
+      - "traefik.enable=false"
 
   # diun:
   #   container_name: diun
