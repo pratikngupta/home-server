@@ -1,3 +1,0 @@
-[submodule "compose/nvidia/iQbit"]
-	path = compose/nvidia/iQbit
-	url = https://github.com/ntoporcov/iQbit.git
