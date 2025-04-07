@@ -99,36 +99,80 @@ services:
       - "traefik.http.routers.jellyfin-external.service=jellyfin-svc@file"
       - "traefik.http.routers.jellyfin-external.middlewares=chain-github-oauth@file,jellyfin-mw"
 
+  navidrome:
+    image: deluan/navidrome:latest
+    container_name: navidrome
+    # user: 1000:1000 # should be owner of volumes
+    networks:
+      - traefik_network
+    # ports:
+    #   - "4533:4533"
+    restart: unless-stopped
+    env_file: .env
+    volumes:
+      - ${DATA_DIR}/navidrome:/data:rw
+      - ${MEDIA_DIR}/media/music:/music:ro
+    labels:
+      - "traefik.enable=true"
+      ## navidrome UI
+      - "traefik.http.routers.navidrome-rtr.entrypoints=https"
+      - "traefik.http.routers.navidrome-rtr.rule=Host(`navidrome.$DOMAIN`)"
+      - "traefik.http.routers.navidrome-rtr.priority=99"
+      - "traefik.http.routers.navidrome-rtr.tls=true"
+      - "traefik.http.routers.navidrome-rtr.middlewares=chain-no-auth@file"
+      - "traefik.http.routers.navidrome-rtr.service=navidrome-svc"
+      - "traefik.http.services.navidrome-svc.loadbalancer.server.port=4533"
+      ## Redirect to GitHub
+      - "traefik.http.routers.navidrome-github.rule=Host(`navidrome.$DOMAIN`) && Path(`/github`)"
+      - "traefik.http.routers.navidrome-github.entrypoints=https"
+      - "traefik.http.routers.navidrome-github.tls=true"
+      - "traefik.http.routers.navidrome-github.priority=100"
+      - "traefik.http.routers.navidrome-github.middlewares=redirect-to-github-navidrome@file"
+      - "traefik.http.routers.navidrome-github.service=navidrome-github"
+      - "traefik.http.services.navidrome-github.loadbalancer.server.port=4533"
 
-      ## Middleware
-      # - "traefik.http.middlewares.jellyfin-mw.headers.customResponseHeaders.X-Robots-Tag=noindex,nofollow,nosnippet,noarchive,notranslate,noimageindex"
-      # - "traefik.http.middlewares.jellyfin-mw.headers.SSLRedirect=true"
-      # - "traefik.http.middlewares.jellyfin-mw.headers.SSLForceHost=true"
-      # - "traefik.http.middlewares.jellyfin-mw.headers.STSSeconds=315360000"
-      # - "traefik.http.middlewares.jellyfin-mw.headers.STSIncludeSubdomains=true"
-      # - "traefik.http.middlewares.jellyfin-mw.headers.STSPreload=true"
-      # - "traefik.http.middlewares.jellyfin-mw.headers.forceSTSHeader=true"
-      # - "traefik.http.middlewares.jellyfin-mw.headers.frameDeny=true"
-      # - "traefik.http.middlewares.jellyfin-mw.headers.contentTypeNosniff=true"
-      # - "traefik.http.middlewares.jellyfin-mw.headers.customResponseHeaders.X-XSS-PROTECTION=1"
-      # - "traefik.http.middlewares.jellyfin-mw.headers.customFrameOptionsValue='allow-from https://${DOMAIN}'"
+  gonic:
+    image: sentriz/gonic:latest
+    container_name: gonic
+    # environment:
+    #   - TZ
+    #   # optionally, see more available env vars in the readme
+    env_file: .env
+    # ports:
+    #   - 4747:80
+    volumes:
+      - ${DATA_DIR}/gonic/config:/data
+      - ${MEDIA_DIR}/media/music:/music:ro # your music
+      - ${MEDIA_DIR}/media/podcasts:/podcasts # your podcasts
+      - ${MEDIA_DIR}/media/laylists:/playlists # your playlists
+      - ${DATA_DIR}/gonic/cache:/cache # gonic cache dir
+    networks:
+      - traefik_network
+    labels:
+      - "traefik.enable=true"
+      ## Lidarr UI
+      - "traefik.http.routers.gonic-rtr.entrypoints=https"
+      - "traefik.http.routers.gonic-rtr.rule=Host(`gonic.$DOMAIN`)"
+      - "traefik.http.routers.gonic-rtr.priority=99"
+      - "traefik.http.routers.gonic-rtr.tls=true"
+      - "traefik.http.routers.gonic-rtr.middlewares=chain-no-auth@file"
+      - "traefik.http.routers.gonic-rtr.service=gonic-svc"
+      - "traefik.http.services.gonic-svc.loadbalancer.server.port=80"
+      ## Redirect to GitHub
+      - "traefik.http.routers.gonic-github.rule=Host(`gonic.$DOMAIN`) && Path(`/github`)"
+      - "traefik.http.routers.gonic-github.entrypoints=https"
+      - "traefik.http.routers.gonic-github.tls=true"
+      - "traefik.http.routers.gonic-github.priority=100"
+      - "traefik.http.routers.gonic-github.middlewares=redirect-to-github-gonic@file"
+      - "traefik.http.routers.gonic-github.service=gonic-github"
+      - "traefik.http.services.gonic-github.loadbalancer.server.port=80"
 
+    # set the following two sections if you've enabled jukebox
+    group_add:
+      - audio
+    devices:
+      - /dev/snd:/dev/snd
 
-      # ## Internal Access
-      # - "traefik.http.routers.jellyfin-internal.rule=Host(`jellyfin.${INTERNAL_DOMAIN}`)"
-      # - "traefik.http.routers.jellyfin-internal.entrypoints=https"
-      # - "traefik.http.routers.jellyfin-internal.tls=true"
-      # - "traefik.http.routers.jellyfin-internal.service=jellyfin-svc@file"
-      # - "traefik.http.routers.jellyfin-internal.middlewares=jellyfin-mw"
-      # ## getHomepage Labels
-      # - "homepage.group=Media"
-      # - "homepage.name=Jellyfin"
-      # - "homepage.icon=jellyfin"
-      # - "homepage.instance.internal.href=http://jellyfin:8096/"
-      # - "homepage.href=https://jellyfin.${EXTERNAL_DOMAIN}"
-      # - "homepage.description=Media Server"
-      # - "homepage.color=#FFA500"
-      # - "homepage.widget.type=jellyfin"
-      # - "homepage.widget.url=http://192.168.2.55:8096"
-      # - "homepage.widget.key=43b6ec2e1a8e461883792ead2726d4b9"
-      # - "homepage.widget.enableBlocks=true"
+networks:
+  traefik_network:
+    external: true

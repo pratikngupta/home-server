@@ -79,51 +79,28 @@ services:
       ## Middlewares
       # - "traefik.http.routers.notifiarr.middlewares=chain-google-oauth@file"
       - "traefik.http.routers.notifiarr.middlewares=chain-no-auth@file"
-    # configarr:
-    #   image: ghcr.io/raydak-labs/configarr:latest
-    #   container_name: configarr
-    #   environment:
-    #     - TZ=Etc/UTC
-    #   env_file: .env
-    #   networks:
-    #     - traefik_network
-    #   volumes:
-    #     - ${DATA_DIR}/media-server/configarr/config:/app/config # Contains the config.yml and secrets.yml
-    #     - ${DATA_DIR}/media-server/configarr/dockerrepos:/app/repos # Cache repositories
-    #     # - ${DATA_DIR}/media-server/configarr/custom/cfs:/app/cfs # Optional if custom formats locally provided
-    #     # - ${DATA_DIR}/media-server/configarr/custom/templates:/app/templates # Optional if custom templates
-    #   restart: "always" # optional make sure this is set to no or removed. Default is no
 
-    # recyclarr:
-    #   image: ghcr.io/recyclarr/recyclarr
-    #   container_name: recyclarr
-    #   user: 1000:1000
-    #   env_file: .env
-    #   networks:
-    #     - traefik_network
-    #   volumes:
-    #     - ${DATA_DIR}/media-server/recyclarr:/config
-    #     # # timezone
-    #     # - /etc/localtime:/etc/localtime:ro
-    # labels:
-    #   - "dev.dozzle.group=Smart Media"
-    #   #  kometa:
-    #   #    image: kometateam/kometa
-    #   #    container_name: kometa
-    #   #    volumes:
-    #   #      - ${DATA_DIR}/kometa/config:/config
-    #   #    restart: unless-stopped
-    #   #    networks:
-    #   #      - traefik_network
-    #   #    command: --run  kometa:
-    #   #    image: kometateam/kometa
-    #   #    container_name: kometa
-    #   #    volumes:
-    #   #      - ${DATA_DIR}/kometa/config:/config
-    #   #    restart: unless-stopped
-    #   #    networks:
-    #   #      - traefik_network
-    #   #    command: --run
+  profilarr:
+    image: santiagosayshey/profilarr:latest # Use :beta for early access to new features
+    container_name: profilarr
+    env_file: .env
+    # ports:
+    #   - 6868:6868
+    volumes:
+      - ${DATA_DIR}/media-server/profilarr:/config # Replace with your actual path
+    restart: unless-stopped
+    networks:
+      - traefik_network
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.profilarr.rule=Host(`profilarr.${DOMAIN}`)"
+      - "traefik.http.routers.profilarr.entrypoints=https"
+      - "traefik.http.routers.profilarr.tls=true"
+      ## Middlewares
+      # - "traefik.http.routers.profilarr.middlewares=chain-google-oauth@file"
+      - "traefik.http.routers.profilarr.middlewares=chain-google-oauth@file"
+      # define port for the service
+      - "traefik.http.services.profilarr.loadbalancer.server.port=6868"
 
 networks:
   traefik_network:

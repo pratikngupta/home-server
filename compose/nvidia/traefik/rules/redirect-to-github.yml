@@ -45,3 +45,18 @@ http:
         regex: "^https://traefik\\..*/github$"
         replacement: "https://doc.traefik.io/traefik/"
         permanent: true
+    redirect-to-github-bazarr:
+      redirectRegex:
+        regex: "^https://bazarr\\..*/github$"
+        replacement: "https://github.com/morpheus65535/bazarr"
+        permanent: true
+    redirect-to-github-navidrome:
+      redirectRegex:
+        regex: "^https://navidrome\\..*/github$"
+        replacement: "https://www.navidrome.org/docs/"
+        permanent: true
+    redirect-to-github-gonic:
+      redirectRegex:
+        regex: "^https://gonic\\..*/github$"
+        replacement: "https://github.com/sentriz/gonic"
+        permanent: true

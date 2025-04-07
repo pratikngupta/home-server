@@ -78,26 +78,31 @@ services:
       - "traefik.http.services.overseerr-techsanctuary.loadbalancer.server.port=5055"
       - "dev.dozzle.group=Smart Media"
 
-  # requestrr:
-  #   image: darkalfx/requestrr
-  #   hostname: requestrr
-  #   container_name: requestrr
+  # ombi:
+  #   image: lscr.io/linuxserver/ombi:latest
+  #   container_name: ombi
+  #   env_file: .env
+  #   environment:
+  #     - PUID=1000
+  #     - PGID=1000
   #   volumes:
-  #     - ${DATA_DIR}/requestrr/config:/root/config
-  #     # timezone
-  #     - /etc/localtime:/etc/localtime:ro
-  #   restart: unless-stopped
+  #     - ${DATA_DIR}/media-server/ombi:/app/config
+  #   # ports:
+  #   #   - 3579:3579
   #   networks:
   #     - traefik_network
-  #   env_file: .env
+  #   restart: unless-stopped
   #   labels:
   #     - "traefik.enable=true"
-  #     - "traefik.http.routers.requestrr.rule=Host(`requestrr.$DOMAIN`)"
-  #     - "traefik.http.routers.requestrr.entrypoints=https"
-  #     - "traefik.http.routers.requestrr.tls=true"
-  #     - "traefik.http.services.requestrr.loadbalancer.server.port=4545"
-  #     ## Middlewares - No Auth
-  #     - "traefik.http.routers.requestrr.middlewares=chain-github-oauth@file"
+  #     ## Internal access
+  #     - "traefik.http.routers.ombi.rule=Host(`ombi.techsanctuary.me`)"
+  #     - "traefik.http.routers.ombi.entrypoints=https"
+  #     - "traefik.http.services.ombi.loadbalancer.server.port=3579"
+  #     ## add google oauth 
+  #     - "traefik.http.routers.ombi.middlewares=chain-github-oauth@file"
+  #     ## theme file for ombi
+  #     # enable tls
+  #     - "traefik.http.routers.ombi.tls=true"
   #     - "dev.dozzle.group=Smart Media"
 
 networks:

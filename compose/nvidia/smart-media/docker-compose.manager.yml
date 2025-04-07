@@ -172,7 +172,8 @@ services:
   #     - "traefik.http.routers.sonarr-techsanctuary.service=sonarr-techsanctuary"
   #     - "traefik.http.services.sonarr-techsanctuary.loadbalancer.server.port=8989"
 
-  # # Lidarr - Music
+  # Lidarr - Music
+
   # lidarr:
   #   image: lscr.io/linuxserver/lidarr:latest
   #   container_name: lidarr
@@ -182,8 +183,8 @@ services:
   #   # ports:
   #   #   - 8686:8686
   #   volumes:
-  #     - ${DATA_DIR}/lidarr:/config
-  #     - ./content:/data
+  #     - ${DATA_DIR}/media-server/lidarr:/config
+  #     - ${MEDIA_DIR}:/data
   #     # timezone
   #     - /etc/localtime:/etc/localtime:ro
   #   networks:
@@ -224,6 +225,42 @@ services:
   #     - "traefik.http.routers.lidarr-techsanctuary.service=lidarr-techsanctuary"
   #     - "traefik.http.services.lidarr-techsanctuary.loadbalancer.server.port=8686"
 
+  # lidarr-on-steroids:
+  #   image: youegraillot/lidarr-on-steroids
+  #   container_name: lidarr-on-steroids
+  #   restart: unless-stopped
+  #   env_file: .env
+  #   networks:
+  #     - traefik_network
+  #   # ports:
+  #   #   - "8686:8686" # Lidarr web UI
+  #   #   - "6595:6595" # Deemix web UI
+  #   volumes:
+  #     - ${DATA_DIR}/media-server/LidarrSteroids:/config
+  #     - ${DATA_DIR}/media-server/deemix:/config_deemix
+  #     - ${MEDIA_DIR}/deemix/music:/downloads
+  #     - ${MEDIA_DIR}:/data
+
+  #   labels:
+  #     - "traefik.enable=true"
+  #     ## Lidarr UI
+  #     - "traefik.http.routers.lidarr-rtr-steroids.entrypoints=https"
+  #     - "traefik.http.routers.lidarr-rtr-steroids.rule=Host(`LidarrSteroids.$DOMAIN`)"
+  #     - "traefik.http.routers.lidarr-rtr-steroids.priority=99"
+  #     - "traefik.http.routers.lidarr-rtr-steroids.tls=true"
+  #     - "traefik.http.routers.lidarr-rtr-steroids.middlewares=chain-github-oauth@file"
+  #     - "traefik.http.routers.lidarr-rtr-steroids.service=lidarr-svc-steroids"
+  #     - "traefik.http.services.lidarr-svc-steroids.loadbalancer.server.port=8686"
+  #     ## Deemix UI
+  #     - "traefik.http.routers.deemix-rtr.entrypoints=https"
+  #     - "traefik.http.routers.deemix-rtr.rule=Host(`deemix.$DOMAIN`)"
+  #     - "traefik.http.routers.deemix-rtr.priority=99"
+  #     - "traefik.http.routers.deemix-rtr.tls=true"
+  #     - "traefik.http.routers.deemix-rtr.middlewares=chain-github-oauth@file"
+  #     - "traefik.http.routers.deemix-rtr.service=deemix-svc"
+  #     - "traefik.http.services.deemix-svc.loadbalancer.server.port=6595"
+
+
   # Prowlarr: Indexer manager
   prowlarr:
     image: linuxserver/prowlarr
@@ -247,37 +284,62 @@ services:
       - traefik_network
     labels:
       - "traefik.enable=true"
-      ## HTTP Routers Auth Bypass
-      - "traefik.http.routers.prowlarr-rtr-bypass.entrypoints=https"
-      - "traefik.http.routers.prowlarr-rtr-bypass.rule=Host(`prowlarr.$DOMAIN`) && Header(`traefik-auth-bypass-key`, `$TRAEFIK_AUTH_BYPASS_KEY`)"
-      - "traefik.http.routers.prowlarr-rtr-bypass.priority=100"
-      ## HTTP Routers Auth
+
+      ## HTTP Routers
       - "traefik.http.routers.prowlarr-rtr.entrypoints=https"
       - "traefik.http.routers.prowlarr-rtr.rule=Host(`prowlarr.$DOMAIN`)"
       - "traefik.http.routers.prowlarr-rtr.priority=99"
-      ## Enable tls
       - "traefik.http.routers.prowlarr-rtr.tls=true"
-      - "traefik.http.routers.prowlarr-rtr-bypass.tls=true"
-      ## Middlewares
-      - "traefik.http.routers.prowlarr-rtr-bypass.middlewares=chain-no-auth@file"
       - "traefik.http.routers.prowlarr-rtr.middlewares=chain-github-oauth@file"
-      ## HTTP Services
       - "traefik.http.routers.prowlarr-rtr.service=prowlarr-svc"
-      - "traefik.http.routers.prowlarr-rtr-bypass.service=prowlarr-svc"
-      - "traefik.http.services.prowlarr-svc.loadbalancer.server.port=9696"
-      - "dev.dozzle.group=Smart Media"
 
-      ### REDIRECT TO GITHUB ### Usefull for redirecting to github page easily
-      # add if prowlarr.techsanctuary.me/github is called, it will redirect to the github page
-      - "traefik.http.routers.prowlarr-techsanctuary.rule=Host(`prowlarr.${DOMAIN}`) && Path(`/github`)"
+      ## Auth Bypass Router
+      - "traefik.http.routers.prowlarr-rtr-bypass.entrypoints=https"
+      - "traefik.http.routers.prowlarr-rtr-bypass.rule=Host(`prowlarr.$DOMAIN`) && Header(`traefik-auth-bypass-key`, `$TRAEFIK_AUTH_BYPASS_KEY`)"
+      - "traefik.http.routers.prowlarr-rtr-bypass.priority=100"
+      - "traefik.http.routers.prowlarr-rtr-bypass.tls=true"
+      - "traefik.http.routers.prowlarr-rtr-bypass.middlewares=chain-no-auth@file"
+      - "traefik.http.routers.prowlarr-rtr-bypass.service=prowlarr-svc"
+
+      ## HTTP Service
+      - "traefik.http.services.prowlarr-svc.loadbalancer.server.port=9696"
+
+      ## Redirect to GitHub
+      - "traefik.http.routers.prowlarr-techsanctuary.rule=Host(`prowlarr.$DOMAIN`) && Path(`/github`)"
       - "traefik.http.routers.prowlarr-techsanctuary.entrypoints=https"
-      - "traefik.http.routers.prowlarr-techsanctuary.middlewares=redirect-to-github-prowlarr@file"
       - "traefik.http.routers.prowlarr-techsanctuary.tls=true"
-      # set priority to 1 so it will be checked first
       - "traefik.http.routers.prowlarr-techsanctuary.priority=100"
-      # define service for the redirect
+      - "traefik.http.routers.prowlarr-techsanctuary.middlewares=redirect-to-github-prowlarr@file"
       - "traefik.http.routers.prowlarr-techsanctuary.service=prowlarr-techsanctuary"
       - "traefik.http.services.prowlarr-techsanctuary.loadbalancer.server.port=9696"
+
+      ## Metadata
+      - "dev.dozzle.group=Smart Media"
+
+  picard:
+    image: mikenye/picard:latest
+    env_file: .env
+    container_name: picard
+    networks:
+      - traefik_network
+    # ports:
+    #   - "5800:5800"
+    volumes:
+      # - "/path/to/config:/config:rw"
+      - ${DATA_DIR}/media-server/picard:/config:rw
+      - ${MEDIA_DIR}/media/music:/storage:rw # your music
+      # - /mnt/movie/data/media/raw:/storage:rw
+
+    labels:
+      - "traefik.enable=true"
+      ## Lidarr UI
+      - "traefik.http.routers.picard-rtr.entrypoints=https"
+      - "traefik.http.routers.picard-rtr.rule=Host(`picard.$DOMAIN`)"
+      - "traefik.http.routers.picard-rtr.priority=99"
+      - "traefik.http.routers.picard-rtr.tls=true"
+      - "traefik.http.routers.picard-rtr.middlewares=chain-github-oauth@file"
+      - "traefik.http.routers.picard-rtr.service=picard-svc"
+      - "traefik.http.services.picard-svc.loadbalancer.server.port=5800"
 
 networks:
   traefik_network:
