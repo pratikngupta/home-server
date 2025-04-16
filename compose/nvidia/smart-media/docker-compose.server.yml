@@ -144,7 +144,7 @@ services:
       - ${DATA_DIR}/gonic/config:/data
       - ${MEDIA_DIR}/media/music:/music:ro # your music
       - ${MEDIA_DIR}/media/podcasts:/podcasts # your podcasts
-      - ${MEDIA_DIR}/media/laylists:/playlists # your playlists
+      - ${MEDIA_DIR}/media/playlists:/playlists # your playlists
       - ${DATA_DIR}/gonic/cache:/cache # gonic cache dir
     networks:
       - traefik_network

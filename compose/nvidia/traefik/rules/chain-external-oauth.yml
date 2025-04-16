@@ -7,7 +7,7 @@ http:
           - internal-cloudflare-whitelist
           - middlewares-rate-limit
           - middlewares-secure-headers
-          - middlewares-oauth
+          - middlewares-tinyauth-oauth
 
     chain-github-oauth:
       chain:

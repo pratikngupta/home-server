@@ -18,6 +18,10 @@ entryPoints:
     http3:
       advertisedPort: 443
     address: ":443"
+    forwardedHeaders:
+      trustedIPs:
+        - "127.0.0.1/32"
+        - "172.16.0.0/12"
 
 serversTransport:
   insecureSkipVerify: true

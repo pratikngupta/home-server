@@ -75,6 +75,27 @@ services:
       - "traefik.http.routers.oauth-rtr.service=oauth-svc"
       - "traefik.http.services.oauth-svc.loadbalancer.server.port=4181"
 
+  tinyauth:
+    image: ghcr.io/steveiliop56/tinyauth:v3
+    container_name: tinyauth
+    restart: unless-stopped
+    networks:
+      - traefik_network
+    env_file: auth.env
+    # environment:
+    #   - SECRET=some-random-32-chars-string
+    #   - APP_URL=https://tinyauth.example.com
+    #   - USERS=your-username-password-hash
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.tinyauth-rtr.entrypoints=https"
+      - "traefik.http.routers.tinyauth-rtr.tls=true"
+      - "traefik.http.routers.tinyauth-rtr.rule=Host(`tinyauth.techsanctuary.me`)"
+      # traefik.http.middlewares.tinyauth.forwardauth.address: http://tinyauth:3000/api/auth/traefik
+      - "traefik.http.routers.tinyauth-rtr.service=tinyauth-svc"
+      - "traefik.http.services.tinyauth-svc.loadbalancer.server.port=3000"
+
+
   dozzle-traefik-logs:
     container_name: dozzle-traefik-logs
     image: alpine
