@@ -1,36 +1,36 @@
 name: <your project name>
 services:
-  open-webui:
-    # ports:
-    #     - 3000:8080
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              count: all
-              capabilities:
-                - gpu
-    volumes:
-      - ${DATA_DIR}/ollama:/root/.ollama
-      - /etc/OpenCL/vendors/nvidia.icd:/etc/OpenCL/vendors/nvidia.icd
-      - ${DATA_DIR}/open-webui:/app/backend/data
-    env_file: .env
-    container_name: open-webui
-    restart: always
-    image: ghcr.io/open-webui/open-webui:ollama
-    networks:
-      - traefik_network
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.webui.rule=Host(`webui.${DOMAIN}`)"
-      - "traefik.http.routers.webui.entrypoints=https"
-      - "traefik.http.routers.webui.tls=true"
-      - "traefik.http.services.webui.loadbalancer.server.port=8080"
-      ## Middlewaress
-      - "traefik.http.routers.webui.middlewares=chain-google-oauth@file"
-      # - "traefik.http.routers.webui.middlewares=chain-no-auth@file"
+    open-webui:
+        # ports:
+        #     - 3000:8080
+        deploy:
+            resources:
+                reservations:
+                    devices:
+                        - driver: nvidia
+                          count: all
+                          capabilities:
+                              - gpu
+        volumes:
+            - ${DATA_DIR}/ollama:/root/.ollama
+            - /etc/OpenCL/vendors/nvidia.icd:/etc/OpenCL/vendors/nvidia.icd
+            - ${DATA_DIR}/open-webui:/app/backend/data
+        env_file: .env
+        container_name: open-webui
+        restart: always
+        image: ghcr.io/open-webui/open-webui:ollama
+        networks:
+            - traefik_network
+        labels:
+            - "traefik.enable=true"
+            - "traefik.http.routers.webui.rule=Host(`webui.${DOMAIN}`)"
+            - "traefik.http.routers.webui.entrypoints=https"
+            - "traefik.http.routers.webui.tls=true"
+            - "traefik.http.services.webui.loadbalancer.server.port=8080"
+            ## Middlewaress
+            - "traefik.http.routers.webui.middlewares=chain-tinyauth-oauth@file"
+            # - "traefik.http.routers.webui.middlewares=chain-no-auth@file"
 
 networks:
-  traefik_network:
-    external: true
+    traefik_network:
+        external: true

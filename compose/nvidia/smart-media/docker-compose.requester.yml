@@ -7,104 +7,104 @@
 ######################################################
 
 services:
-  # jellyseerr:
-  #   image: fallenbagel/jellyseerr:latest
-  #   container_name: jellyseerr
-  #   environment:
-  #     - PUID=1000
-  #     - PGID=1000
-  #     - LOG_LEVEL=debug
-  #     - TZ=America/Toronto
-  #   networks:
-  #     - traefik_network
-  #   volumes:
-  #     - ${DATA_DIR}/jellyseerr:/app/config
-  #   restart: unless-stopped
-  #   labels:
-  #     - "traefik.enable=true"
-  #     - "traefik.http.routers.jellyseerr.rule=Host(`jellyseerr.${DOMAIN}`)"
-  #     - "traefik.http.routers.jellyseerr.entrypoints=https"
-  #     - "traefik.http.routers.jellyseerr.tls=true"
-  #     - "traefik.http.services.jellyseerr.loadbalancer.server.port=8096"
-  #     ## Middlewares - Google OAuth
-  #     - "traefik.http.routers.jellyseerr.middlewares=chain-github-oauth-external@file"
+    # jellyseerr:
+    #   image: fallenbagel/jellyseerr:latest
+    #   container_name: jellyseerr
+    #   environment:
+    #     - PUID=1000
+    #     - PGID=1000
+    #     - LOG_LEVEL=debug
+    #     - TZ=America/Toronto
+    #   networks:
+    #     - traefik_network
+    #   volumes:
+    #     - ${DATA_DIR}/jellyseerr:/app/config
+    #   restart: unless-stopped
+    #   labels:
+    #     - "traefik.enable=true"
+    #     - "traefik.http.routers.jellyseerr.rule=Host(`jellyseerr.${DOMAIN}`)"
+    #     - "traefik.http.routers.jellyseerr.entrypoints=https"
+    #     - "traefik.http.routers.jellyseerr.tls=true"
+    #     - "traefik.http.services.jellyseerr.loadbalancer.server.port=8096"
+    #     ## Middlewares - Google OAuth
+    #     - "traefik.http.routers.jellyseerr.middlewares=chain-tinyauth-oauth-external@file"
 
-  overseerr:
-    image: sctx/overseerr:develop
-    container_name: overseerr #overseerr
-    environment:
-      - PUID=1000
-      - PGID=1000
-      - LOG_LEVEL=debug
-    env_file: .env
-    networks:
-      - traefik_network
-    volumes:
-      - ${DATA_DIR}/media-server/overseerr:/app/config
-      # timezone
-      - /etc/localtime:/etc/localtime:ro
-    restart: unless-stopped
-    labels:
-      - "traefik.enable=true"
-      ## HTTP Routers Auth Bypass
-      - "traefik.http.routers.overseerr-rtr-bypass.entrypoints=https"
-      - "traefik.http.routers.overseerr-rtr-bypass.rule=Host(`overseerr.$DOMAIN`) && Header(`traefik-auth-bypass-key`, `$TRAEFIK_AUTH_BYPASS_KEY`)" # Bypass Auth for LunaSea on iOS
-      - "traefik.http.routers.overseerr-rtr-bypass.priority=100"
-      ## HTTP Routers Auth
-      - "traefik.http.routers.overseerr-rtr.entrypoints=https"
-      - "traefik.http.routers.overseerr-rtr.rule=Host(`overseerr.$DOMAIN`)"
-      - "traefik.http.routers.overseerr-rtr.priority=99"
-      ## Enable tls
-      - "traefik.http.routers.overseerr-rtr.tls=true"
-      - "traefik.http.routers.overseerr-rtr-bypass.tls=true"
-      ## Middleware
-      - "traefik.http.routers.overseerr-rtr-bypass.middlewares=chain-no-auth@file"
-      - "traefik.http.routers.overseerr-rtr.middlewares=chain-github-oauth@file"
-      ## HTTP Services
-      - "traefik.http.routers.overseerr-rtr.service=overseerr-svc"
-      - "traefik.http.routers.overseerr-rtr-bypass.service=overseerr-svc"
-      - "traefik.http.services.overseerr-svc.loadbalancer.server.port=5055"
+    overseerr:
+        image: sctx/overseerr:develop
+        container_name: overseerr #overseerr
+        environment:
+            - PUID=1000
+            - PGID=1000
+            - LOG_LEVEL=debug
+        env_file: .env
+        networks:
+            - traefik_network
+        volumes:
+            - ${DATA_DIR}/media-server/overseerr:/app/config
+            # timezone
+            - /etc/localtime:/etc/localtime:ro
+        restart: unless-stopped
+        labels:
+            - "traefik.enable=true"
+            ## HTTP Routers Auth Bypass
+            - "traefik.http.routers.overseerr-rtr-bypass.entrypoints=https"
+            - "traefik.http.routers.overseerr-rtr-bypass.rule=Host(`overseerr.$DOMAIN`) && Header(`traefik-auth-bypass-key`, `$TRAEFIK_AUTH_BYPASS_KEY`)" # Bypass Auth for LunaSea on iOS
+            - "traefik.http.routers.overseerr-rtr-bypass.priority=100"
+            ## HTTP Routers Auth
+            - "traefik.http.routers.overseerr-rtr.entrypoints=https"
+            - "traefik.http.routers.overseerr-rtr.rule=Host(`overseerr.$DOMAIN`)"
+            - "traefik.http.routers.overseerr-rtr.priority=99"
+            ## Enable tls
+            - "traefik.http.routers.overseerr-rtr.tls=true"
+            - "traefik.http.routers.overseerr-rtr-bypass.tls=true"
+            ## Middleware
+            - "traefik.http.routers.overseerr-rtr-bypass.middlewares=chain-no-auth@file"
+            - "traefik.http.routers.overseerr-rtr.middlewares=chain-tinyauth-oauth@file"
+            ## HTTP Services
+            - "traefik.http.routers.overseerr-rtr.service=overseerr-svc"
+            - "traefik.http.routers.overseerr-rtr-bypass.service=overseerr-svc"
+            - "traefik.http.services.overseerr-svc.loadbalancer.server.port=5055"
 
-      ### REDIRECT TO GITHUB ### Usefull for redirecting to github page easily
-      # add if overseerr.techsanctuary.me/github is called, it will redirect to the github page
-      - "traefik.http.routers.overseerr-techsanctuary.rule=Host(`overseerr.${DOMAIN}`) && Path(`/github`)"
-      - "traefik.http.routers.overseerr-techsanctuary.entrypoints=https"
-      - "traefik.http.routers.overseerr-techsanctuary.middlewares=redirect-to-github-overseerr@file"
-      - "traefik.http.routers.overseerr-techsanctuary.tls=true"
-      # set priority to 1 so it will be checked first
-      - "traefik.http.routers.overseerr-techsanctuary.priority=100"
-      # define service for the redirect
-      - "traefik.http.routers.overseerr-techsanctuary.service=overseerr-techsanctuary"
-      - "traefik.http.services.overseerr-techsanctuary.loadbalancer.server.port=5055"
-      - "dev.dozzle.group=Smart Media"
+            ### REDIRECT TO GITHUB ### Usefull for redirecting to github page easily
+            # add if overseerr.techsanctuary.me/github is called, it will redirect to the github page
+            - "traefik.http.routers.overseerr-techsanctuary.rule=Host(`overseerr.${DOMAIN}`) && Path(`/github`)"
+            - "traefik.http.routers.overseerr-techsanctuary.entrypoints=https"
+            - "traefik.http.routers.overseerr-techsanctuary.middlewares=redirect-to-github-overseerr@file"
+            - "traefik.http.routers.overseerr-techsanctuary.tls=true"
+            # set priority to 1 so it will be checked first
+            - "traefik.http.routers.overseerr-techsanctuary.priority=100"
+            # define service for the redirect
+            - "traefik.http.routers.overseerr-techsanctuary.service=overseerr-techsanctuary"
+            - "traefik.http.services.overseerr-techsanctuary.loadbalancer.server.port=5055"
+            - "dev.dozzle.group=Smart Media"
 
-  # ombi:
-  #   image: lscr.io/linuxserver/ombi:latest
-  #   container_name: ombi
-  #   env_file: .env
-  #   environment:
-  #     - PUID=1000
-  #     - PGID=1000
-  #   volumes:
-  #     - ${DATA_DIR}/media-server/ombi:/app/config
-  #   # ports:
-  #   #   - 3579:3579
-  #   networks:
-  #     - traefik_network
-  #   restart: unless-stopped
-  #   labels:
-  #     - "traefik.enable=true"
-  #     ## Internal access
-  #     - "traefik.http.routers.ombi.rule=Host(`ombi.techsanctuary.me`)"
-  #     - "traefik.http.routers.ombi.entrypoints=https"
-  #     - "traefik.http.services.ombi.loadbalancer.server.port=3579"
-  #     ## add google oauth 
-  #     - "traefik.http.routers.ombi.middlewares=chain-github-oauth@file"
-  #     ## theme file for ombi
-  #     # enable tls
-  #     - "traefik.http.routers.ombi.tls=true"
-  #     - "dev.dozzle.group=Smart Media"
+    # ombi:
+    #   image: lscr.io/linuxserver/ombi:latest
+    #   container_name: ombi
+    #   env_file: .env
+    #   environment:
+    #     - PUID=1000
+    #     - PGID=1000
+    #   volumes:
+    #     - ${DATA_DIR}/media-server/ombi:/app/config
+    #   # ports:
+    #   #   - 3579:3579
+    #   networks:
+    #     - traefik_network
+    #   restart: unless-stopped
+    #   labels:
+    #     - "traefik.enable=true"
+    #     ## Internal access
+    #     - "traefik.http.routers.ombi.rule=Host(`ombi.techsanctuary.me`)"
+    #     - "traefik.http.routers.ombi.entrypoints=https"
+    #     - "traefik.http.services.ombi.loadbalancer.server.port=3579"
+    #     ## add google oauth
+    #     - "traefik.http.routers.ombi.middlewares=chain-tinyauth-oauth@file"
+    #     ## theme file for ombi
+    #     # enable tls
+    #     - "traefik.http.routers.ombi.tls=true"
+    #     - "dev.dozzle.group=Smart Media"
 
 networks:
-  traefik_network:
-    external: true
+    traefik_network:
+        external: true

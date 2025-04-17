@@ -1,187 +1,187 @@
 services:
-  # uptime-kuma:
-  #   image: louislam/uptime-kuma:beta
-  #   container_name: uptime-kuma
-  #   volumes:
-  #     - ${DATA_DIR}/kuma:/app/data
-  #     - /var/run/docker.sock:/var/run/docker.sock
-  #   restart: unless-stopped
-  #   env_file: .env
-  #   networks:
-  #     - traefik_network
-  #   labels:
-  #     - "traefik.enable=true"
-  #     # - "traefik.http.routers.kuma.rule=Host(`kuma.${EXTERNAL_DOMAIN}`)"
-  #     # - "traefik.http.routers.kuma.entrypoints=https"
-  #     # - "traefik.http.routers.kuma.tls=true"
-  #     # - "traefik.http.services.kuma.loadbalancer.server.port=3001"
-  #     # - "traefik.http.routers.kuma.middlewares=chain-github-oauth@file,kuma-theme@file"
+    # uptime-kuma:
+    #   image: louislam/uptime-kuma:beta
+    #   container_name: uptime-kuma
+    #   volumes:
+    #     - ${DATA_DIR}/kuma:/app/data
+    #     - /var/run/docker.sock:/var/run/docker.sock
+    #   restart: unless-stopped
+    #   env_file: .env
+    #   networks:
+    #     - traefik_network
+    #   labels:
+    #     - "traefik.enable=true"
+    #     # - "traefik.http.routers.kuma.rule=Host(`kuma.${EXTERNAL_DOMAIN}`)"
+    #     # - "traefik.http.routers.kuma.entrypoints=https"
+    #     # - "traefik.http.routers.kuma.tls=true"
+    #     # - "traefik.http.services.kuma.loadbalancer.server.port=3001"
+    #     # - "traefik.http.routers.kuma.middlewares=chain-tinyauth-oauth@file,kuma-theme@file"
 
-  #     ## internal domain
-  #     - "traefik.http.routers.kuma-internal.rule=Host(`kuma.${DOMAIN}`)"
-  #     - "traefik.http.routers.kuma-internal.entrypoints=https"
-  #     - "traefik.http.routers.kuma-internal.tls=true"
-  #     - "traefik.http.services.kuma-internal.loadbalancer.server.port=3001"
-  #     - "traefik.http.routers.kuma-internal.middlewares=chain-github-oauth@file"
+    #     ## internal domain
+    #     - "traefik.http.routers.kuma-internal.rule=Host(`kuma.${DOMAIN}`)"
+    #     - "traefik.http.routers.kuma-internal.entrypoints=https"
+    #     - "traefik.http.routers.kuma-internal.tls=true"
+    #     - "traefik.http.services.kuma-internal.loadbalancer.server.port=3001"
+    #     - "traefik.http.routers.kuma-internal.middlewares=chain-tinyauth-oauth@file"
 
-  # dockge:
-  #   image: louislam/dockge:nightly
-  #   container_name: dockge
-  #   restart: unless-stopped
-  #   volumes:
-  #     - /var/run/docker.sock:/var/run/docker.sock
-  #     - ${DATA_DIR}/dockge:/app/data
-  #     - ${DOCKGE_STACKS_DIR}:${DOCKGE_STACKS_DIR}
-  #   env_file: .env
-  #   environment:
-  #     # Tell Dockge where to find the stacks
-  #     - DOCKGE_STACKS_DIR=${DOCKGE_STACKS_DIR}
-  #   networks:
-  #     - traefik_network
+    # dockge:
+    #   image: louislam/dockge:nightly
+    #   container_name: dockge
+    #   restart: unless-stopped
+    #   volumes:
+    #     - /var/run/docker.sock:/var/run/docker.sock
+    #     - ${DATA_DIR}/dockge:/app/data
+    #     - ${DOCKGE_STACKS_DIR}:${DOCKGE_STACKS_DIR}
+    #   env_file: .env
+    #   environment:
+    #     # Tell Dockge where to find the stacks
+    #     - DOCKGE_STACKS_DIR=${DOCKGE_STACKS_DIR}
+    #   networks:
+    #     - traefik_network
 
-  #   labels:
-  #     - "traefik.enable=true"
-  #     - "traefik.http.routers.dockge.rule=Host(`dockge.${DOMAIN}`)"
-  #     - "traefik.http.routers.dockge.entrypoints=https"
-  #     - "traefik.http.routers.dockge.tls=true"
-  #     - "traefik.http.services.dockge.loadbalancer.server.port=5001"
-  #     - "traefik.http.routers.dockge.middlewares=chain-github-oauth@file"
+    #   labels:
+    #     - "traefik.enable=true"
+    #     - "traefik.http.routers.dockge.rule=Host(`dockge.${DOMAIN}`)"
+    #     - "traefik.http.routers.dockge.entrypoints=https"
+    #     - "traefik.http.routers.dockge.tls=true"
+    #     - "traefik.http.services.dockge.loadbalancer.server.port=5001"
+    #     - "traefik.http.routers.dockge.middlewares=chain-tinyauth-oauth@file"
 
-  dozzle:
-    container_name: dozzle
-    image: amir20/dozzle:latest
-    env_file: .env
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-    ports:
-      - 9000:8080
-    networks:
-      - traefik_network
-    restart: unless-stopped
-    # environment:
-    #   DOZZLE_REMOTE_HOST: ${DOZZLE_REMOTE_HOST}
-    #   DOZZLE_HOSTNAME: ${DOZZLE_HOSTNAME}
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.dozzle.rule=Host(`logs.${EXTERNAL_DOMAIN}`)"
-      - "traefik.http.routers.dozzle.entrypoints=https"
-      - "traefik.http.routers.dozzle.tls=true"
-      ## Middlewaress
-      - "traefik.http.routers.dozzle.middlewares=chain-google-oauth@file"
-      # - "traefik.http.routers.dozzle.middlewares=chain-no-auth@file"
+    dozzle:
+        container_name: dozzle
+        image: amir20/dozzle:latest
+        env_file: .env
+        volumes:
+            - /var/run/docker.sock:/var/run/docker.sock
+        ports:
+            - 9000:8080
+        networks:
+            - traefik_network
+        restart: unless-stopped
+        # environment:
+        #   DOZZLE_REMOTE_HOST: ${DOZZLE_REMOTE_HOST}
+        #   DOZZLE_HOSTNAME: ${DOZZLE_HOSTNAME}
+        labels:
+            - "traefik.enable=true"
+            - "traefik.http.routers.dozzle.rule=Host(`logs.${EXTERNAL_DOMAIN}`)"
+            - "traefik.http.routers.dozzle.entrypoints=https"
+            - "traefik.http.routers.dozzle.tls=true"
+            ## Middlewaress
+            - "traefik.http.routers.dozzle.middlewares=chain-tinyauth-oauth@file"
+            # - "traefik.http.routers.dozzle.middlewares=chain-no-auth@file"
 
-  watchtower:
-    container_name: watchtower
-    image: containrrr/watchtower
-    networks:
-      - traefik_network
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-    env_file: .env
-    environment:
-      - WATCHTOWER_SCHEDULE=0 0 8 * * *
-      - WATCHTOWER_NOTIFICATIONS=shoutrrr
-      - WATCHTOWER_HTTP_API_TOKEN=${WATCHTOWER_HTTP_API_TOKEN}
-      - WATCHTOWER_HTTP_API_METRICS=true
-      - WATCHTOWER_CLEANUP=true
-      - WATCHTOWER_NOTIFICATION_URL=${WATCHTOWER_NOTIFICATION_URL}
+    watchtower:
+        container_name: watchtower
+        image: containrrr/watchtower
+        networks:
+            - traefik_network
+        volumes:
+            - /var/run/docker.sock:/var/run/docker.sock
+        env_file: .env
+        environment:
+            - WATCHTOWER_SCHEDULE=0 0 8 * * *
+            - WATCHTOWER_NOTIFICATIONS=shoutrrr
+            - WATCHTOWER_HTTP_API_TOKEN=${WATCHTOWER_HTTP_API_TOKEN}
+            - WATCHTOWER_HTTP_API_METRICS=true
+            - WATCHTOWER_CLEANUP=true
+            - WATCHTOWER_NOTIFICATION_URL=${WATCHTOWER_NOTIFICATION_URL}
 
-    labels:
-      - "traefik.enable=false"
+        labels:
+            - "traefik.enable=false"
 
-  # diun:
-  #   container_name: diun
-  #   image: crazymax/diun:latest
-  #   command: serve
-  #   networks:
-  #     - traefik_network
-  #   volumes:
-  #     - ${DATA_DIR}/diun:/data
-  #     - ${DATA_DIR}/diun/diun.yml:/diun.yml:ro
-  #     - /var/run/docker.sock:/var/run/docker.sock
-  #   environment:
-  #     - TZ=America/Toronto
-  #     - LOG_LEVEL=info
-  #     - LOG_JSON=false
-  #   restart: always
+    # diun:
+    #   container_name: diun
+    #   image: crazymax/diun:latest
+    #   command: serve
+    #   networks:
+    #     - traefik_network
+    #   volumes:
+    #     - ${DATA_DIR}/diun:/data
+    #     - ${DATA_DIR}/diun/diun.yml:/diun.yml:ro
+    #     - /var/run/docker.sock:/var/run/docker.sock
+    #   environment:
+    #     - TZ=America/Toronto
+    #     - LOG_LEVEL=info
+    #     - LOG_JSON=false
+    #   restart: always
 
-  speedtest:
-    restart: unless-stopped
-    container_name: speedtest
-    image: openspeedtest/latest
-    networks:
-      - traefik_network
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.speedtest.rule=Host(`speedtest.${DOMAIN}`)"
-      - "traefik.http.routers.speedtest.entrypoints=https"
-      - "traefik.http.routers.speedtest.tls=true"
-      - "traefik.http.services.speedtest.loadbalancer.server.port=3000"
-      - "traefik.http.routers.speedtest.middlewares=chain-no-auth@file"
-      # - "traefik.http.routers.speedtest.middlewares=chain-no-auth@file"
+    speedtest:
+        restart: unless-stopped
+        container_name: speedtest
+        image: openspeedtest/latest
+        networks:
+            - traefik_network
+        labels:
+            - "traefik.enable=true"
+            - "traefik.http.routers.speedtest.rule=Host(`speedtest.${DOMAIN}`)"
+            - "traefik.http.routers.speedtest.entrypoints=https"
+            - "traefik.http.routers.speedtest.tls=true"
+            - "traefik.http.services.speedtest.loadbalancer.server.port=3000"
+            - "traefik.http.routers.speedtest.middlewares=chain-no-auth@file"
+            # - "traefik.http.routers.speedtest.middlewares=chain-no-auth@file"
 
-  glances:
-    container_name: glances
-    image: nicolargo/glances:latest
-    restart: always
-    # port 61208
-    # ports:
-    #   - 61208:61208
-    networks:
-      - traefik_network
-    environment:
-      - GLANCES_OPT=-w
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock:ro
-      - /sys:/sys:ro
-      - /mnt/main:/mnt/main:ro
-      - /:/host:ro
-    pid: "host"
-    # Uncomment for GPU compatibility (Nvidia) inside the container
-    # deploy:
-    #   resources:
-    #     reservations:
-    #       devices:
-    #         - driver: nvidia
-    #           count: 1
-    #           capabilities: [gpu]
+    glances:
+        container_name: glances
+        image: nicolargo/glances:latest
+        restart: always
+        # port 61208
+        # ports:
+        #   - 61208:61208
+        networks:
+            - traefik_network
+        environment:
+            - GLANCES_OPT=-w
+        volumes:
+            - /var/run/docker.sock:/var/run/docker.sock:ro
+            - /sys:/sys:ro
+            - /mnt/main:/mnt/main:ro
+            - /:/host:ro
+        pid: "host"
+        # Uncomment for GPU compatibility (Nvidia) inside the container
+        # deploy:
+        #   resources:
+        #     reservations:
+        #       devices:
+        #         - driver: nvidia
+        #           count: 1
+        #           capabilities: [gpu]
 
-  netdata:
-    image: netdata/netdata:edge
-    container_name: netdata
-    pid: host
-    network_mode: host
-    restart: unless-stopped
-    env_file: .env
-    cap_add:
-      - SYS_PTRACE
-      - SYS_ADMIN
-    security_opt:
-      - apparmor:unconfined
-    volumes:
-      - ${DATA_DIR}/netdata/config:/etc/netdata
-      - ${DATA_DIR}/netdata/lib:/var/lib/netdata
-      - ${DATA_DIR}/netdata/cache:/var/cache/netdata
-      - /:/host/root:ro,rslave
-      - /etc/passwd:/host/etc/passwd:ro
-      - /etc/group:/host/etc/group:ro
-      - /etc/localtime:/etc/localtime:ro
-      - /proc:/host/proc:ro
-      - /sys:/host/sys:ro
-      - /etc/os-release:/host/etc/os-release:ro
-      - /var/log:/host/var/log:ro
-      - /var/run/docker.sock:/var/run/docker.sock:ro
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              count: 1
-              capabilities:
-                - gpu
-                - compute
-                - video
+    netdata:
+        image: netdata/netdata:edge
+        container_name: netdata
+        pid: host
+        network_mode: host
+        restart: unless-stopped
+        env_file: .env
+        cap_add:
+            - SYS_PTRACE
+            - SYS_ADMIN
+        security_opt:
+            - apparmor:unconfined
+        volumes:
+            - ${DATA_DIR}/netdata/config:/etc/netdata
+            - ${DATA_DIR}/netdata/lib:/var/lib/netdata
+            - ${DATA_DIR}/netdata/cache:/var/cache/netdata
+            - /:/host/root:ro,rslave
+            - /etc/passwd:/host/etc/passwd:ro
+            - /etc/group:/host/etc/group:ro
+            - /etc/localtime:/etc/localtime:ro
+            - /proc:/host/proc:ro
+            - /sys:/host/sys:ro
+            - /etc/os-release:/host/etc/os-release:ro
+            - /var/log:/host/var/log:ro
+            - /var/run/docker.sock:/var/run/docker.sock:ro
+        deploy:
+            resources:
+                reservations:
+                    devices:
+                        - driver: nvidia
+                          count: 1
+                          capabilities:
+                              - gpu
+                              - compute
+                              - video
 
 networks:
-  traefik_network:
-    external: true
+    traefik_network:
+        external: true

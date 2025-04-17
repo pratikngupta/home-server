@@ -1,26 +1,26 @@
 services:
-  icloudpd:
-    image: icloudpd/icloudpd:latest
-    container_name: icloudpd
-    volumes:
-      - /mnt/photo/apple:/data
-      - /home/pratik/appData/data/icloud/:/home/auth
-    environment:
-      - TZ=America/Los_Angeles
-    command: icloudpd --directory /data --mfa-provider webui --watch-with-interval 3600 --username ${username} --password ${password} --library SharedSync-E9C7BAB7-9F17-424C-A918-9FFB068EC5F7 --cookie-directory /home/auth --auto-delete
-    networks:
-      - traefik_network
-    restart: unless-stopped
-    env_file: .env
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.photo.rule=Host(`photo.${DOMAIN}`)"
-      - "traefik.http.routers.photo.entrypoints=https"
-      - "traefik.http.routers.photo.tls=true"
-      ## Middlewares
-      # - "traefik.http.routers.photo.middlewares=chain-google-oauth@file"
-      - "traefik.http.routers.photo.middlewares=chain-no-auth@file"
+    icloudpd:
+        image: icloudpd/icloudpd:latest
+        container_name: icloudpd
+        volumes:
+            - /mnt/photo/apple:/data
+            - /home/pratik/appData/data/icloud/:/home/auth
+        environment:
+            - TZ=America/Los_Angeles
+        command: icloudpd --directory /data --mfa-provider webui --watch-with-interval 3600 --username ${username} --password ${password} --library SharedSync-E9C7BAB7-9F17-424C-A918-9FFB068EC5F7 --cookie-directory /home/auth --auto-delete
+        networks:
+            - traefik_network
+        restart: unless-stopped
+        env_file: .env
+        labels:
+            - "traefik.enable=true"
+            - "traefik.http.routers.photo.rule=Host(`photo.${DOMAIN}`)"
+            - "traefik.http.routers.photo.entrypoints=https"
+            - "traefik.http.routers.photo.tls=true"
+            ## Middlewares
+            # - "traefik.http.routers.photo.middlewares=chain-tinyauth-oauth@file"
+            - "traefik.http.routers.photo.middlewares=chain-no-auth@file"
 
 networks:
-  traefik_network:
-    external: true
+    traefik_network:
+        external: true

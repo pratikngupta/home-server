@@ -1,30 +1,30 @@
-version: '3'
+version: "3"
 services:
-  iqbit:
-    image: pratikngupta/iqbit:latest
-    container_name: iqbit
-    restart: unless-stopped
-    networks:
-      - traefik_network
-    # ports:
-    #   - 8081:8081
-    environment:
-      - QBIT_HOST=https://qbittorrent.techsanctuary.me
-      - STANDALONE_SERVER_PORT=8081
+    iqbit:
+        image: pratikngupta/iqbit:latest
+        container_name: iqbit
+        restart: unless-stopped
+        networks:
+            - traefik_network
+        # ports:
+        #   - 8081:8081
+        environment:
+            - QBIT_HOST=https://qbittorrent.techsanctuary.me
+            - STANDALONE_SERVER_PORT=8081
 
-    labels:
-      - "traefik.enable=true"
-      ## Internal access
-      - "traefik.http.routers.mobile-qbittorrent.rule=Host(`mobile-qbittorrent.techsanctuary.me`)"
-      - "traefik.http.routers.mobile-qbittorrent.entrypoints=https"
-      - "traefik.http.services.mobile-qbittorrent.loadbalancer.server.port=8081"
-      ## add google oauth
-      - "traefik.http.routers.mobile-qbittorrent.middlewares=chain-github-oauth@file"
-      ## theme file for mobile-qbittorrent
-      # enable tls
-      - "traefik.http.routers.mobile-qbittorrent.tls=true"
-      - "dev.dozzle.group=Smart Media"
+        labels:
+            - "traefik.enable=true"
+            ## Internal access
+            - "traefik.http.routers.mobile-qbittorrent.rule=Host(`mobile-qbittorrent.techsanctuary.me`)"
+            - "traefik.http.routers.mobile-qbittorrent.entrypoints=https"
+            - "traefik.http.services.mobile-qbittorrent.loadbalancer.server.port=8081"
+            ## add google oauth
+            - "traefik.http.routers.mobile-qbittorrent.middlewares=chain-tinyauth-oauth@file"
+            ## theme file for mobile-qbittorrent
+            # enable tls
+            - "traefik.http.routers.mobile-qbittorrent.tls=true"
+            - "dev.dozzle.group=Smart Media"
 
 networks:
-  traefik_network:
-    external: true
+    traefik_network:
+        external: true
