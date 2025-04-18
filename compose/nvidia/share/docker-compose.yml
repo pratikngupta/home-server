@@ -24,6 +24,7 @@ services:
     #     - "traefik.http.routers.file-browser.middlewares=chain-no-auth@file"
 
     samba:
+        container_name: samba
         image: crazymax/samba
         network_mode: host
         env_file: .env
@@ -40,6 +41,7 @@ services:
         restart: always
 
     avahi:
+        container_name: avahi
         image: ydkn/avahi
         hostname: $HOSTNAME
         network_mode: host
@@ -51,8 +53,10 @@ services:
     minidlna:
         container_name: minidlna
         network_mode: host
+        env_file: .env
         volumes:
-            - /mnt/storage/Movie:/opt/Videos
+            - ${STORAGE_DIR}/movies:/opt/Videos
+            - ${STORAGE_DIR}/music:/opt/Music
         image: geekduck/minidlna
 
 networks:
