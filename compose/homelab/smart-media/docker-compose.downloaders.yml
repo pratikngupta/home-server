@@ -18,7 +18,7 @@ services:
     env_file: .env
     volumes:
       - ${DATA_DIR}/qbittorrent:/config
-      - ./content/torrents:/data/torrents
+      - ${CONTENT_DIR}/media/torrents:/data/torrents
       # timezone
       - /etc/localtime:/etc/localtime:ro
     restart: unless-stopped

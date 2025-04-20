@@ -19,9 +19,9 @@ services:
     env_file: .env
     volumes:
       - ${DATA_DIR}/plex:/config
-      - ./content/media:/data/media
+      - ${CONTENT_DIR}/media/media:/data/media
       - /mnt/main/Movie:/movies
-      - "/home/pratik/Docker/onedrive/data/Movies (Homelab Upload):/onedrive"
+      - "/home/pratik/appData/content/onedrive/Movies (Homelab Upload):/onedrive"
       # timezone
       - /etc/localtime:/etc/localtime:ro
 
@@ -69,7 +69,7 @@ services:
   #     - DOCKER_MODS=linuxserver/mods:jellyfin-opencl-intel
   #   volumes:
   #     - ${DATA_DIR}/jellyfin:/config
-  #     - ./content/media:/data/movies
+  #     - ${CONTENT_DIR}/media/media:/data/movies
   #     - /mnt/main/Movie:/movies
   #     - /home/pratik/Docker/youtube/data:/youtube
   #   network_mode: "host"

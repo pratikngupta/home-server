@@ -21,9 +21,9 @@ services:
     env_file: .env
     volumes:
       - ${DATA_DIR}/radarr:/config
-      - ./content:/data
+      - ${CONTENT_DIR}/media:/data
       - /mnt/main/Movie:/movies
-      - "/home/pratik/Docker/onedrive/data/Movies (Homelab Upload):/onedrive"
+      - "/home/pratik/appData/content/onedrive/Movies (Homelab Upload):/onedrive"
       # timezone
       - /etc/localtime:/etc/localtime:ro
 
@@ -80,7 +80,7 @@ services:
     env_file: .env
     volumes:
       - ${DATA_DIR}/sonarr:/config
-      - ./content:/data
+      - ${CONTENT_DIR}/media:/data
       # timezone
       - /etc/localtime:/etc/localtime:ro
     restart: unless-stopped
@@ -132,7 +132,7 @@ services:
     #   - 8686:8686
     volumes:
       - ${DATA_DIR}/lidarr:/config
-      - ./content:/data
+      - ${CONTENT_DIR}/media:/data
       # timezone
       - /etc/localtime:/etc/localtime:ro
     networks:
