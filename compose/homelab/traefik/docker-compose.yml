@@ -135,7 +135,7 @@ services:
         environment:
             GIN_MODE: release # default is debug (more logs)
             CROWDSEC_AGENT_HOST: crowdsec:8080 # CrowdSec host and port
-            CROWDSEC_BOUNCER_LOG_LEVEL: 2 # https://pkg.go.dev/github.com/rs/zerolog#readme-leveled-logging
+            CROWDSEC_BOUNCER_LOG_LEVEL: 0 # https://pkg.go.dev/github.com/rs/zerolog#readme-leveled-logging
 
 networks:
     traefik_network:
