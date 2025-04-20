@@ -1,58 +1,11 @@
 services:
-  uptime-kuma:
-    image: louislam/uptime-kuma:beta
-    container_name: uptime-kuma
-    volumes:
-      - ${DATA_DIR}/kuma:/app/data
-      - /var/run/docker.sock:/var/run/docker.sock
-    restart: unless-stopped
-    env_file: .env
-    networks:
-      - traefik_network
-    labels:
-      - "traefik.enable=true"
-      # - "traefik.http.routers.kuma.rule=Host(`kuma.${EXTERNAL_DOMAIN}`)"
-      # - "traefik.http.routers.kuma.entrypoints=https"
-      # - "traefik.http.routers.kuma.tls=true"
-      # - "traefik.http.services.kuma.loadbalancer.server.port=3001"
-      # - "traefik.http.routers.kuma.middlewares=chain-github-oauth@file,kuma-theme@file"
-
-      ## internal domain
-      - "traefik.http.routers.kuma-internal.rule=Host(`kuma.${DOMAIN}`)"
-      - "traefik.http.routers.kuma-internal.entrypoints=https"
-      - "traefik.http.routers.kuma-internal.tls=true"
-      - "traefik.http.services.kuma-internal.loadbalancer.server.port=3001"
-      - "traefik.http.routers.kuma-internal.middlewares=chain-github-oauth@file"
-
-  dockge:
-    image: louislam/dockge:nightly
-    container_name: dockge
-    restart: unless-stopped
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-      - ${DATA_DIR}/dockge:/app/data
-      - ${DOCKGE_STACKS_DIR}:${DOCKGE_STACKS_DIR}
-    env_file: .env
-    environment:
-      # Tell Dockge where to find the stacks
-      - DOCKGE_STACKS_DIR=${DOCKGE_STACKS_DIR}
-    networks:
-      - traefik_network
-
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.dockge.rule=Host(`dockge.${DOMAIN}`)"
-      - "traefik.http.routers.dockge.entrypoints=https"
-      - "traefik.http.routers.dockge.tls=true"
-      - "traefik.http.services.dockge.loadbalancer.server.port=5001"
-      - "traefik.http.routers.dockge.middlewares=chain-github-oauth@file"
-
   dozzle:
     container_name: dozzle
     image: amir20/dozzle:latest
     env_file: .env
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
+      - ${CERTS_DIR}:/certs:ro
     networks:
       - traefik_network
     environment:
@@ -65,6 +18,9 @@ services:
       - "traefik.http.routers.dozzle.tls=true"
       ## Middlewares
       - "traefik.http.routers.dozzle.middlewares=chain-google-oauth@file"
+      # set higher priority to the local dozzle
+      - "traefik.http.routers.dozzle.priority=1"
+      - dev.dozzle.group=Logs
 
   watchtower:
     container_name: watchtower
@@ -73,32 +29,17 @@ services:
       - traefik_network
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-    env_file: .env
     environment:
       - WATCHTOWER_SCHEDULE=0 0 8 * * *
       - WATCHTOWER_NOTIFICATIONS=shoutrrr
+      - WATCHTOWER_NOTIFICATION_URL=discord://4mpsphpztftygTO1eGUV9QcBYLEzE-dPGCAw690Bb2Q4f7mFq9jEGhNzO-IxkxoxcI2p@1268397860228042826
       - WATCHTOWER_HTTP_API_TOKEN=${WATCHTOWER_HTTP_API_TOKEN}
       - WATCHTOWER_HTTP_API_METRICS=true
       - WATCHTOWER_CLEANUP=true
 
     labels:
       - "traefik.enable=false"
-
-  # diun:
-  #   container_name: diun
-  #   image: crazymax/diun:latest
-  #   command: serve
-  #   networks:
-  #     - traefik_network
-  #   volumes:
-  #     - ${DATA_DIR}/diun:/data
-  #     - ${DATA_DIR}/diun/diun.yml:/diun.yml:ro
-  #     - /var/run/docker.sock:/var/run/docker.sock
-  #   environment:
-  #     - TZ=America/Toronto
-  #     - LOG_LEVEL=info
-  #     - LOG_JSON=false
-  #   restart: always
+      - dev.dozzle.group=Monitoring
 
   speedtest:
     restart: unless-stopped
@@ -113,6 +54,7 @@ services:
       - "traefik.http.routers.speedtest.tls=true"
       - "traefik.http.services.speedtest.loadbalancer.server.port=3000"
       - "traefik.http.routers.speedtest.middlewares=chain-github-oauth@file"
+      - dev.dozzle.group=Monitoring
 
   glances:
     container_name: glances
@@ -139,7 +81,92 @@ services:
     #         - driver: nvidia
     #           count: 1
     #           capabilities: [gpu]
+    labels:
+      - dev.dozzle.group=Monitoring
+
+        #  statping:
+        #    container_name: statping
+        #    image: statping/statping:dev
+        #    restart: always
+        #    volumes:
+        #      - ${DATA_DIR}/statping:/app
+        #    environment:
+        #      DB_CONN: sqlite
+        #    env_file: .env
+        #    networks:
+        #      - traefik_network
+        #    labels:
+        #      - "traefik.enable=true"
+        #      - "traefik.http.routers.statping.rule=Host(`statping.${DOMAIN}`)"
+        #      - "traefik.http.routers.statping.entrypoints=https"
+        #      - "traefik.http.routers.statping.tls=true"
+        #      - "traefik.http.services.statping.loadbalancer.server.port=8080"
+        #      - "traefik.http.routers.statping.middlewares=chain-github-oauth@file"
+        #      - dev.dozzle.group=Monitoring
 
 networks:
   traefik_network:
     external: true
+
+  # uptime-kuma:
+  #   image: louislam/uptime-kuma:beta
+  #   container_name: uptime-kuma
+  #   volumes:
+  #     - ${DATA_DIR}/kuma:/app/data
+  #     - /var/run/docker.sock:/var/run/docker.sock
+  #   restart: unless-stopped
+  #   env_file: .env
+  #   networks:
+  #     - traefik_network
+  #   labels:
+  #     - "traefik.enable=true"
+  #     # - "traefik.http.routers.kuma.rule=Host(`kuma.${EXTERNAL_DOMAIN}`)"
+  #     # - "traefik.http.routers.kuma.entrypoints=https"
+  #     # - "traefik.http.routers.kuma.tls=true"
+  #     # - "traefik.http.services.kuma.loadbalancer.server.port=3001"
+  #     # - "traefik.http.routers.kuma.middlewares=chain-github-oauth@file,kuma-theme@file"
+
+  #     ## internal domain
+  #     - "traefik.http.routers.kuma-internal.rule=Host(`kuma.${DOMAIN}`)"
+  #     - "traefik.http.routers.kuma-internal.entrypoints=https"
+  #     - "traefik.http.routers.kuma-internal.tls=true"
+  #     - "traefik.http.services.kuma-internal.loadbalancer.server.port=3001"
+  #     - "traefik.http.routers.kuma-internal.middlewares=chain-github-oauth@file"
+  # dockge:
+  #   image: louislam/dockge:nightly
+  #   container_name: dockge
+  #   restart: unless-stopped
+  #   volumes:
+  #     - /var/run/docker.sock:/var/run/docker.sock
+  #     - ${DATA_DIR}/dockge:/app/data
+  #     - ${DOCKGE_STACKS_DIR}:${DOCKGE_STACKS_DIR}
+  #   env_file: .env
+  #   environment:
+  #     # Tell Dockge where to find the stacks
+  #     - DOCKGE_STACKS_DIR=${DOCKGE_STACKS_DIR}
+  #   networks:
+  #     - traefik_network
+
+  #   labels:
+  #     - "traefik.enable=true"
+  #     - "traefik.http.routers.dockge.rule=Host(`dockge.${DOMAIN}`)"
+  #     - "traefik.http.routers.dockge.entrypoints=https"
+  #     - "traefik.http.routers.dockge.tls=true"
+  #     - "traefik.http.services.dockge.loadbalancer.server.port=5001"
+  #     - "traefik.http.routers.dockge.middlewares=chain-github-oauth@file"
+
+  # diun:
+  #   container_name: diun
+  #   image: crazymax/diun:latest
+  #   command: serve
+  #   networks:
+  #     - traefik_network
+  #   volumes:
+  #     - ${DATA_DIR}/diun:/data
+  #     - ${DATA_DIR}/diun/diun.yml:/diun.yml:ro
+  #     - /var/run/docker.sock:/var/run/docker.sock
+  #   environment:
+  #     - TZ=America/Toronto
+  #     - LOG_LEVEL=info
+  #     - LOG_JSON=false
+  #   restart: always

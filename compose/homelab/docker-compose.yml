@@ -1,0 +1,32 @@
+# MASTER DOCKER FILE #
+# create a network for traefik called traefik_network
+
+include:
+  # ## TRAEFIK ##
+  # - traefik/docker-compose.yml
+
+  # # clouldflare ##
+  # - cloudflared/docker-compose.yml
+
+  ## OneDrive ##
+  - onedrive/docker-compose.yml
+
+  ## Media ##
+  - smart-media/docker-compose.yml
+
+  # ## Smart Home ##
+  # - smart-home/docker-compose.yml
+
+  ## Monitoring ##
+  - monitoring/docker-compose.yml
+  # - netdata/docker-compose.yml
+  - portainer/docker-compose.yml
+
+  ## Password ##
+  - vault/docker-compose.yml
+
+  # ## Podcast ##
+  # - podsync/docker-compose.yml
+  # - podify/docker-compose.yml
+
+  

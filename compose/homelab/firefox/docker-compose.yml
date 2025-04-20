@@ -1,0 +1,23 @@
+services:
+  firefox:
+    image: jlesage/firefox
+    # ports:
+    #   - "5800:5800"
+    env_file: .env
+    networks:
+      - traefik_network
+    volumes:
+      - ${DATA_DIR}/firefox:/config:rw
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.firefox.rule=Host(`firefox.webninja.me`)"
+      - "traefik.http.routers.firefox.entrypoints=https"
+      - "traefik.http.routers.firefox.tls=true"
+      - "traefik.http.routers.firefox.priority=100"
+      - "traefik.http.routers.firefox.service=firefox"
+      - "traefik.http.services.firefox.loadbalancer.server.port=5800"
+      - dev.dozzle.group=Browser
+
+networks:
+  traefik_network:
+    external: true

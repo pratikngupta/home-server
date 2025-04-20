@@ -1,0 +1,34 @@
+version: '3'
+services:
+  netdata:
+    image: netdata/netdata:edge
+    container_name: netdata
+    pid: host
+    network_mode: host
+    restart: unless-stopped
+    cap_add:
+      - SYS_PTRACE
+      - SYS_ADMIN
+    security_opt:
+      - apparmor:unconfined
+    volumes:
+      - ./data:/etc/netdata
+      - netdatalib:/var/lib/netdata
+      - netdatacache:/var/cache/netdata
+      - /:/host/root:ro,rslave
+      - /etc/passwd:/host/etc/passwd:ro
+      - /etc/group:/host/etc/group:ro
+      - /etc/localtime:/etc/localtime:ro
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /etc/os-release:/host/etc/os-release:ro
+      - /var/log:/host/var/log:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    environment:
+      - NETDATA_CLAIM_TOKEN=A4QQkFQwclw_pTC1RgU7MSGk0icIS-6OTMfq5l0l5rDHXM-nv24xydwmOgqAuVV8l-9dsUPdqtUgPENZAyqxYjt5DjjO4BvN9A914Q-GlfOWFPZpN4pU5r_xKNs4hHFsYV6VA4I
+      - NETDATA_CLAIM_URL=https://app.netdata.cloud
+      - NETDATA_CLAIM_ROOMS=62db9299-f4e1-4951-9347-b7a378d392ee
+volumes:
+  netdatalib: {}
+  netdatacache: {}
+

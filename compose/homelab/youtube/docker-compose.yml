@@ -1,0 +1,89 @@
+services:
+  metube:
+    image: ghcr.io/alexta69/metube
+    container_name: metube
+    restart: unless-stopped
+    networks:
+      - traefik_network
+    volumes:
+      - ./data/metube:/downloads
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers Auth Bypass
+      - "traefik.http.routers.youtube-metube-rtr-bypass.entrypoints=https"
+      - "traefik.http.routers.youtube-metube-rtr-bypass.rule=Host(`youtube.$DOMAIN`) && Header(`traefik-auth-bypass-key`, `$TRAEFIK_AUTH_BYPASS_KEY`)" # Bypass Auth for LunaSea on iOS
+      - "traefik.http.routers.youtube-metube-rtr-bypass.priority=100"
+      ## HTTP Routers Auth
+      - "traefik.http.routers.youtube-metube-rtr.entrypoints=https"
+      - "traefik.http.routers.youtube-metube-rtr.rule=Host(`youtube.$DOMAIN`)"
+      - "traefik.http.routers.youtube-metube-rtr.priority=99"
+      ## Enable tls
+      - "traefik.http.routers.youtube-metube-rtr.tls=true"
+      - "traefik.http.routers.youtube-metube-rtr-bypass.tls=true"
+      ## Middleware
+      - "traefik.http.routers.youtube-metube-rtr-bypass.middlewares=chain-no-auth@file"
+      - "traefik.http.routers.youtube-metube-rtr.middlewares=chain-google-oauth@file"
+      ## HTTP Services
+      - "traefik.http.routers.youtube-metube-rtr.service=youtube-metube-svc"
+      - "traefik.http.routers.youtube-metube-rtr-bypass.service=youtube-metube-svc"
+      - "traefik.http.services.youtube-metube-svc.loadbalancer.server.port=8081"
+
+  ytdl_material:
+    environment:
+      ytdl_mongodb_connection_string: "mongodb://ytdl-mongo-db:27017"
+      ytdl_use_local_db: "false"
+      write_ytdl_config: "true"
+      ytdl_default_theme: "dark"
+      ytdl_title_top: "Youtube Downloader"
+      ytdl_download_only_mode: "true"
+
+    restart: always
+    depends_on:
+      - ytdl-mongo-db
+    volumes:
+      - ./data/youtube-ui/appdata:/app/appdata
+      - "/home/pratik/Docker/onedrive/data/YouTube (Homelab Upload)/audio:/app/audio"
+      - "/home/pratik/Docker/onedrive/data/YouTube (Homelab Upload)/video:/app/video"
+      - "/home/pratik/Docker/onedrive/data/YouTube (Homelab Upload)/subscriptions:/app/subscriptions"
+      - "/home/pratik/Docker/onedrive/data/YouTube (Homelab Upload)/users:/app/users"
+    # ports:
+    #   - "17442:17442"
+    networks:
+      - traefik_network
+    image: tzahi12345/youtubedl-material:nightly
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers Auth Bypass
+      - "traefik.http.routers.youtube-ui-rtr-bypass.entrypoints=https"
+      - "traefik.http.routers.youtube-ui-rtr-bypass.rule=Host(`youtube-ui.$DOMAIN`) && Header(`traefik-auth-bypass-key`, `$TRAEFIK_AUTH_BYPASS_KEY`)" # Bypass Auth for LunaSea on iOS
+      - "traefik.http.routers.youtube-ui-rtr-bypass.priority=100"
+      ## HTTP Routers Auth
+      - "traefik.http.routers.youtube-ui-rtr.entrypoints=https"
+      - "traefik.http.routers.youtube-ui-rtr.rule=Host(`youtube-ui.$DOMAIN`)"
+      - "traefik.http.routers.youtube-ui-rtr.priority=99"
+      ## Enable tls
+      - "traefik.http.routers.youtube-ui-rtr.tls=true"
+      - "traefik.http.routers.youtube-ui-rtr-bypass.tls=true"
+      ## Middleware
+      - "traefik.http.routers.youtube-ui-rtr-bypass.middlewares=chain-no-auth@file"
+      - "traefik.http.routers.youtube-ui-rtr.middlewares=chain-google-oauth@file"
+      ## HTTP Services
+      - "traefik.http.routers.youtube-ui-rtr.service=youtube-ui-svc"
+      - "traefik.http.routers.youtube-ui-rtr-bypass.service=youtube-ui-svc"
+      - "traefik.http.services.youtube-ui-svc.loadbalancer.server.port=17442"
+
+  ytdl-mongo-db:
+    # If you are using a Raspberry Pi, use mongo:4.4.18
+    image: mongo:4
+    logging:
+      driver: "none"
+    container_name: mongo-db
+    restart: always
+    volumes:
+      - ./data/youtube-ui/db:/data/db
+    networks:
+      - traefik_network
+
+networks:
+  traefik_network:
+    external: true

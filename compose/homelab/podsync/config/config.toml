@@ -9,38 +9,68 @@ hostname = "https://podsync.webninja.me:443"
   data_dir = "/app/data"
 
 [tokens]
-youtube = "AIzaSyCp0HLQ2wd0B8FEe2t2yiEIda4xk886G2w"
+youtube = [
+	"AIzaSyB8ClYvep3i1qrvrj7QLgKsb-rgNVs9xS8",
+	"AIzaSyAiNBH4CSDLUqnTkMrDnIkumVNePVb_VDw"
+	]
 
 [feeds]
     [feeds.Ramayana-Mahabharata]
     url = "https://youtube.com/playlist?list=PLwL1EbEwUxHI9kDW0AyluLdXaKXyz6fOz&si=Z8uz4hpt8RPa_zbw"
-    update_period = "15m"
+    update_period = "10m"
     quality = "high" # "high" or "low"
-    format = "video" # "audio", "video" or "custom"
+    format = "audio" # "audio", "video" or "custom"
     opml = true
     max_height = 1080
     private_feed = true
-    cover_art = "https://m.media-amazon.com/images/I/51ceUFlwfJL._SL500_.jpg"
-    cover_art_quality = "high"
+    youtube_dl_args = ["--write-sub", "--embed-subs", "--sub-lang", "en,en-US,en-GB","--sleep-requests", "1.5", "--min-sleep-interval", "60", "--max-sleep-interval", "90", "--cookies", "/app/data/cookies.txt", "--extractor-args", "youtube:po_token=web.gvs+Mltlp_gE6CDWw2WfeNbIf0MzyphQHpT_v2wODev4I_rCg5N1-JkF01_HYdoVFTajngYFAV2bSl7C-5Z_WCnT2mc4cgcPkr4iim2s4AqxMn4sBgxpACdp4_-djDIX"]
 
     [feeds.Ramayana-Mahabharata.custom]
     title = "Podsync - Ramayana and Mahabharata"
     description = "Collection of best stories"
     author = "Pratik Gupta"
-    
     category = "TV"
-    lang = "en"
+    lang = "hi"
     ownerName = "Pratik Gupta"
     ownerEmail = "pratikngupta@outlook.com"
+    cover_art = "https://res.cloudinary.com/dgvb8nzdv/image/upload/v1735685883/ramayan-mahabhara-podcast_dbqsp7.png"
+    cover_art_quality = "high"
 
-    [feeds.watch-later]
-    url = "https://youtube.com/playlist?list=PLwL1EbEwUxHI55EngMmxo3ybDE9DRYBUZ&si=uQWZte_8rOWCKrJQ"
-    update_period = "15m"
+    [feeds.poem]
+    url = "https://youtube.com/playlist?list=PLwL1EbEwUxHKROJCcvRLyMG_KpqSjmSCj&si=0EoEWI5zmeuU7a_Y"
+    update_period = "10m"
     quality = "high" # "high" or "low"
-    format = "video" # "audio", "video" or "custom"
+    format = "custom" # "audio", "video" or "custom"
+    custom_format = { youtube_dl_format = "bestaudio[ext=m4a]", extension = "m4a" }
     opml = true
     max_height = 1080
     private_feed = true
+    youtube_dl_args = ["--write-sub", "--embed-subs", "--sub-lang", "en,en-US,en-GB","--sleep-requests", "1.5", "--min-sleep-interval", "60", "--max-sleep-interval", "90", "--cookies", "/app/data/cookies.txt", "--extractor-args", "youtube:po_token=web.gvs+Mltlp_gE6CDWw2WfeNbIf0MzyphQHpT_v2wODev4I_rCg5N1-JkF01_HYdoVFTajngYFAV2bSl7C-5Z_WCnT2mc4cgcPkr4iim2s4AqxMn4sBgxpACdp4_-djDIX"]
+
+    [feeds.poem.custom]
+    title = "Podsync - Poem"
+    description = "Collection of Poem"
+    author = "Pratik Gupta"
+    category = "Youtube"
+    lang = "hi"
+    ownerName = "Pratik Gupta"
+    ownerEmail = "pratikngupta@outlook.com"
+    cover_art = "https://res.cloudinary.com/dgvb8nzdv/image/upload/v1735686189/Ramayan_Mahabharat_Podcast_Art_yrokbf.png"
+    cover_art_quality = "high"
+
+
+    [feeds.watch-later]
+    url = "https://youtube.com/playlist?list=PLwL1EbEwUxHI55EngMmxo3ybDE9DRYBUZ&si=uQWZte_8rOWCKrJQ"
+    update_period = "10m"
+    quality = "high" # "high" or "low"
+    format = "custom" # "audio", "video" or "custom"
+    custom_format = { youtube_dl_format = "bestaudio[ext=m4a]", extension = "m4a" }
+    opml = true
+    max_height = 1080
+    private_feed = true
+    clean = { keep_last = 10 }
+    youtube_dl_args = ["--write-sub", "--embed-subs", "--sub-lang", "en,en-US,en-GB","--sleep-requests", "1.5", "--min-sleep-interval", "60", "--max-sleep-interval", "90", "--cookies", "/app/data/cookies.txt", "--extractor-args", "youtube:po_token=web.gvs+Mltlp_gE6CDWw2WfeNbIf0MzyphQHpT_v2wODev4I_rCg5N1-JkF01_HYdoVFTajngYFAV2bSl7C-5Z_WCnT2mc4cgcPkr4iim2s4AqxMn4sBgxpACdp4_-djDIX"]
+
 
     [feeds.watch-later.custom]
     title = "Podsync - Watch Later"
@@ -50,15 +80,20 @@ youtube = "AIzaSyCp0HLQ2wd0B8FEe2t2yiEIda4xk886G2w"
     lang = "en"
     ownerName = "Pratik Gupta"
     ownerEmail = "pratikngupta@outlook.com"
+    cover_art = "https://res.cloudinary.com/dgvb8nzdv/image/upload/v1735686189/Watch_Later_Podcast_Art_c1rk3v.png"
+    cover_art_quality = "high"
 
     [feeds.watch-later-secondary]
     url = "https://youtube.com/playlist?list=PLQr5rwcDMXDvF0E8Ki6c0DDILh__kIqVs&si=I6Wc27QDAkDr4shu"
-    update_period = "15m"
+    update_period = "10m"
     quality = "high" # "high" or "low"
-    format = "video" # "audio", "video" or "custom"
+    format = "custom" # "audio", "video" or "custom"
+    custom_format = { youtube_dl_format = "bestaudio[ext=m4a]", extension = "m4a" }    
     opml = true
     max_height = 1080
     private_feed = true
+    clean = { keep_last = 10 }
+    youtube_dl_args = ["--write-sub", "--embed-subs", "--sub-lang", "en,en-US,en-GB","--sleep-requests", "1.5", "--min-sleep-interval", "60", "--max-sleep-interval", "90", "--cookies", "/app/data/cookies.txt", "--extractor-args", "youtube:player-client=web,default;po_token=MnTJuXhGtSZ89smBLtWSSRSGqKMvt7O82W7-W5V75Z5c9tLI17LBkdBUdYevKEb_eOlqz3mG_OUJYB3VNVxYJtETG7nnfi9Q6mn1XF3TQx2Ij-8drC1eIOkBHbV81ZiQa1Mc5XKIIXFydWP4bpB_rKNZK_G6kw=="]
 
     [feeds.watch-later-secondary.custom]
     title = "Podsync - Watch Later - Secondary"
@@ -68,24 +103,31 @@ youtube = "AIzaSyCp0HLQ2wd0B8FEe2t2yiEIda4xk886G2w"
     lang = "en"
     ownerName = "Pratik Gupta"
     ownerEmail = "pratikngupta@outlook.com"
+    cover_art = "https://res.cloudinary.com/dgvb8nzdv/image/upload/v1735686189/Watch_Later_Podcast_Art_c1rk3v.png"
+    cover_art_quality = "high"
 
-    [feeds.poem]
-    url = "https://youtube.com/playlist?list=PLwL1EbEwUxHKROJCcvRLyMG_KpqSjmSCj&si=0EoEWI5zmeuU7a_Y"
-    update_period = "15m"
+    [feeds.watch-later-secondary-mp3]
+    url = "https://youtube.com/playlist?list=PLQr5rwcDMXDvF0E8Ki6c0DDILh__kIqVs&si=I6Wc27QDAkDr4shu"
+    update_period = "10m"
     quality = "high" # "high" or "low"
-    format = "video" # "audio", "video" or "custom"
+    format = "audio" # "audio", "video" or "custom"
+    custom_format = { youtube_dl_format = "bestaudio[ext=m4a]", extension = "m4a" }    
     opml = true
     max_height = 1080
     private_feed = true
+    clean = { keep_last = 10 }
+    youtube_dl_args = ["--write-sub", "--embed-subs", "--sub-lang", "en,en-US,en-GB","--sleep-requests", "1.5", "--min-sleep-interval", "60", "--max-sleep-interval", "90", "--cookies", "/app/data/cookies.txt", "--extractor-args", "youtube:player-client=web,default;po_token=MnTJuXhGtSZ89smBLtWSSRSGqKMvt7O82W7-W5V75Z5c9tLI17LBkdBUdYevKEb_eOlqz3mG_OUJYB3VNVxYJtETG7nnfi9Q6mn1XF3TQx2Ij-8drC1eIOkBHbV81ZiQa1Mc5XKIIXFydWP4bpB_rKNZK_G6kw=="]
 
-    [feeds.poem.custom]
-    title = "Podsync - Poem"
-    description = "Collection of Poem"
+    [feeds.watch-later-secondary-mp3.custom]
+    title = "Podsync - Watch Later - Secondary - mp3"
+    description = "Collection of watch later podcast from second account"
     author = "Pratik Gupta"
     category = "Youtube"
     lang = "en"
     ownerName = "Pratik Gupta"
     ownerEmail = "pratikngupta@outlook.com"
-
+    cover_art = "https://res.cloudinary.com/dgvb8nzdv/image/upload/v1735686189/Watch_Later_Podcast_Art_c1rk3v.png"
+    cover_art_quality = "high"
 [log]
 debug = true
+compress = true

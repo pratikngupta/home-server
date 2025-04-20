@@ -21,7 +21,8 @@ services:
       - "traefik.http.routers.podsync.service=podsync"
       - "traefik.http.services.podsync.loadbalancer.server.port=8080"
 
-      - "traefik.http.routers.podsync-mp4.rule=Host(`podsync.webninja.me`) && PathRegexp(`.mp4$`)"
+      - "traefik.http.routers.podsync-mp4.rule=Host(`podsync.webninja.me`) && PathRegexp(`.(mp4|m4a|mp3)$`)"
+      # - "traefik.http.routers.podsync-mp4.rule=Host(`podsync.webninja.me`) && PathRegexp(`.mp4$`) || PathRegexp(`.m4a$`) || PathRegexp(`.mp3$`)"
       - "traefik.http.routers.podsync-mp4.entrypoints=https"
       - "traefik.http.routers.podsync-mp4.tls=true"
       - "traefik.http.routers.podsync-mp4.priority=100"
@@ -37,6 +38,7 @@ services:
       - "traefik.http.routers.podsync-redirect.priority=90"
       - "traefik.http.routers.podsync-redirect.service=podsync-redirect"
       - "traefik.http.services.podsync-redirect.loadbalancer.server.port=8080"
+      - dev.dozzle.group=Podcast
 
 networks:
   traefik_network:

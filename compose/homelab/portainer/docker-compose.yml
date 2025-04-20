@@ -2,10 +2,11 @@ version: "3.3"
 services:
   portainer-ce:
     container_name: portainer
-    restart: always
+    restart: unless-stopped
+    env_file: .env
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-      - portainer_data:/data
+      - ${DATA_DIR}/portainer:/data
     image: portainer/portainer-ee:latest
     networks:
       - traefik_network
@@ -16,12 +17,9 @@ services:
       - traefik.http.services.portainer.loadbalancer.server.port=9000
       # enable tls
       - traefik.http.routers.portainer.tls=true
-      #
+      # enable middleware
       - traefik.http.routers.portainer.middlewares=chain-google-oauth@file
 
 networks:
   traefik_network:
     external: true
-
-volumes:
-  portainer_data: {}
