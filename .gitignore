@@ -9,3 +9,4 @@ acme.json
 oauth_secrets
 
 .fleet/
+appdata/

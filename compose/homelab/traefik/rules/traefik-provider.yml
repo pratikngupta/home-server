@@ -1,19 +1,46 @@
 http:
+  # routers:
+  #   # Define a connection between requests and services
+  #   gonic-router:
+  #     rule: "Host(`gonic.webninja.me`)"
+  #      # If the rule matches, applies the middleware
+  #     middlewares:
+  #     - chain-no-auth
+  #     # If the rule matches, forward to the whoami service (declared below)
+  #     service: gonic-service
+  #     entryPoints:
+  #       - https
+  #     tls:
+  #       certResolver: letsencrypt
+  #       domains:
+  #         - main: gonic.webninja.me
+  #           sans:
+  #             - "*.gonic.webninja.me"
+      
   services:
     # jellyfin-svc:
     #   loadBalancer:
     #     servers:
     #       - url: "http://192.168.2.55:8096"
 
+    # podify-media-server:
+    #   loadBalancer:
+    #     servers:
+    #       - url: "http://192.168.2.55:3000"
+
     plex-media-server:
       loadBalancer:
         servers:
           - url: "http://192.168.2.55:32400"
 
-    # podify-media-server:
+    # gonic-service:
     #   loadBalancer:
+    #     passHostHeader: false
     #     servers:
-    #       - url: "http://192.168.2.55:3000"
+    #       # - url: "http://192.168.4.70:8080"
+    #       - url: "https://gonic.techsanctuary.me"
+
+
 tls:
   options:
     default:
