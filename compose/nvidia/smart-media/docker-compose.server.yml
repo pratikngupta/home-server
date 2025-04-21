@@ -7,172 +7,172 @@
 ######################################################
 
 services:
-    plex:
-        image: plexinc/pms-docker:latest
-        container_name: plex
-        environment:
-            - PUID=1000
-            - PGID=1000
-            - VERSION=docker
-            - HOSTNAME=plex.${DOMAIN}
-        env_file: .env
-        volumes:
-            - ${DATA_DIR}/plex:/config
-            # - ./content/media:/data/media
-            - ${MEDIA_DIR}/media:/movies
-            # - "/home/pratik/Docker/onedrive/data/Movies (Homelab Upload):/onedrive"
-            # timezone
-            - /etc/localtime:/etc/localtime:ro
+  plex:
+    image: plexinc/pms-docker:latest
+    container_name: plex
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - VERSION=docker
+      - HOSTNAME=plex.${DOMAIN}
+    env_file: .env
+    volumes:
+      - ${DATA_DIR}/plex:/config
+      # - ./content/media:/data/media
+      - ${MEDIA_DIR}/media:/movies
+      # - "/home/pratik/Docker/onedrive/data/Movies (Homelab Upload):/onedrive"
+      # timezone
+      - /etc/localtime:/etc/localtime:ro
 
-        network_mode: host
-        privileged: true # libusb_init failed
-        restart: unless-stopped
-        # networks:
-        #   - media-network
-        devices:
-            - /dev/dri:/dev/dri
-        labels:
-            - "traefik.enable=true"
-            - "traefik.http.routers.plex.rule=Host(`playninja.${DOMAIN}`)"
-            # - "traefik.http.routers.playninja.rule=(Host(`playninja.${DOMAIN}.me`) && (Path(`/prefs`) || Path(`/actions/removeFromContinueWatching`) || Path(`/library/clean/bundles`) || Path(`/library/optimize`) || Path(`/media/grabbers/devices/discover`) || Path(`/myplex/refreshReachability`) || Path(`/playQueues`) || Path(`/playlists`) || PathRegexp(`^/accounts/[0-9]+$`) || PathRegexp(`^/library/metadata/[0-9]+/[a-z]+$`) || PathRegexp(`^/library/parts/[0-9]+$`) || PathRegexp(`^/playQueues/[0-9]+/(unshuffle|shuffle)$`) || PathRegexp(`^/[a-z]+/sections$`) || PathRegexp(`^/hubs/sections/[0-9]+/manage$`) || Path(`/updater/check`) || PathRegexp(`^/system/agents/`) || PathRegexp(`^/library/metadata/[0-9]+/related$`) || PathRegexp(`^/[a-z]+/sections$`) || PathRegexp(`^/[a-z]+/$`) || PathRegexp(`^/hubs/$`) || PathRegexp(`^/library/metadata/plex:/`) || Path(`/library/all`) || Path(`/library/all/top`) || Path(`/statistics/media`) || Path(`/status/sessions/history/all`)))"
-            - "traefik.http.routers.plex.entrypoints=https"
-            - "traefik.http.routers.plex.tls=true"
-            - "traefik.http.routers.plex.service=plex-media-server@file"
-            - "traefik.http.routers.plex.middlewares=jellyfin-mw"
+    network_mode: host
+    privileged: true # libusb_init failed
+    restart: unless-stopped
+    # networks:
+    #   - media-network
+    devices:
+      - /dev/dri:/dev/dri
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.plex.rule=Host(`playninja.${DOMAIN}`)"
+      # - "traefik.http.routers.playninja.rule=(Host(`playninja.${DOMAIN}.me`) && (Path(`/prefs`) || Path(`/actions/removeFromContinueWatching`) || Path(`/library/clean/bundles`) || Path(`/library/optimize`) || Path(`/media/grabbers/devices/discover`) || Path(`/myplex/refreshReachability`) || Path(`/playQueues`) || Path(`/playlists`) || PathRegexp(`^/accounts/[0-9]+$`) || PathRegexp(`^/library/metadata/[0-9]+/[a-z]+$`) || PathRegexp(`^/library/parts/[0-9]+$`) || PathRegexp(`^/playQueues/[0-9]+/(unshuffle|shuffle)$`) || PathRegexp(`^/[a-z]+/sections$`) || PathRegexp(`^/hubs/sections/[0-9]+/manage$`) || Path(`/updater/check`) || PathRegexp(`^/system/agents/`) || PathRegexp(`^/library/metadata/[0-9]+/related$`) || PathRegexp(`^/[a-z]+/sections$`) || PathRegexp(`^/[a-z]+/$`) || PathRegexp(`^/hubs/$`) || PathRegexp(`^/library/metadata/plex:/`) || Path(`/library/all`) || Path(`/library/all/top`) || Path(`/statistics/media`) || Path(`/status/sessions/history/all`)))"
+      - "traefik.http.routers.plex.entrypoints=https"
+      - "traefik.http.routers.plex.tls=true"
+      - "traefik.http.routers.plex.service=plex-media-server@file"
+      - "traefik.http.routers.plex.middlewares=jellyfin-mw"
 
-            ## HTTP Service
-            - "traefik.http.services.plex.loadBalancer.server.port=32400"
-            - "traefik.http.services.plex.loadBalancer.passHostHeader=true"
+      ## HTTP Service
+      - "traefik.http.services.plex.loadBalancer.server.port=32400"
+      - "traefik.http.services.plex.loadBalancer.passHostHeader=true"
 
-            ## Middleware
-            - "traefik.http.middlewares.jellyfin-mw.headers.customResponseHeaders.X-Robots-Tag=noindex,nofollow,nosnippet,noarchive,notranslate,noimageindex"
-            - "traefik.http.middlewares.jellyfin-mw.headers.SSLRedirect=true"
-            - "traefik.http.middlewares.jellyfin-mw.headers.SSLForceHost=true"
-            - "traefik.http.middlewares.jellyfin-mw.headers.STSSeconds=315360000"
-            - "traefik.http.middlewares.jellyfin-mw.headers.STSIncludeSubdomains=true"
-            - "traefik.http.middlewares.jellyfin-mw.headers.STSPreload=true"
-            - "traefik.http.middlewares.jellyfin-mw.headers.forceSTSHeader=true"
-            - "traefik.http.middlewares.jellyfin-mw.headers.frameDeny=true"
-            - "traefik.http.middlewares.jellyfin-mw.headers.contentTypeNosniff=true"
-            - "traefik.http.middlewares.jellyfin-mw.headers.customResponseHeaders.X-XSS-PROTECTION=1"
-            - "traefik.http.middlewares.jellyfin-mw.headers.customFrameOptionsValue='allow-from https://${DOMAIN}'"
-            - "dev.dozzle.group=Smart Media"
+      ## Middleware
+      - "traefik.http.middlewares.jellyfin-mw.headers.customResponseHeaders.X-Robots-Tag=noindex,nofollow,nosnippet,noarchive,notranslate,noimageindex"
+      - "traefik.http.middlewares.jellyfin-mw.headers.SSLRedirect=true"
+      - "traefik.http.middlewares.jellyfin-mw.headers.SSLForceHost=true"
+      - "traefik.http.middlewares.jellyfin-mw.headers.STSSeconds=315360000"
+      - "traefik.http.middlewares.jellyfin-mw.headers.STSIncludeSubdomains=true"
+      - "traefik.http.middlewares.jellyfin-mw.headers.STSPreload=true"
+      - "traefik.http.middlewares.jellyfin-mw.headers.forceSTSHeader=true"
+      - "traefik.http.middlewares.jellyfin-mw.headers.frameDeny=true"
+      - "traefik.http.middlewares.jellyfin-mw.headers.contentTypeNosniff=true"
+      - "traefik.http.middlewares.jellyfin-mw.headers.customResponseHeaders.X-XSS-PROTECTION=1"
+      - "traefik.http.middlewares.jellyfin-mw.headers.customFrameOptionsValue='allow-from https://${DOMAIN}'"
+      - "dev.dozzle.group=Smart Media"
 
-    jellyfin:
-        image: lscr.io/linuxserver/jellyfin:latest
-        container_name: jellyfin
-        environment:
-            - PUID=1000
-            - PGID=1000
-            - TZ=America/Toronto
-            - NVIDIA_VISIBLE_DEVICES=all # Change to specific GPU UUID if needed
-            - NVIDIA_DRIVER_CAPABILITIES=all # Ensure full GPU feature access
+  jellyfin:
+    image: lscr.io/linuxserver/jellyfin:latest
+    container_name: jellyfin
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/Toronto
+      - NVIDIA_VISIBLE_DEVICES=all # Change to specific GPU UUID if needed
+      - NVIDIA_DRIVER_CAPABILITIES=all # Ensure full GPU feature access
 
-        env_file: .env
-        volumes:
-            - ${DATA_DIR}/jellyfin:/config
-            - ${MEDIA_DIR}/media:/movies
-        deploy:
-            resources:
-                reservations:
-                    devices:
-                        - driver: nvidia
-                          count: all
-                          capabilities:
-                              - gpu
+    env_file: .env
+    volumes:
+      - ${DATA_DIR}/jellyfin:/config
+      - ${MEDIA_DIR}/media:/movies
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities:
+                - gpu
 
-        network_mode: "host"
-        restart: unless-stopped
-        devices:
-            - /dev/dri:/dev/dri
+    network_mode: "host"
+    restart: unless-stopped
+    devices:
+      - /dev/dri:/dev/dri
 
-        labels:
-            - "traefik.enable=true"
-            ## HTTP Service
-            - "traefik.http.services.jellyfin-svc.loadBalancer.server.port=8096"
-            - "traefik.http.services.jellyfin-svc.loadBalancer.passHostHeader=true"
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Service
+      - "traefik.http.services.jellyfin-svc.loadBalancer.server.port=8096"
+      - "traefik.http.services.jellyfin-svc.loadBalancer.passHostHeader=true"
 
-            ## External Access
-            - "traefik.http.routers.jellyfin-external.rule=Host(`jellyfin.${EXTERNAL_DOMAIN}`)"
-            - "traefik.http.routers.jellyfin-external.entrypoints=https"
-            - "traefik.http.routers.jellyfin-external.tls=true"
-            - "traefik.http.routers.jellyfin-external.service=jellyfin-svc@file"
-            - "traefik.http.routers.jellyfin-external.middlewares=chain-tinyauth-oauth@file,jellyfin-mw"
+      ## External Access
+      - "traefik.http.routers.jellyfin-external.rule=Host(`jellyfin.${EXTERNAL_DOMAIN}`)"
+      - "traefik.http.routers.jellyfin-external.entrypoints=https"
+      - "traefik.http.routers.jellyfin-external.tls=true"
+      - "traefik.http.routers.jellyfin-external.service=jellyfin-svc@file"
+      - "traefik.http.routers.jellyfin-external.middlewares=chain-tinyauth-oauth@file,jellyfin-mw"
 
-    navidrome:
-        image: deluan/navidrome:latest
-        container_name: navidrome
-        # user: 1000:1000 # should be owner of volumes
-        networks:
-            - traefik_network
-        # ports:
-        #   - "4533:4533"
-        restart: unless-stopped
-        env_file: .env
-        volumes:
-            - ${DATA_DIR}/navidrome:/data:rw
-            - ${MEDIA_DIR}/media/music:/music:ro
-        labels:
-            - "traefik.enable=true"
-            ## navidrome UI
-            - "traefik.http.routers.navidrome-rtr.entrypoints=https"
-            - "traefik.http.routers.navidrome-rtr.rule=Host(`navidrome.$DOMAIN`)"
-            - "traefik.http.routers.navidrome-rtr.priority=99"
-            - "traefik.http.routers.navidrome-rtr.tls=true"
-            - "traefik.http.routers.navidrome-rtr.middlewares=chain-no-auth@file"
-            - "traefik.http.routers.navidrome-rtr.service=navidrome-svc"
-            - "traefik.http.services.navidrome-svc.loadbalancer.server.port=4533"
-            ## Redirect to GitHub
-            - "traefik.http.routers.navidrome-github.rule=Host(`navidrome.$DOMAIN`) && Path(`/github`)"
-            - "traefik.http.routers.navidrome-github.entrypoints=https"
-            - "traefik.http.routers.navidrome-github.tls=true"
-            - "traefik.http.routers.navidrome-github.priority=100"
-            - "traefik.http.routers.navidrome-github.middlewares=redirect-to-github-navidrome@file"
-            - "traefik.http.routers.navidrome-github.service=navidrome-github"
-            - "traefik.http.services.navidrome-github.loadbalancer.server.port=4533"
+  navidrome:
+    image: deluan/navidrome:latest
+    container_name: navidrome
+    # user: 1000:1000 # should be owner of volumes
+    networks:
+      - traefik_network
+    # ports:
+    #   - "4533:4533"
+    restart: unless-stopped
+    env_file: .env
+    volumes:
+      - ${DATA_DIR}/navidrome:/data:rw
+      - ${MEDIA_DIR}/media/music:/music:ro
+    labels:
+      - "traefik.enable=true"
+      ## navidrome UI
+      - "traefik.http.routers.navidrome-rtr.entrypoints=https"
+      - "traefik.http.routers.navidrome-rtr.rule=Host(`navidrome.$DOMAIN`)"
+      - "traefik.http.routers.navidrome-rtr.priority=99"
+      - "traefik.http.routers.navidrome-rtr.tls=true"
+      - "traefik.http.routers.navidrome-rtr.middlewares=chain-no-auth@file"
+      - "traefik.http.routers.navidrome-rtr.service=navidrome-svc"
+      - "traefik.http.services.navidrome-svc.loadbalancer.server.port=4533"
+      ## Redirect to GitHub
+      - "traefik.http.routers.navidrome-github.rule=Host(`navidrome.$DOMAIN`) && Path(`/github`)"
+      - "traefik.http.routers.navidrome-github.entrypoints=https"
+      - "traefik.http.routers.navidrome-github.tls=true"
+      - "traefik.http.routers.navidrome-github.priority=100"
+      - "traefik.http.routers.navidrome-github.middlewares=redirect-to-github-navidrome@file"
+      - "traefik.http.routers.navidrome-github.service=navidrome-github"
+      - "traefik.http.services.navidrome-github.loadbalancer.server.port=4533"
 
-    gonic:
-        image: sentriz/gonic:latest
-        container_name: gonic
-        # environment:
-        #   - TZ
-        #   # optionally, see more available env vars in the readme
-        env_file: .env
-        # ports:
-        #   - 4747:80
-        volumes:
-            - ${DATA_DIR}/gonic/config:/data
-            - ${MEDIA_DIR}/media/music:/music:ro # your music
-            - ${MEDIA_DIR}/media/podcasts:/podcasts # your podcasts
-            - ${MEDIA_DIR}/media/playlists:/playlists # your playlists
-            - ${DATA_DIR}/gonic/cache:/cache # gonic cache dir
-        networks:
-            - traefik_network
-        labels:
-            - "traefik.enable=true"
-            ## Lidarr UI
-            - "traefik.http.routers.gonic-rtr.entrypoints=https"
-            - "traefik.http.routers.gonic-rtr.rule=Host(`gonic.$DOMAIN`)"
-            - "traefik.http.routers.gonic-rtr.priority=99"
-            - "traefik.http.routers.gonic-rtr.tls=true"
-            - "traefik.http.routers.gonic-rtr.middlewares=chain-no-auth@file"
-            - "traefik.http.routers.gonic-rtr.service=gonic-svc"
-            - "traefik.http.services.gonic-svc.loadbalancer.server.port=80"
-            ## Redirect to GitHub
-            - "traefik.http.routers.gonic-github.rule=Host(`gonic.$DOMAIN`) && Path(`/github`)"
-            - "traefik.http.routers.gonic-github.entrypoints=https"
-            - "traefik.http.routers.gonic-github.tls=true"
-            - "traefik.http.routers.gonic-github.priority=100"
-            - "traefik.http.routers.gonic-github.middlewares=redirect-to-github-gonic@file"
-            - "traefik.http.routers.gonic-github.service=gonic-github"
-            - "traefik.http.services.gonic-github.loadbalancer.server.port=80"
+  gonic:
+    image: sentriz/gonic:latest
+    container_name: gonic
+    # environment:
+    #   - TZ
+    #   # optionally, see more available env vars in the readme
+    env_file: .env
+    # ports:
+    #   - 4747:80
+    volumes:
+      - ${DATA_DIR}/gonic/config:/data
+      - ${MEDIA_DIR}/media/music:/music:ro # your music
+      - ${MEDIA_DIR}/media/podcasts:/podcasts # your podcasts
+      - ${MEDIA_DIR}/media/playlists:/playlists # your playlists
+      - ${DATA_DIR}/gonic/cache:/cache # gonic cache dir
+    networks:
+      - traefik_network
+    labels:
+      - "traefik.enable=true"
+      ## Lidarr UI
+      - "traefik.http.routers.gonic-rtr.entrypoints=https"
+      - "traefik.http.routers.gonic-rtr.rule=Host(`gonic.$DOMAIN`)"
+      - "traefik.http.routers.gonic-rtr.priority=99"
+      - "traefik.http.routers.gonic-rtr.tls=true"
+      - "traefik.http.routers.gonic-rtr.middlewares=chain-no-auth@file"
+      - "traefik.http.routers.gonic-rtr.service=gonic-svc"
+      - "traefik.http.services.gonic-svc.loadbalancer.server.port=80"
+      ## Redirect to GitHub
+      - "traefik.http.routers.gonic-github.rule=Host(`gonic.$DOMAIN`) && Path(`/github`)"
+      - "traefik.http.routers.gonic-github.entrypoints=https"
+      - "traefik.http.routers.gonic-github.tls=true"
+      - "traefik.http.routers.gonic-github.priority=100"
+      - "traefik.http.routers.gonic-github.middlewares=redirect-to-github-gonic@file"
+      - "traefik.http.routers.gonic-github.service=gonic-github"
+      - "traefik.http.services.gonic-github.loadbalancer.server.port=80"
 
-        # set the following two sections if you've enabled jukebox
-        group_add:
-            - audio
-        devices:
-            - /dev/snd:/dev/snd
+    # set the following two sections if you've enabled jukebox
+    group_add:
+      - audio
+    devices:
+      - /dev/snd:/dev/snd
 
 networks:
-    traefik_network:
-        external: true
+  traefik_network:
+    external: true

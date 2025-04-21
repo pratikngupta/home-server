@@ -7,101 +7,101 @@
 ######################################################
 
 services:
-    tautulli:
-        image: lscr.io/linuxserver/tautulli:latest
-        container_name: tautulli
-        environment:
-            - PUID=1000
-            - PGID=1000
-        env_file: .env
-        volumes:
-            - ${DATA_DIR}/media-server/tautulli/config:/config
-            # timezone
-            - /etc/localtime:/etc/localtime:ro
-        restart: unless-stopped
-        networks:
-            - traefik_network
-        labels:
-            - "traefik.enable=true"
-            ## HTTP Routers Auth Bypass
-            - "traefik.http.routers.tautulli-rtr-bypass.entrypoints=https"
-            - "traefik.http.routers.tautulli-rtr-bypass.rule=Host(`tautulli.$DOMAIN`) && Header(`traefik-auth-bypass-key`, `$TRAEFIK_AUTH_BYPASS_KEY`)" # Bypass Auth for LunaSea on iOS
-            - "traefik.http.routers.tautulli-rtr-bypass.priority=100"
-            ## HTTP Routers Auth
-            - "traefik.http.routers.tautulli-rtr.entrypoints=https"
-            - "traefik.http.routers.tautulli-rtr.rule=Host(`tautulli.$DOMAIN`)"
-            - "traefik.http.routers.tautulli-rtr.priority=99"
-            ## Enable tls
-            - "traefik.http.routers.tautulli-rtr.tls=true"
-            - "traefik.http.routers.tautulli-rtr-bypass.tls=true"
-            ## Middleware
-            - "traefik.http.routers.tautulli-rtr-bypass.middlewares=chain-no-auth@file"
-            - "traefik.http.routers.tautulli-rtr.middlewares=chain-tinyauth-oauth@file"
-            ## HTTP Services
-            - "traefik.http.routers.tautulli-rtr.service=tautulli-svc"
-            - "traefik.http.routers.tautulli-rtr-bypass.service=tautulli-svc"
-            - "traefik.http.services.tautulli-svc.loadbalancer.server.port=8181"
-            - "dev.dozzle.group=Smart Media"
+  tautulli:
+    image: lscr.io/linuxserver/tautulli:latest
+    container_name: tautulli
+    environment:
+      - PUID=1000
+      - PGID=1000
+    env_file: .env
+    volumes:
+      - ${DATA_DIR}/media-server/tautulli/config:/config
+      # timezone
+      - /etc/localtime:/etc/localtime:ro
+    restart: unless-stopped
+    networks:
+      - traefik_network
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers Auth Bypass
+      - "traefik.http.routers.tautulli-rtr-bypass.entrypoints=https"
+      - "traefik.http.routers.tautulli-rtr-bypass.rule=Host(`tautulli.$DOMAIN`) && Header(`traefik-auth-bypass-key`, `$TRAEFIK_AUTH_BYPASS_KEY`)" # Bypass Auth for LunaSea on iOS
+      - "traefik.http.routers.tautulli-rtr-bypass.priority=100"
+      ## HTTP Routers Auth
+      - "traefik.http.routers.tautulli-rtr.entrypoints=https"
+      - "traefik.http.routers.tautulli-rtr.rule=Host(`tautulli.$DOMAIN`)"
+      - "traefik.http.routers.tautulli-rtr.priority=99"
+      ## Enable tls
+      - "traefik.http.routers.tautulli-rtr.tls=true"
+      - "traefik.http.routers.tautulli-rtr-bypass.tls=true"
+      ## Middleware
+      - "traefik.http.routers.tautulli-rtr-bypass.middlewares=chain-no-auth@file"
+      - "traefik.http.routers.tautulli-rtr.middlewares=chain-tinyauth-oauth@file"
+      ## HTTP Services
+      - "traefik.http.routers.tautulli-rtr.service=tautulli-svc"
+      - "traefik.http.routers.tautulli-rtr-bypass.service=tautulli-svc"
+      - "traefik.http.services.tautulli-svc.loadbalancer.server.port=8181"
+      - "dev.dozzle.group=Smart Media"
 
-    notifiarr:
-        container_name: notifiarr
-        hostname: notifiarr
-        image: golift/notifiarr
-        restart: unless-stopped
-        privileged: true # Enables privileged mode
-        env_file: .env
-        environment:
-            - DN_SNAPSHOT_NVIDIA_SMI_PATH=/usr/bin/nvidia-smi
-        networks:
-            - traefik_network
-        deploy:
-            resources:
-                reservations:
-                    devices:
-                        - driver: nvidia
-                          count: all
-                          capabilities:
-                              - gpu
-        # ports:
-        #   - "5454:5454"
-        volumes:
-            - ${DATA_DIR}/media-server/notifiarr:/config
-            - /var/run/utmp:/var/run/utmp
-            - /etc/machine-id:/etc/machine-id
-            - /mnt/movie:/movie
-            - /usr/bin/nvidia-smi:/usr/bin/nvidia-smi:rw
+  notifiarr:
+    container_name: notifiarr
+    hostname: notifiarr
+    image: golift/notifiarr
+    restart: unless-stopped
+    privileged: true # Enables privileged mode
+    env_file: .env
+    environment:
+      - DN_SNAPSHOT_NVIDIA_SMI_PATH=/usr/bin/nvidia-smi
+    networks:
+      - traefik_network
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities:
+                - gpu
+    # ports:
+    #   - "5454:5454"
+    volumes:
+      - ${DATA_DIR}/media-server/notifiarr:/config
+      - /var/run/utmp:/var/run/utmp
+      - /etc/machine-id:/etc/machine-id
+      - /mnt/movie:/movie
+      - /usr/bin/nvidia-smi:/usr/bin/nvidia-smi:rw
 
-        labels:
-            - "traefik.enable=true"
-            - "traefik.http.routers.notifiarr.rule=Host(`notifiarr.${DOMAIN}`)"
-            - "traefik.http.routers.notifiarr.entrypoints=https"
-            - "traefik.http.routers.notifiarr.tls=true"
-            ## Middlewares
-            # - "traefik.http.routers.notifiarr.middlewares=chain-tinyauth-oauth@file"
-            - "traefik.http.routers.notifiarr.middlewares=chain-no-auth@file"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.notifiarr.rule=Host(`notifiarr.${DOMAIN}`)"
+      - "traefik.http.routers.notifiarr.entrypoints=https"
+      - "traefik.http.routers.notifiarr.tls=true"
+      ## Middlewares
+      # - "traefik.http.routers.notifiarr.middlewares=chain-tinyauth-oauth@file"
+      - "traefik.http.routers.notifiarr.middlewares=chain-no-auth@file"
 
-    profilarr:
-        image: santiagosayshey/profilarr:latest # Use :beta for early access to new features
-        container_name: profilarr
-        env_file: .env
-        # ports:
-        #   - 6868:6868
-        volumes:
-            - ${DATA_DIR}/media-server/profilarr:/config # Replace with your actual path
-        restart: unless-stopped
-        networks:
-            - traefik_network
-        labels:
-            - "traefik.enable=true"
-            - "traefik.http.routers.profilarr.rule=Host(`profilarr.${DOMAIN}`)"
-            - "traefik.http.routers.profilarr.entrypoints=https"
-            - "traefik.http.routers.profilarr.tls=true"
-            ## Middlewares
-            # - "traefik.http.routers.profilarr.middlewares=chain-tinyauth-oauth@file"
-            - "traefik.http.routers.profilarr.middlewares=chain-tinyauth-oauth@file"
-            # define port for the service
-            - "traefik.http.services.profilarr.loadbalancer.server.port=6868"
+  profilarr:
+    image: santiagosayshey/profilarr:latest # Use :beta for early access to new features
+    container_name: profilarr
+    env_file: .env
+    # ports:
+    #   - 6868:6868
+    volumes:
+      - ${DATA_DIR}/media-server/profilarr:/config # Replace with your actual path
+    restart: unless-stopped
+    networks:
+      - traefik_network
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.profilarr.rule=Host(`profilarr.${DOMAIN}`)"
+      - "traefik.http.routers.profilarr.entrypoints=https"
+      - "traefik.http.routers.profilarr.tls=true"
+      ## Middlewares
+      # - "traefik.http.routers.profilarr.middlewares=chain-tinyauth-oauth@file"
+      - "traefik.http.routers.profilarr.middlewares=chain-tinyauth-oauth@file"
+      # define port for the service
+      - "traefik.http.services.profilarr.loadbalancer.server.port=6868"
 
 networks:
-    traefik_network:
-        external: true
+  traefik_network:
+    external: true

@@ -1,63 +1,63 @@
 version: "3"
 services:
-    homeassistant:
-        container_name: homeassistant
-        image: ghcr.io/home-assistant/home-assistant:stable
-        volumes:
-            - ${DATA_DIR}/homeassistant:/config
-            - /etc/localtime:/etc/localtime:ro
-            - /run/dbus:/run/dbus:ro
-        restart: unless-stopped
-        privileged: true
-        network_mode: host
-        labels:
-            - traefik.enable=true
-            - traefik.http.routers.homeassistant.rule=Host(`home.techsanctuary.me`)
-            - traefik.http.routers.homeassistant.entrypoints=https
-            - traefik.http.routers.homeassistant.tls=true
-            - traefik.http.services.homeassistant.loadbalancer.server.port=8123
-            - traefik.http.routers.homeassistant.service=homeassistant-server@file
-    matter-server:
-        image: ghcr.io/home-assistant-libs/python-matter-server:stable
-        container_name: matter-server
-        restart: unless-stopped
-        security_opt:
-            - apparmor=unconfined
-        volumes:
-            - ${DATA_DIR}/matter:/data
-            - /run/dbus:/run/dbus:ro
-        network_mode: host
+  homeassistant:
+    container_name: homeassistant
+    image: ghcr.io/home-assistant/home-assistant:stable
+    volumes:
+      - ${DATA_DIR}/homeassistant:/config
+      - /etc/localtime:/etc/localtime:ro
+      - /run/dbus:/run/dbus:ro
+    restart: unless-stopped
+    privileged: true
+    network_mode: host
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.homeassistant.rule=Host(`home.techsanctuary.me`)
+      - traefik.http.routers.homeassistant.entrypoints=https
+      - traefik.http.routers.homeassistant.tls=true
+      - traefik.http.services.homeassistant.loadbalancer.server.port=8123
+      - traefik.http.routers.homeassistant.service=homeassistant-server@file
+  matter-server:
+    image: ghcr.io/home-assistant-libs/python-matter-server:stable
+    container_name: matter-server
+    restart: unless-stopped
+    security_opt:
+      - apparmor=unconfined
+    volumes:
+      - ${DATA_DIR}/matter:/data
+      - /run/dbus:/run/dbus:ro
+    network_mode: host
 
-    # mqtt5 eclipse-mosquitto
-    mqtt5:
-        image: eclipse-mosquitto
-        container_name: mqtt5
-        env_file: .env
-        ports:
-            - "1883:1883" #default mqtt port
-            - "9001:9001" #default mqtt port for websockets
-        volumes:
-            - ${DATA_DIR}/mqtt5/config:/mosquitto/config:rw
-            - ${DATA_DIR}/mqtt5/data:/mosquitto/data:rw
-            - ${DATA_DIR}/mqtt5/logs:/mosquitto/log:rw
-        restart: unless-stopped
+  # mqtt5 eclipse-mosquitto
+  mqtt5:
+    image: eclipse-mosquitto
+    container_name: mqtt5
+    env_file: .env
+    ports:
+      - "1883:1883" #default mqtt port
+      - "9001:9001" #default mqtt port for websockets
+    volumes:
+      - ${DATA_DIR}/mqtt5/config:/mosquitto/config:rw
+      - ${DATA_DIR}/mqtt5/data:/mosquitto/data:rw
+      - ${DATA_DIR}/mqtt5/logs:/mosquitto/log:rw
+    restart: unless-stopped
 
-    mqttx-web:
-        container_name: mqttx-web
-        networks:
-            - traefik_network
-        ports:
-            - 2005:80
-        labels:
-            - "traefik.enable=true"
-            - "traefik.http.routers.mqttx.rule=Host(`mqttx.${DOMAIN}`)"
-            - "traefik.http.routers.mqttx.entrypoints=https"
-            - "traefik.http.routers.mqttx.tls=true"
-            - "traefik.http.services.mqttx.loadbalancer.server.port=80"
-            ## Middlewaress
-            - "traefik.http.routers.mqttx.middlewares=chain-tinyauth-oauth@file"
-        image: emqx/mqttx-web
+  mqttx-web:
+    container_name: mqttx-web
+    networks:
+      - traefik_network
+    ports:
+      - 2005:80
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.mqttx.rule=Host(`mqttx.${DOMAIN}`)"
+      - "traefik.http.routers.mqttx.entrypoints=https"
+      - "traefik.http.routers.mqttx.tls=true"
+      - "traefik.http.services.mqttx.loadbalancer.server.port=80"
+      ## Middlewaress
+      - "traefik.http.routers.mqttx.middlewares=chain-tinyauth-oauth@file"
+    image: emqx/mqttx-web
 
 networks:
-    traefik_network:
-        external: true
+  traefik_network:
+    external: true

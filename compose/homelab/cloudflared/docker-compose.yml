@@ -1,19 +1,19 @@
 version: "3"
 services:
-    cloudflared:
-        network_mode: host
-        container_name: cloudflared_tunnel
-        image: cloudflare/cloudflared:latest
-        command: tunnel --no-autoupdate run --token ${CLOUDFLARED_TOKEN}
-        env_file: .env
+  cloudflared:
+    network_mode: host
+    container_name: cloudflared_tunnel
+    image: cloudflare/cloudflared:latest
+    command: tunnel --no-autoupdate run --token ${CLOUDFLARED_TOKEN}
+    env_file: .env
 
-    cloudflare-ddns:
-        container_name: cloudflare_ddns
-        image: favonia/cloudflare-ddns:edge
-        network_mode: host
-        restart: always
-        user: "1000:1000"
-        read_only: true
-        cap_drop: [all]
-        security_opt: [no-new-privileges:true]
-        env_file: .env
+  cloudflare-ddns:
+    container_name: cloudflare_ddns
+    image: favonia/cloudflare-ddns:edge
+    network_mode: host
+    restart: always
+    user: "1000:1000"
+    read_only: true
+    cap_drop: [all]
+    security_opt: [no-new-privileges:true]
+    env_file: .env

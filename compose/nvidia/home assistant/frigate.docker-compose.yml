@@ -1,61 +1,61 @@
 services:
-    frigate:
-        container_name: frigate
-        privileged: true # this may not be necessary for all setups
-        restart: unless-stopped
-        image: ghcr.io/blakeblackshear/frigate:stable-tensorrt
-        shm_size: "130mb" # update for your cameras based on calculation above
-        deploy:
-            # <------------- Add this section
-            resources:
-                reservations:
-                    devices:
-                        - driver: nvidia
-                          count: 1 # number of GPUs
-                          capabilities: [gpu]
+  frigate:
+    container_name: frigate
+    privileged: true # this may not be necessary for all setups
+    restart: unless-stopped
+    image: ghcr.io/blakeblackshear/frigate:stable-tensorrt
+    shm_size: "130mb" # update for your cameras based on calculation above
+    deploy:
+      # <------------- Add this section
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1 # number of GPUs
+              capabilities: [gpu]
 
-        devices:
-            - /dev/dri/renderD128:/dev/dri/renderD128 # For intel hwaccel, needs to be updated for your hardware
-        volumes:
-            - /etc/localtime:/etc/localtime:ro
-            - /mnt/camera/frigate/config:/config
-            - /mnt/camera/frigate/storage:/media/frigate
-        networks:
-            - traefik_network
-              # ipv4_address: 172.18.0.4
+    devices:
+      - /dev/dri/renderD128:/dev/dri/renderD128 # For intel hwaccel, needs to be updated for your hardware
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /mnt/camera/frigate/config:/config
+      - /mnt/camera/frigate/storage:/media/frigate
+    networks:
+      - traefik_network
+        # ipv4_address: 172.18.0.4
 
-        ports:
-            - "8971:8971"
-            - "5000:5000" # Internal unauthenticated access. Expose carefully.
-            - "8554:8554" # RTSP feeds
-            - "8555:8555/tcp" # WebRTC over tcp
-            - "8555:8555/udp" # WebRTC over udp
-        environment:
-            - FRIGATE_RTSP_PASSWORD="password"
-        labels:
-            - "traefik.enable=true"
-            - "traefik.http.routers.ring.rule=Host(`ring.${DOMAIN}`)"
-            - "traefik.http.routers.ring.entrypoints=https"
-            - "traefik.http.routers.ring.tls=true"
-            - "traefik.http.services.ring.loadbalancer.server.port=5000"
-            - "traefik.http.routers.ring.middlewares=chain-tinyauth-oauth@file"
-            - "traefik.docker.network=traefik_network"
+    ports:
+      - "8971:8971"
+      - "5000:5000" # Internal unauthenticated access. Expose carefully.
+      - "8554:8554" # RTSP feeds
+      - "8555:8555/tcp" # WebRTC over tcp
+      - "8555:8555/udp" # WebRTC over udp
+    environment:
+      - FRIGATE_RTSP_PASSWORD="password"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.ring.rule=Host(`ring.${DOMAIN}`)"
+      - "traefik.http.routers.ring.entrypoints=https"
+      - "traefik.http.routers.ring.tls=true"
+      - "traefik.http.services.ring.loadbalancer.server.port=5000"
+      - "traefik.http.routers.ring.middlewares=chain-tinyauth-oauth@file"
+      - "traefik.docker.network=traefik_network"
 
 networks:
-    traefik_network:
-        external: true
-        # ipam:
-        #   config:
-        #     - subnet: 172.18.0.0/24
-        #       gateway: 172.18.0.1
-        #       auxiliary_addresses:
-        #         scrypted: 172.18.0.7
+  traefik_network:
+    external: true
+    # ipam:
+    #   config:
+    #     - subnet: 172.18.0.0/24
+    #       gateway: 172.18.0.1
+    #       auxiliary_addresses:
+    #         scrypted: 172.18.0.7
 
-    # camera_internal:
-    #   external: true
-    #   # ipam:
-    #   #   config:
-    #   #     - subnet: 172.21.0.0/24
-    #   #       gateway: 172.21.0.1
-    #   #       auxiliary_addresses:
-    #   #         scrypted: 172.21.0.2
+  # camera_internal:
+  #   external: true
+  #   # ipam:
+  #   #   config:
+  #   #     - subnet: 172.21.0.0/24
+  #   #       gateway: 172.21.0.1
+  #   #       auxiliary_addresses:
+  #   #         scrypted: 172.21.0.2

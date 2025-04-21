@@ -7,103 +7,103 @@
 ######################################################
 
 services:
-    # qBittorrent: Torrent client
-    qbittorrent:
-        image: linuxserver/qbittorrent
-        container_name: qbittorrent
-        environment:
-            - PUID=1000
-            - PGID=1000
-            - DOCKER_MODS=ghcr.io/gabe565/linuxserver-mod-vuetorrent
-        env_file: .env
-        ports:
-            - 8080:8080
-        volumes:
-            - ${DATA_DIR}/media-server/qbittorrent:/config
-            - ${MEDIA_DIR}/torrents:/data/torrents
-            # timezone
-            - /etc/localtime:/etc/localtime:ro
-        restart: unless-stopped
-        networks:
-            - traefik_network
-        labels:
-            - "traefik.enable=true"
-            ## Internal access
-            - "traefik.http.routers.qbittorrent.rule=Host(`qbittorrent.${DOMAIN}`)"
-            - "traefik.http.routers.qbittorrent.entrypoints=https"
-            - "traefik.http.services.qbittorrent.loadbalancer.server.port=8080"
-            ## add google oauth
-            - "traefik.http.routers.qbittorrent.middlewares=chain-tinyauth-oauth@file"
-            ## theme file for qBittorrent
-            # enable tls
-            - "traefik.http.routers.qbittorrent.tls=true"
-            - "dev.dozzle.group=Smart Media"
+  # qBittorrent: Torrent client
+  qbittorrent:
+    image: linuxserver/qbittorrent
+    container_name: qbittorrent
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - DOCKER_MODS=ghcr.io/gabe565/linuxserver-mod-vuetorrent
+    env_file: .env
+    ports:
+      - 8080:8080
+    volumes:
+      - ${DATA_DIR}/media-server/qbittorrent:/config
+      - ${MEDIA_DIR}/torrents:/data/torrents
+      # timezone
+      - /etc/localtime:/etc/localtime:ro
+    restart: unless-stopped
+    networks:
+      - traefik_network
+    labels:
+      - "traefik.enable=true"
+      ## Internal access
+      - "traefik.http.routers.qbittorrent.rule=Host(`qbittorrent.${DOMAIN}`)"
+      - "traefik.http.routers.qbittorrent.entrypoints=https"
+      - "traefik.http.services.qbittorrent.loadbalancer.server.port=8080"
+      ## add google oauth
+      - "traefik.http.routers.qbittorrent.middlewares=chain-tinyauth-oauth@file"
+      ## theme file for qBittorrent
+      # enable tls
+      - "traefik.http.routers.qbittorrent.tls=true"
+      - "dev.dozzle.group=Smart Media"
 
-    iqbit:
-        image: pratikngupta/iqbit:latest
-        container_name: iqbit
-        restart: unless-stopped
-        networks:
-            - traefik_network
-        # ports:
-        #   - 8081:8081
-        environment:
-            - QBIT_HOST=https://qbittorrent.techsanctuary.me
-            - STANDALONE_SERVER_PORT=8081
+  iqbit:
+    image: pratikngupta/iqbit:latest
+    container_name: iqbit
+    restart: unless-stopped
+    networks:
+      - traefik_network
+    # ports:
+    #   - 8081:8081
+    environment:
+      - QBIT_HOST=https://qbittorrent.techsanctuary.me
+      - STANDALONE_SERVER_PORT=8081
 
-        labels:
-            - "traefik.enable=true"
-            ## Internal access
-            - "traefik.http.routers.mobile-qbittorrent.rule=Host(`iqbit.techsanctuary.me`)"
-            - "traefik.http.routers.mobile-qbittorrent.entrypoints=https"
-            - "traefik.http.services.mobile-qbittorrent.loadbalancer.server.port=8081"
-            ## add google oauth
-            - "traefik.http.routers.mobile-qbittorrent.middlewares=chain-tinyauth-oauth@file"
-            ## theme file for mobile-qbittorrent
-            # enable tls
-            - "traefik.http.routers.mobile-qbittorrent.tls=true"
-            - "dev.dozzle.group=Smart Media"
+    labels:
+      - "traefik.enable=true"
+      ## Internal access
+      - "traefik.http.routers.mobile-qbittorrent.rule=Host(`iqbit.techsanctuary.me`)"
+      - "traefik.http.routers.mobile-qbittorrent.entrypoints=https"
+      - "traefik.http.services.mobile-qbittorrent.loadbalancer.server.port=8081"
+      ## add google oauth
+      - "traefik.http.routers.mobile-qbittorrent.middlewares=chain-tinyauth-oauth@file"
+      ## theme file for mobile-qbittorrent
+      # enable tls
+      - "traefik.http.routers.mobile-qbittorrent.tls=true"
+      - "dev.dozzle.group=Smart Media"
 
-    # flaresolverr: proxy to resolve cloudflare protected sites
-    flaresolverr:
-        container_name: flaresolverr
-        environment:
-            - LOG_LEVEL=info
-        restart: unless-stopped
-        image: ghcr.io/flaresolverr/flaresolverr:latest
-        networks:
-            - traefik_network
-        labels:
-            - "dev.dozzle.group=Smart Media"
+  # flaresolverr: proxy to resolve cloudflare protected sites
+  flaresolverr:
+    container_name: flaresolverr
+    environment:
+      - LOG_LEVEL=info
+    restart: unless-stopped
+    image: ghcr.io/flaresolverr/flaresolverr:latest
+    networks:
+      - traefik_network
+    labels:
+      - "dev.dozzle.group=Smart Media"
 
-    feishin:
-        container_name: feishin
-        image: "ghcr.io/jeffvli/feishin:latest"
-        networks:
-            - traefik_network
-        environment:
-            - SERVER_NAME=navidrome # pre defined server name
-            - SERVER_LOCK=true # When true AND name/type/url are set, only username/password can be toggled
-            - SERVER_TYPE=subsonic # navidrome also works
-            - SERVER_URL=https://gonic.techsanctuary.me # http://address:port
-            - PUID=1000
-            - PGID=1000
-            - UMASK=002
-            - TZ=America/Los_Angeles
-        # ports:
-        #   - 9180:9180
-        restart: unless-stopped
-        labels:
-            - "traefik.enable=true"
-            - "traefik.http.routers.feishin.rule=Host(`feishin.${DOMAIN}`)"
-            - "traefik.http.routers.feishin.entrypoints=https"
-            - "traefik.http.services.feishin.loadbalancer.server.port=9180"
-            - "traefik.http.routers.feishin.middlewares=chain-tinyauth-oauth@file"
-            - "traefik.http.routers.feishin.tls=true"
+  feishin:
+    container_name: feishin
+    image: "ghcr.io/jeffvli/feishin:latest"
+    networks:
+      - traefik_network
+    environment:
+      - SERVER_NAME=navidrome # pre defined server name
+      - SERVER_LOCK=true # When true AND name/type/url are set, only username/password can be toggled
+      - SERVER_TYPE=subsonic # navidrome also works
+      - SERVER_URL=https://gonic.techsanctuary.me # http://address:port
+      - PUID=1000
+      - PGID=1000
+      - UMASK=002
+      - TZ=America/Los_Angeles
+    # ports:
+    #   - 9180:9180
+    restart: unless-stopped
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.feishin.rule=Host(`feishin.${DOMAIN}`)"
+      - "traefik.http.routers.feishin.entrypoints=https"
+      - "traefik.http.services.feishin.loadbalancer.server.port=9180"
+      - "traefik.http.routers.feishin.middlewares=chain-tinyauth-oauth@file"
+      - "traefik.http.routers.feishin.tls=true"
 
 networks:
-    traefik_network:
-        external: true
+  traefik_network:
+    external: true
 ### IMPORTANT ###
 # To use iQbit UI: `/config/iQbit/release`
 # to use vuetorrent UI: `/vuetorrent`
