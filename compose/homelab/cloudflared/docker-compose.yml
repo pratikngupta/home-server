@@ -2,6 +2,7 @@ version: "3"
 services:
   cloudflared:
     network_mode: host
+    restart: always
     container_name: cloudflared_tunnel
     image: cloudflare/cloudflared:latest
     command: tunnel --no-autoupdate run --token ${CLOUDFLARED_TOKEN}

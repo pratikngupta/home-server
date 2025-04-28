@@ -3,6 +3,20 @@ secrets:
     file: ./data/oauth_secrets
 
 services:
+  whoami:
+    image: traefik/whoami
+    container_name: whoami
+    restart: unless-stopped
+    networks:
+      - traefik_network
+    env_file: .env
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.whoami.rule=Host(`whoami.${DOMAIN}`)"
+      - "traefik.http.routers.whoami.entrypoints=https"
+      - "traefik.http.routers.whoami.tls=true"
+      - "traefik.http.routers.whoami.middlewares=chain-no-auth@file" # optional, if you want to test OAuth
+
   traefik:
     image: traefik:v3.3
     container_name: traefik
@@ -12,6 +26,8 @@ services:
     networks:
       - traefik_network
       - vaultwarden_secure_network
+      - searxng_secure
+      - wireguard_secure
     ports:
       - 80:80
       - 443:443
@@ -143,4 +159,10 @@ networks:
   # create a network for vaultwarden called vaultwarden_secure_network
   vaultwarden_secure_network:
     name: vaultwarden_secure_network
+    driver: bridge
+  searxng_secure:
+    name: searxng_secure
+    driver: bridge
+  wireguard_secure:
+    name: wireguard_secure
     driver: bridge
