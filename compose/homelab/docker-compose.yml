@@ -23,7 +23,7 @@ include:
     - portainer/docker-compose.yml
 
     ## Password ##
-    - vault/docker-compose.yml
+    # - vault/docker-compose.yml
 
     # ## Podcast ##
     # - podsync/docker-compose.yml

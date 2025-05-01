@@ -1,7 +1,0 @@
-http:
-  middlewares:
-    middlewares-basic-auth:
-      basicAuth:
-        # users:
-          # - "pratik:$apr1$jlbHlOJa$dKNPV3d04SBTz7Y9b6bxP1"
-        usersFile: "/data/usersfile"
