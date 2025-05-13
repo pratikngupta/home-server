@@ -1,0 +1,22 @@
+services:
+  microbin:
+    image: danielszabo99/microbin:latest
+    restart: always
+    # ports:
+    #   - "${MICROBIN_PORT}:8080"
+    volumes:
+      - ${DATA_DIR}/microbin-data:/app/microbin_data
+    env_file: .env
+    networks:
+      - traefik_network
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.microbin.rule=Host(`microbin.${DOMAIN}`)"
+      - "traefik.http.routers.microbin.entrypoints=https"
+      - "traefik.http.routers.microbin.tls=true"
+      - "traefik.http.services.microbin.loadbalancer.server.port=8080"
+      - "traefik.http.routers.microbin.middlewares=chain-github-oauth@file"
+
+networks:
+  traefik_network:
+    external: true
