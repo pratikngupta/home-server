@@ -23,6 +23,7 @@ services:
       - ${DATA_DIR}/radarr:/config
       - ${CONTENT_DIR}/media:/data
       - /mnt/main/Movie:/movies
+      - ${SECOND_DIR}/data:/second
       - "/home/pratik/appData/content/onedrive/Movies (Homelab Upload):/onedrive"
       # timezone
       - /etc/localtime:/etc/localtime:ro
@@ -81,6 +82,7 @@ services:
     volumes:
       - ${DATA_DIR}/sonarr:/config
       - ${CONTENT_DIR}/media:/data
+      - ${SECOND_DIR}/data:/second
       # timezone
       - /etc/localtime:/etc/localtime:ro
     restart: unless-stopped

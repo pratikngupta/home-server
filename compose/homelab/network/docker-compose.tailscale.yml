@@ -1,0 +1,20 @@
+services:
+  tailscale-exit-node:
+    container_name: tailscale-exit-node
+    env_file: tailscale.env
+    image: ghcr.io/tailscale/tailscale:latest
+    restart: unless-stopped
+    network_mode: "container:gluetun"
+    volumes:
+      - ts-data:/var/lib/tailscale
+    devices:
+      - /dev/net/tun:/dev/net/tun
+    cap_add:
+      - NET_ADMIN
+      - NET_RAW
+    depends_on:
+      gluetun:
+        condition: service_healthy
+
+volumes:
+  ts-data:

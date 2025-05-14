@@ -15,6 +15,7 @@ services:
       - PUID=1000
       - PGID=1000
       - DOCKER_MODS=ghcr.io/gabe565/linuxserver-mod-vuetorrent
+      - WEBUI_PORT=8123
     env_file: .env
     volumes:
       - ${DATA_DIR}/qbittorrent:/config
@@ -22,20 +23,22 @@ services:
       # timezone
       - /etc/localtime:/etc/localtime:ro
     restart: unless-stopped
-    networks:
-      - traefik_network
-    labels:
-      - "traefik.enable=true"
-      ## Internal access
-      - "traefik.http.routers.qbittorrent.rule=Host(`qbittorrent.${DOMAIN}`)"
-      - "traefik.http.routers.qbittorrent.entrypoints=https"
-      - "traefik.http.services.qbittorrent.loadbalancer.server.port=8080"
-      ## add google oauth
-      - "traefik.http.routers.qbittorrent.middlewares=chain-github-oauth@file"
-      ## theme file for qBittorrent
-      # enable tls
-      - "traefik.http.routers.qbittorrent.tls=true"
-      - "dev.dozzle.group=Smart Media"
+    network_mode: "container:gluetun"
+
+    # networks:
+    #   - traefik_network
+    # labels:
+    #   - "traefik.enable=true"
+    #   ## Internal access
+    #   - "traefik.http.routers.qbittorrent.rule=Host(`qbittorrent.${DOMAIN}`)"
+    #   - "traefik.http.routers.qbittorrent.entrypoints=https"
+    #   - "traefik.http.services.qbittorrent.loadbalancer.server.port=8080"
+    #   ## add google oauth
+    #   - "traefik.http.routers.qbittorrent.middlewares=chain-github-oauth@file"
+    #   ## theme file for qBittorrent
+    #   # enable tls
+    #   - "traefik.http.routers.qbittorrent.tls=true"
+    #   - "dev.dozzle.group=Smart Media"
 
   # flaresolverr: proxy to resolve cloudflare protected sites
   flaresolverr:

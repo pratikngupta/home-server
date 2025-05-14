@@ -21,6 +21,8 @@ services:
       - ${DATA_DIR}/plex:/config
       - ${CONTENT_DIR}/media/media:/data/media
       - /mnt/main/Movie:/movies
+      - ${SECOND_DIR}/data:/second
+
       - "/home/pratik/appData/content/onedrive/Movies (Homelab Upload):/onedrive"
       # timezone
       - /etc/localtime:/etc/localtime:ro

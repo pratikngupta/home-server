@@ -9,7 +9,7 @@ include:
   - docker-compose.manager.yml
 
   # qBittorrent, flaresolverr
-  # - docker-compose.downloaders.yml
+  - docker-compose.downloaders.yml
 
   # Overseerr, Jellyseer, requesterr
   - docker-compose.requester.yml

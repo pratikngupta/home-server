@@ -9,7 +9,7 @@ include:
     # - cloudflared/docker-compose.yml
 
     ## OneDrive ##
-    - onedrive/docker-compose.yml
+    # - onedrive/docker-compose.yml
 
     ## Media ##
     - smart-media/docker-compose.yml

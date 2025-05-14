@@ -1,0 +1,29 @@
+services:
+  gluetun:
+    container_name: gluetun
+    image: qmcgaw/gluetun
+    cap_add:
+      - NET_ADMIN
+    ports:
+      - 8123:8123
+    devices:
+      - /dev/net/tun:/dev/net/tun
+    env_file: .env
+    networks:
+      - traefik_network
+    labels:
+      - "traefik.enable=true"
+      ## Internal access
+      - "traefik.http.routers.qbittorrent.rule=Host(`qbittorrent.${DOMAIN}`)"
+      - "traefik.http.routers.qbittorrent.entrypoints=https"
+      - "traefik.http.services.qbittorrent.loadbalancer.server.port=8123"
+      ## add google oauth
+      - "traefik.http.routers.qbittorrent.middlewares=chain-github-oauth@file"
+      ## theme file for qBittorrent
+      # enable tls
+      - "traefik.http.routers.qbittorrent.tls=true"
+      - "dev.dozzle.group=Smart Media"
+
+networks:
+  traefik_network:
+    external: true
