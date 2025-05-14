@@ -18,7 +18,7 @@ services:
       - "traefik.http.routers.whoami.middlewares=chain-no-auth@file" # optional, if you want to test OAuth
 
   traefik:
-    image: traefik:v3.3
+    image: traefik:v3.4
     container_name: traefik
     restart: unless-stopped
     security_opt:
