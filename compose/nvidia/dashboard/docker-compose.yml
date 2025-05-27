@@ -1,0 +1,22 @@
+services:
+  homarr:
+    container_name: homarr
+    image: ghcr.io/homarr-labs/homarr:latest
+    restart: unless-stopped
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock # <--- add this line here!
+      - ${DATA_DIR}/homarr:/app/data
+    env_file: .env
+    networks:
+      - traefik_network
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.homarr.rule=Host(`homarr.${DOMAIN}`)"
+      - "traefik.http.routers.homarr.entrypoints=https"
+      - "traefik.http.routers.homarr.tls=true"
+      - "traefik.http.services.homarr.loadbalancer.server.port=7575"
+      - "traefik.http.routers.homarr.middlewares=chain-tinyauth-oauth@file" # optional, if you want to test OAuth
+
+networks:
+  traefik_network:
+    external: true

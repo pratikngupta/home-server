@@ -7,37 +7,45 @@
 ######################################################
 
 services:
+  # gluetun VPN
+  gluetun:
+    container_name: gluetun
+    image: qmcgaw/gluetun
+    cap_add:
+      - NET_ADMIN
+    devices:
+      - /dev/net/tun:/dev/net/tun
+    env_file: .env
+    networks:
+      - traefik_network
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.qbittorrent.rule=Host(`qbittorrent.${DOMAIN}`)"
+      - "traefik.http.routers.qbittorrent.entrypoints=https"
+      - "traefik.http.routers.qbittorrent.tls=true"
+      - "traefik.http.routers.qbittorrent.middlewares=chain-tinyauth-oauth@file" # optional, if you want to test OAuth
+      - "traefik.http.services.qbittorrent.loadbalancer.server.port=8080"
+
+
   # qBittorrent: Torrent client
   qbittorrent:
-    image: linuxserver/qbittorrent
+    image: linuxserver/qbittorrent:libtorrentv1
     container_name: qbittorrent
     environment:
       - PUID=1000
       - PGID=1000
       - DOCKER_MODS=ghcr.io/gabe565/linuxserver-mod-vuetorrent
     env_file: .env
-    ports:
-      - 8080:8080
     volumes:
       - ${DATA_DIR}/media-server/qbittorrent:/config
       - ${MEDIA_DIR}/torrents:/data/torrents
       # timezone
       - /etc/localtime:/etc/localtime:ro
     restart: unless-stopped
-    networks:
-      - traefik_network
-    labels:
-      - "traefik.enable=true"
-      ## Internal access
-      - "traefik.http.routers.qbittorrent.rule=Host(`qbittorrent.${DOMAIN}`)"
-      - "traefik.http.routers.qbittorrent.entrypoints=https"
-      - "traefik.http.services.qbittorrent.loadbalancer.server.port=8080"
-      ## add google oauth
-      - "traefik.http.routers.qbittorrent.middlewares=chain-tinyauth-oauth@file"
-      ## theme file for qBittorrent
-      # enable tls
-      - "traefik.http.routers.qbittorrent.tls=true"
-      - "dev.dozzle.group=Smart Media"
+    network_mode: "service:gluetun"
+    depends_on:
+      gluetun:
+        condition: service_healthy
 
   iqbit:
     image: pratikngupta/iqbit:latest

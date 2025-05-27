@@ -19,7 +19,9 @@ services:
       # Do not edit the next line. If you want to change the media storage location on your system, edit the value of UPLOAD_LOCATION in the .env file
       - ${UPLOAD_LOCATION}:/usr/src/app/upload
       - /etc/localtime:/etc/localtime:ro
-      - /mnt/photo/apple:/mnt/photo/apple
+      - ${APPLE_DIR}:/mnt/photo/apple
+      - ${GOOGLE_DIR}:/mnt/photo/google
+      - ${ORIGINAL_DIR}:/mnt/photo/original-archive
     env_file:
       - .env
     # ports:
@@ -142,7 +144,8 @@ services:
 
 volumes:
   model-cache:
-
+  pgdata:
+    
 networks:
   traefik_network:
     external: true

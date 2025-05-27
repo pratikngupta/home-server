@@ -18,7 +18,7 @@ services:
       - "traefik.http.routers.whoami.middlewares=chain-tinyauth-oauth@file" # optional, if you want to test OAuth
 
   traefik:
-    image: traefik:v3.3
+    image: traefik:v3.4
     container_name: traefik
     restart: unless-stopped
     security_opt:
@@ -68,46 +68,42 @@ services:
       # - "traefik.http.routers.traefik-internal.middlewares=no-auth@file"
       - "traefik.http.routers.traefik-secure.service=api@internal"
 
-  oauth:
-    container_name: oauth
-    image: thomseddon/traefik-forward-auth:latest
-    # image: ghcr.io/jordemort/traefik-forward-auth:latest
-    security_opt:
-      - no-new-privileges:true
-    restart: unless-stopped
-    env_file:
-      - .env
-    networks:
-      - traefik_network
-    labels:
-      - "traefik.enable=true"
-      # HTTP Routers
-      - "traefik.http.routers.oauth-rtr.tls=true"
-      - "traefik.http.routers.oauth-rtr.entrypoints=https"
-      - "traefik.http.routers.oauth-rtr.rule=Host(`oauth.$DOMAIN`)"
-      # Middlewares
-      - "traefik.http.routers.oauth-rtr.middlewares=chain-tinyauth-oauth@file"
-      # HTTP Services
-      - "traefik.http.routers.oauth-rtr.service=oauth-svc"
-      - "traefik.http.services.oauth-svc.loadbalancer.server.port=4181"
+  # oauth:
+  #   container_name: oauth
+  #   image: thomseddon/traefik-forward-auth:latest
+  #   # image: ghcr.io/jordemort/traefik-forward-auth:latest
+  #   security_opt:
+  #     - no-new-privileges:true
+  #   restart: unless-stopped
+  #   env_file:
+  #     - .env
+  #   networks:
+  #     - traefik_network
+  #   labels:
+  #     - "traefik.enable=true"
+  #     # HTTP Routers
+  #     - "traefik.http.routers.oauth-rtr.tls=true"
+  #     - "traefik.http.routers.oauth-rtr.entrypoints=https"
+  #     - "traefik.http.routers.oauth-rtr.rule=Host(`oauth.$DOMAIN`)"
+  #     # Middlewares
+  #     - "traefik.http.routers.oauth-rtr.middlewares=chain-tinyauth-oauth@file"
+  #     # HTTP Services
+  #     - "traefik.http.routers.oauth-rtr.service=oauth-svc"
+  #     - "traefik.http.services.oauth-svc.loadbalancer.server.port=4181"
 
   tinyauth:
-    image: ghcr.io/steveiliop56/tinyauth:v3
+    image: ghcr.io/steveiliop56/tinyauth:latest
     container_name: tinyauth
     restart: unless-stopped
     networks:
       - traefik_network
     env_file: auth.env
-    # environment:
-    #   - SECRET=some-random-32-chars-string
-    #   - APP_URL=https://tinyauth.example.com
-    #   - USERS=your-username-password-hash
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.tinyauth-rtr.entrypoints=https"
       - "traefik.http.routers.tinyauth-rtr.tls=true"
       - "traefik.http.routers.tinyauth-rtr.rule=Host(`tinyauth.techsanctuary.me`)"
-      # traefik.http.middlewares.tinyauth.forwardauth.address: http://tinyauth:3000/api/auth/traefik
+      # - "traefik.http.middlewares.tinyauth.forwardauth.address: http://tinyauth:3000/api/auth/traefik"
       - "traefik.http.routers.tinyauth-rtr.service=tinyauth-svc"
       - "traefik.http.services.tinyauth-svc.loadbalancer.server.port=3000"
 
