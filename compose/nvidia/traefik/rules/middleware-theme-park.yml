@@ -16,17 +16,16 @@ http:
 
     radarr-theme:
       plugin:
-        theme-park:
+        themepark:
           # The name of the supported application listed on https://docs.theme-park.dev/themes.
           app: radarr
 
           # If using the 'darker' addon the theme MUST be excluded or set to 'base'
-          theme: base
+          theme: Space Gray
 
-          # Multiple addons can be included at the same time
-          addons:
-            - radarr-darker
-            - radarr-4k-logo
+          # # Multiple addons can be included at the same time
+          # addons:
+          #   - 4k-logo
 
     vaultwarden-theme:
       plugin:

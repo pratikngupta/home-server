@@ -42,6 +42,9 @@ services:
       - "traefik.http.routers.tautulli-rtr-bypass.service=tautulli-svc"
       - "traefik.http.services.tautulli-svc.loadbalancer.server.port=8181"
       - "dev.dozzle.group=Smart Media"
+    depends_on:
+      mount-check:
+        condition: service_healthy
 
   notifiarr:
     container_name: notifiarr
@@ -79,29 +82,12 @@ services:
       ## Middlewares
       # - "traefik.http.routers.notifiarr.middlewares=chain-tinyauth-oauth@file"
       - "traefik.http.routers.notifiarr.middlewares=chain-no-auth@file"
+    depends_on:
+      mount-check:
+        condition: service_healthy
 
-  profilarr:
-    image: santiagosayshey/profilarr:latest # Use :beta for early access to new features
-    container_name: profilarr
-    env_file: .env
-    # ports:
-    #   - 6868:6868
-    volumes:
-      - ${DATA_DIR}/media-server/profilarr:/config # Replace with your actual path
-    restart: unless-stopped
-    networks:
-      - traefik_network
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.profilarr.rule=Host(`profilarr.${DOMAIN}`)"
-      - "traefik.http.routers.profilarr.entrypoints=https"
-      - "traefik.http.routers.profilarr.tls=true"
-      ## Middlewares
-      # - "traefik.http.routers.profilarr.middlewares=chain-tinyauth-oauth@file"
-      - "traefik.http.routers.profilarr.middlewares=chain-tinyauth-oauth@file"
-      # define port for the service
-      - "traefik.http.services.profilarr.loadbalancer.server.port=6868"
 
 networks:
   traefik_network:
     external: true
+

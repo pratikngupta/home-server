@@ -7,28 +7,6 @@
 ######################################################
 
 services:
-  # jellyseerr:
-  #   image: fallenbagel/jellyseerr:latest
-  #   container_name: jellyseerr
-  #   environment:
-  #     - PUID=1000
-  #     - PGID=1000
-  #     - LOG_LEVEL=debug
-  #     - TZ=America/Toronto
-  #   networks:
-  #     - traefik_network
-  #   volumes:
-  #     - ${DATA_DIR}/jellyseerr:/app/config
-  #   restart: unless-stopped
-  #   labels:
-  #     - "traefik.enable=true"
-  #     - "traefik.http.routers.jellyseerr.rule=Host(`jellyseerr.${DOMAIN}`)"
-  #     - "traefik.http.routers.jellyseerr.entrypoints=https"
-  #     - "traefik.http.routers.jellyseerr.tls=true"
-  #     - "traefik.http.services.jellyseerr.loadbalancer.server.port=8096"
-  #     ## Middlewares - Google OAuth
-  #     - "traefik.http.routers.jellyseerr.middlewares=chain-tinyauth-oauth-external@file"
-
   overseerr:
     image: sctx/overseerr:develop
     container_name: overseerr #overseerr
@@ -77,34 +55,9 @@ services:
       - "traefik.http.routers.overseerr-techsanctuary.service=overseerr-techsanctuary"
       - "traefik.http.services.overseerr-techsanctuary.loadbalancer.server.port=5055"
       - "dev.dozzle.group=Smart Media"
-
-  # ombi:
-  #   image: lscr.io/linuxserver/ombi:latest
-  #   container_name: ombi
-  #   env_file: .env
-  #   environment:
-  #     - PUID=1000
-  #     - PGID=1000
-  #   volumes:
-  #     - ${DATA_DIR}/media-server/ombi:/app/config
-  #   # ports:
-  #   #   - 3579:3579
-  #   networks:
-  #     - traefik_network
-  #   restart: unless-stopped
-  #   labels:
-  #     - "traefik.enable=true"
-  #     ## Internal access
-  #     - "traefik.http.routers.ombi.rule=Host(`ombi.techsanctuary.me`)"
-  #     - "traefik.http.routers.ombi.entrypoints=https"
-  #     - "traefik.http.services.ombi.loadbalancer.server.port=3579"
-  #     ## add google oauth
-  #     - "traefik.http.routers.ombi.middlewares=chain-tinyauth-oauth@file"
-  #     ## theme file for ombi
-  #     # enable tls
-  #     - "traefik.http.routers.ombi.tls=true"
-  #     - "dev.dozzle.group=Smart Media"
-
+    depends_on:
+      mount-check:
+        condition: service_healthy
 networks:
   traefik_network:
     external: true

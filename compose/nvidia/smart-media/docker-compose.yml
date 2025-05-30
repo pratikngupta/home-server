@@ -1,4 +1,7 @@
 include:
+  # check if drives are mounted
+  - docker-compose.mount-check.yml
+
   # Plex and jellyfin
   - docker-compose.server.yml
 

@@ -25,7 +25,9 @@ services:
       - "traefik.http.routers.qbittorrent.tls=true"
       - "traefik.http.routers.qbittorrent.middlewares=chain-tinyauth-oauth@file" # optional, if you want to test OAuth
       - "traefik.http.services.qbittorrent.loadbalancer.server.port=8080"
-
+    depends_on:
+      mount-check:
+        condition: service_healthy
 
   # qBittorrent: Torrent client
   qbittorrent:
@@ -34,7 +36,8 @@ services:
     environment:
       - PUID=1000
       - PGID=1000
-      - DOCKER_MODS=ghcr.io/gabe565/linuxserver-mod-vuetorrent
+      - TP_THEME=nord
+      - DOCKER_MODS=ghcr.io/gabe565/linuxserver-mod-vuetorrent|ghcr.io/themepark-dev/theme.park:vuetorrent
     env_file: .env
     volumes:
       - ${DATA_DIR}/media-server/qbittorrent:/config
@@ -46,7 +49,10 @@ services:
     depends_on:
       gluetun:
         condition: service_healthy
+      mount-check:
+        condition: service_healthy
 
+        
   iqbit:
     image: pratikngupta/iqbit:latest
     container_name: iqbit
@@ -71,6 +77,10 @@ services:
       # enable tls
       - "traefik.http.routers.mobile-qbittorrent.tls=true"
       - "dev.dozzle.group=Smart Media"
+    depends_on:
+      mount-check:
+        condition: service_healthy
+
 
   # flaresolverr: proxy to resolve cloudflare protected sites
   flaresolverr:
@@ -83,6 +93,9 @@ services:
       - traefik_network
     labels:
       - "dev.dozzle.group=Smart Media"
+    depends_on:
+      mount-check:
+        condition: service_healthy
 
   feishin:
     container_name: feishin
@@ -108,10 +121,14 @@ services:
       - "traefik.http.services.feishin.loadbalancer.server.port=9180"
       - "traefik.http.routers.feishin.middlewares=chain-tinyauth-oauth@file"
       - "traefik.http.routers.feishin.tls=true"
+    depends_on:
+      mount-check:
+        condition: service_healthy
 
 networks:
   traefik_network:
     external: true
+
 ### IMPORTANT ###
 # To use iQbit UI: `/config/iQbit/release`
 # to use vuetorrent UI: `/vuetorrent`
