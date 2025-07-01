@@ -1,0 +1,25 @@
+services:
+  gluetun-tailscale:
+    container_name: gluetun-tailscale
+    image: qmcgaw/gluetun
+    env_file: vpn.env
+    cap_add:
+      - NET_ADMIN
+    volumes:
+      - ${DATA_DIR}/tailscale-vpn:/gluetun
+
+            
+  tailscale-exit-node:
+    container_name: tailscale-exit-node
+    image: ghcr.io/tailscale/tailscale:latest
+    restart: unless-stopped
+    network_mode: service:gluetun-tailscale
+    cap_add:
+      - NET_ADMIN
+      - NET_RAW
+    env_file:
+      - tailscale.env
+    volumes:
+      - ./tailscale:/var/lib/tailscale
+    depends_on:
+      - gluetun-tailscale

@@ -31,13 +31,13 @@ services:
 
   # qBittorrent: Torrent client
   qbittorrent:
-    image: linuxserver/qbittorrent:libtorrentv1
+    image: lscr.io/linuxserver/qbittorrent:libtorrentv1
     container_name: qbittorrent
     environment:
       - PUID=1000
       - PGID=1000
       - TP_THEME=nord
-      - DOCKER_MODS=ghcr.io/gabe565/linuxserver-mod-vuetorrent|ghcr.io/themepark-dev/theme.park:vuetorrent
+      - DOCKER_MODS=ghcr.io/vuetorrent/vuetorrent-lsio-mod:latest
     env_file: .env
     volumes:
       - ${DATA_DIR}/media-server/qbittorrent:/config

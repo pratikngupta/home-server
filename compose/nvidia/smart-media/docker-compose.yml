@@ -2,6 +2,9 @@ include:
   # check if drives are mounted
   - docker-compose.mount-check.yml
 
+  # converter
+  - docker-compose.converter.yml
+
   # Plex and jellyfin
   - docker-compose.server.yml
 

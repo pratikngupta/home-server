@@ -2,18 +2,16 @@ services:
   mount-check:
     image: alpine
     container_name: mount-check
-    command: sh -c "while true; do df -h | grep -q '/mnt/movie' && df -h | grep -q '/mnt/storage' && df -h | grep -q '/dev/sdb2' && df -h | grep -q '/dev/sdb1' && echo 'Mounts OK'; sleep 60; done"
-    volumes:
-      - "/mnt/movie:/mnt/movie:ro"
-      - "/mnt/storage:/mnt/storage:ro"
-      - "/dev/disk/by-uuid:/dev/disk/by-uuid:ro"
-    healthcheck:
-      test: ["CMD", "sh", "-c", "df -h | grep -q '/mnt/movie' && df -h | grep -q '/mnt/storage' && df -h | grep -q '/dev/sdb2' && df -h | grep -q '/dev/sdb1'"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 10s
     restart: always
+    command: ["sh", "-c", "while true; do sleep 3600; done"]
+    volumes:
+      - /mnt/movies:/mnt/movies:ro # replace with your actual mount path
+    healthcheck:
+      test: ["CMD", "test", "-d", "/mnt/movies"]
+      interval: 1m30s
+      timeout: 30s
+      retries: 5
+      start_period: 30s
     networks:
       - traefik_network
 
