@@ -1,0 +1,56 @@
+services:
+  multi-scrobbler:
+    image: foxxmd/multi-scrobbler
+    container_name: multi-scrobbler
+    volumes:
+      - ${DATA_DIR}/scrobbler/config:/config
+    env_file: .env
+    # ports:
+    #   - "9078:9078"
+    restart: unless-stopped
+    networks:
+      - traefik_network
+    labels:
+      - "traefik.enable=true"
+      # let the traefik know which network to use
+      - "traefik.http.routers.multi-scrobbler.rule=Host(`scrobbler.${EXTERNAL_DOMAIN}`)"
+      - "traefik.http.routers.multi-scrobbler.entrypoints=https"
+      - "traefik.http.routers.multi-scrobbler.tls=true"
+      ## Middlewaress
+      - "traefik.http.routers.multi-scrobbler.middlewares=chain-tinyauth-oauth@file"
+
+  koito:
+    image: gabehf/koito:latest
+    container_name: koito
+    env_file: .env
+    networks:
+      - traefik_network
+    depends_on:
+      - db
+    labels:
+      - "traefik.enable=true"
+      # let the traefik know which network to use
+      - "traefik.http.routers.koito.rule=Host(`koito.${EXTERNAL_DOMAIN}`)"
+      - "traefik.http.routers.koito.entrypoints=https"
+      - "traefik.http.routers.koito.tls=true"
+      ## Middlewaress
+      - "traefik.http.routers.koito.middlewares=chain-tinyauth-oauth@file"
+    # ports:
+    #   - "4110:4110"
+    volumes:
+      - ${DATA_DIR}/koito/koito-data:/etc/koito
+    restart: unless-stopped
+
+  db:
+    image: postgres:16
+    container_name: psql
+    restart: unless-stopped
+    env_file: .env
+    networks:
+      - traefik_network
+    volumes:
+      - ${DATA_DIR}/koito/db-data:/var/lib/postgresql/data
+
+networks:
+  traefik_network:
+    external: true

@@ -1,0 +1,47 @@
+services:
+  beszel:
+    image: henrygd/beszel:latest
+    container_name: beszel
+    restart: unless-stopped
+    env_file: .env
+    # networks_mode: "host"
+    networks:
+      - traefik_network
+      - beszel_internal_network
+    ports:
+      - 8090:8090
+    volumes:
+      - ${DATA_DIR}/bezel/beszel_data:/beszel_data
+      - ${DATA_DIR}/bezel/beszel_socket:/beszel_socket
+    labels:
+      - "traefik.enable=true"
+      # let the traefik know which network to use
+      - "traefik.docker.network=traefik_network"
+      - "traefik.http.routers.beszel.rule=Host(`beszel.${EXTERNAL_DOMAIN}`)"
+      - "traefik.http.routers.beszel.entrypoints=https"
+      - "traefik.http.routers.beszel.tls=true"
+      ## Middlewaress
+      - "traefik.http.routers.beszel.middlewares=chain-tinyauth-oauth@file"
+
+  beszel-agent:
+    image: henrygd/beszel-agent:latest
+    container_name: beszel-agent
+    restart: unless-stopped
+    env_file: .env
+    network_mode: host
+    volumes:
+      - ${DATA_DIR}/bezel/beszel_socket:/beszel_socket
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /mnt/storage:/extra-filesystems/storage:ro
+      - /mnt/movie:/extra-filesystems/movies:ro
+    environment:
+      LISTEN: /beszel_socket/beszel.sock
+      # Do not remove quotes around the key
+      KEY: 'ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIN9/6C60x4ZaBM+0ZaM4bPO4IqQjajcsTd9sP0jCrSY0'
+
+networks:
+  traefik_network:
+    external: true
+  # internal_network just for beszel-agent to communicate with beszel
+  beszel_internal_network:
+    driver: bridge
