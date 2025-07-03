@@ -5,7 +5,7 @@ services:
     restart: unless-stopped
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock # <--- add this line here!
-      - ${DATA_DIR}/homarr:/app/data
+      - ${DATA_DIR}/homarr:/appdata
     env_file: .env
     networks:
       - traefik_network

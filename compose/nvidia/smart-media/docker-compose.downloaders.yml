@@ -52,7 +52,6 @@ services:
       mount-check:
         condition: service_healthy
 
-        
   iqbit:
     image: pratikngupta/iqbit:latest
     container_name: iqbit
@@ -81,14 +80,13 @@ services:
       mount-check:
         condition: service_healthy
 
-
   # flaresolverr: proxy to resolve cloudflare protected sites
-  flaresolverr:
-    container_name: flaresolverr
+  byparr:
+    container_name: byparr
     environment:
       - LOG_LEVEL=info
     restart: unless-stopped
-    image: ghcr.io/flaresolverr/flaresolverr:latest
+    image: ghcr.io/thephaseless/byparr:latest
     networks:
       - traefik_network
     labels:
@@ -103,10 +101,10 @@ services:
     networks:
       - traefik_network
     environment:
-      - SERVER_NAME=navidrome # pre defined server name
-      - SERVER_LOCK=true # When true AND name/type/url are set, only username/password can be toggled
-      - SERVER_TYPE=subsonic # navidrome also works
-      - SERVER_URL=https://gonic.techsanctuary.me # http://address:port
+      # - SERVER_NAME=navidrome # pre defined server name
+      # - SERVER_LOCK=true # When true AND name/type/url are set, only username/password can be toggled
+      # - SERVER_TYPE=navidrome # navidrome also works
+      # - SERVER_URL=http://navidrome:4533 # http://address:port
       - PUID=1000
       - PGID=1000
       - UMASK=002
@@ -128,7 +126,6 @@ services:
 networks:
   traefik_network:
     external: true
-
 ### IMPORTANT ###
 # To use iQbit UI: `/config/iQbit/release`
 # to use vuetorrent UI: `/vuetorrent`
