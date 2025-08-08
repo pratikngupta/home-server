@@ -16,7 +16,21 @@ services:
       - "traefik.http.routers.whoami.entrypoints=https"
       - "traefik.http.routers.whoami.tls=true"
       - "traefik.http.routers.whoami.middlewares=chain-tinyauth-oauth@file" # optional, if you want to test OAuth
-
+  whoami-no-auth:
+    image: traefik/whoami
+    container_name: whoami-no-auth
+    restart: unless-stopped
+    networks:
+      - traefik_network
+    ports:
+      - 1100:80
+    env_file: .env
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.whoami-no-auth.rule=Host(`whoami-no-auth.${DOMAIN}`)"
+      - "traefik.http.routers.whoami-no-auth.entrypoints=https"
+      - "traefik.http.routers.whoami-no-auth.tls=true"
+      - "traefik.http.routers.whoami-no-auth.middlewares=chain-no-auth@file" # optional, if you want to test OAuth
   traefik:
     image: traefik:v3.4
     container_name: traefik
@@ -98,6 +112,8 @@ services:
     networks:
       - traefik_network
     env_file: auth.env
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.tinyauth-rtr.entrypoints=https"

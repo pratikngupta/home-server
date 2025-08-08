@@ -73,14 +73,44 @@ services:
     depends_on:
       mount-check:
         condition: service_healthy
+
+  # jellyfin:
+  #   image: jellyfin/jellyfin
+  #   container_name: jellyfin
+  #   # user: 1000:1000
+  #   network_mode: "host"
+  #   env_file: .env
+  #   volumes:
+  #     - ${DATA_DIR}/jellyfin/config:/config
+  #     - ${DATA_DIR}/jellyfin/cache:/cache
+  #     - type: bind
+  #       source: /mnt/movie/data2
+  #       target: /media
+
+  #   restart: "unless-stopped"
+  #   # Optional - alternative address used for autodiscovery
+  #   environment:
+  #     - JELLYFIN_PublishedServerUrl=https://jellyfin.techsanctuary.me
+  #   labels:
+  #     - "traefik.enable=true"
+  #     - "traefik.http.routers.jellyfin.rule=Host(`jellyfin.${DOMAIN}`)"
+  #     - "traefik.http.routers.jellyfin.entrypoints=https"
+  #     - "traefik.http.routers.jellyfin.tls=true"
+  #     - "traefik.http.routers.jellyfin.service=jellyfin-media-server@file"
+  #     - "traefik.http.routers.jellyfin.middlewares=jellyfin-mw"
+
+  #     ## HTTP Service
+  #     - "traefik.http.services.jellyfin.loadBalancer.server.port=8096"
+  #     - "traefik.http.services.jellyfin.loadBalancer.passHostHeader=true"
+
   navidrome:
     image: deluan/navidrome:latest
     container_name: navidrome
     # user: 1000:1000 # should be owner of volumes
     networks:
       - traefik_network
-    # ports:
-    #   - "4533:4533"
+    ports:
+      - "4533:4533"
     restart: unless-stopped
     env_file: .env
     volumes:
@@ -108,37 +138,76 @@ services:
       mount-check:
         condition: service_healthy
 
-  swingmusic:
-    image: ghcr.io/swingmx/swingmusic:latest
-    container_name: swingmusic
-    # user: 1000:1000 # should be owner of volumes
+  audiobookshelf:
+    image: ghcr.io/advplyr/audiobookshelf:latest
+    # ports:
+    #   - 13378:80
     networks:
       - traefik_network
-    # ports:
-    #   - "4533:4533"
-    restart: unless-stopped
-    env_file: .env
     volumes:
-      - ${DATA_DIR}/swingmusic:/config:rw
-      - ${MEDIA_DIR}/media/music:/music:ro
+      - ${MEDIA_DIR}/media:/media
+      - ${DATA_DIR}/audiobookshelf/config>:/config
+      - ${DATA_DIR}/audiobookshelf/metadata>:/metadata
+    environment:
+      - TZ=America/Los_Angeles
+    env_file: .env
     labels:
       - "traefik.enable=true"
-      ## swingmusic UI
-      - "traefik.http.routers.swingmusic-rtr.entrypoints=https"
-      - "traefik.http.routers.swingmusic-rtr.rule=Host(`swingmusic.$DOMAIN`)"
-      - "traefik.http.routers.swingmusic-rtr.priority=99"
-      - "traefik.http.routers.swingmusic-rtr.tls=true"
-      - "traefik.http.routers.swingmusic-rtr.middlewares=chain-no-auth@file"
-      - "traefik.http.routers.swingmusic-rtr.service=swingmusic-svc"
-      - "traefik.http.services.swingmusic-svc.loadbalancer.server.port=1970"
+      ## audiobookshelf UI
+      - "traefik.http.routers.audiobookshelf-rtr.entrypoints=https"
+      - "traefik.http.routers.audiobookshelf-rtr.rule=Host(`audiobookshelf.$DOMAIN`)"
+      - "traefik.http.routers.audiobookshelf-rtr.priority=99"
+      - "traefik.http.routers.audiobookshelf-rtr.tls=true"
+      - "traefik.http.routers.audiobookshelf-rtr.middlewares=chain-no-auth@file"
+      - "traefik.http.routers.audiobookshelf-rtr.service=audiobookshelf-svc"
+      - "traefik.http.services.audiobookshelf-svc.loadbalancer.server.port=80"
       ## Redirect to GitHub
-      - "traefik.http.routers.swingmusic-github.rule=Host(`swingmusic.$DOMAIN`) && Path(`/github`)"
-      - "traefik.http.routers.swingmusic-github.entrypoints=https"
-      - "traefik.http.routers.swingmusic-github.tls=true"
-      - "traefik.http.routers.swingmusic-github.priority=100"
-      - "traefik.http.routers.swingmusic-github.middlewares=redirect-to-github-swingmusic@file"
-      - "traefik.http.routers.swingmusic-github.service=swingmusic-github"
-      - "traefik.http.services.swingmusic-github.loadbalancer.server.port=1970"
+      - "traefik.http.routers.audiobookshelf-github.rule=Host(`audiobookshelf.$DOMAIN`) && Path(`/github`)"
+      - "traefik.http.routers.audiobookshelf-github.entrypoints=https"
+      - "traefik.http.routers.audiobookshelf-github.tls=true"
+      - "traefik.http.routers.audiobookshelf-github.priority=100"
+      - "traefik.http.routers.audiobookshelf-github.middlewares=redirect-to-github-audiobookshelf@file"
+      - "traefik.http.routers.audiobookshelf-github.service=audiobookshelf-github"
+      - "traefik.http.services.audiobookshelf-github.loadbalancer.server.port=80"
+
+  calibre:
+    image: lscr.io/linuxserver/calibre:latest
+    container_name: calibre
+    security_opt:
+      - seccomp:unconfined #optional
+    environment:
+      - TZ=Etc/UTC
+    networks:
+      - traefik_network
+    volumes:
+      # - ${DATA_DIR}/calibre/config>:/config
+      - ${MEDIA_DIR}/media/books:/books
+      - ${MEDIA_DIR}/media/book:/config
+
+    # ports:
+    #   - 8080:8080 # 	Calibre desktop gui
+    #   - 8181:8181 # 	Calibre desktop gui HTTPS.
+    #   - 8081:8081 #   Calibre webserver gui.
+    restart: unless-stopped
+    env_file: .env
+    labels:
+      - "traefik.enable=true"
+      ## audiobookshelf UI
+      - "traefik.http.routers.calibre-rtr.entrypoints=https"
+      - "traefik.http.routers.calibre-rtr.rule=Host(`calibre.$DOMAIN`)"
+      - "traefik.http.routers.calibre-rtr.priority=99"
+      - "traefik.http.routers.calibre-rtr.tls=true"
+      - "traefik.http.routers.calibre-rtr.middlewares=chain-no-auth@file"
+      - "traefik.http.routers.calibre-rtr.service=calibre-svc"
+      - "traefik.http.services.calibre-svc.loadbalancer.server.port=8080"
+      ## Redirect to GitHub
+      - "traefik.http.routers.calibre-rtr-server.entrypoints=https"
+      - "traefik.http.routers.calibre-rtr-server.rule=Host(`calibre-server.$DOMAIN`)"
+      - "traefik.http.routers.calibre-rtr-server.priority=99"
+      - "traefik.http.routers.calibre-rtr-server.tls=true"
+      - "traefik.http.routers.calibre-rtr-server.middlewares=chain-no-auth@file"
+      - "traefik.http.routers.calibre-rtr-server.service=calibre-svc-server"
+      - "traefik.http.services.calibre-svc-server.loadbalancer.server.port=8081"
 
 networks:
   traefik_network:

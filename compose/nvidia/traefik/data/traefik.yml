@@ -37,17 +37,14 @@ log:
   level: DEBUG
   filePath: "/logs/traefik.log"
   format: common
-
+  
 accessLog:
-  filePath: "/logs/access.log"
-  bufferingSize: 100
-  filters:
-    statusCodes:
-      - "204-299"
-      - "400-499"
-      - "500-599"
-  format: common
-  addInternals: true
+  filePath: /logs/traefik.log
+  format: json
+  fields:
+    defaultMode: keep
+    headers:
+      defaultMode: keep
 
 certificatesResolvers:
   cloudflare:

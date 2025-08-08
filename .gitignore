@@ -11,3 +11,4 @@ oauth_secrets
 .fleet/
 appdata/
 pgdata/
+tailscale/
