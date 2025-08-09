@@ -1,6 +1,6 @@
 http:
   services:
-    jellyfin-media-server:
+    jellyfin-svc:
       loadBalancer:
         servers:
           - url: "http://192.168.4.70:8096"
@@ -8,10 +8,7 @@ http:
     plex-media-server:
       loadBalancer:
         servers:
-          - url: "https://192.168.4.70:32400"
-        # trust the self-signed certificate
-        passHostHeader: true
-
+          - url: "http://192.168.4.70:32400"
 
     homeassistant-server:
       loadBalancer:

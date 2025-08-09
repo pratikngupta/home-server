@@ -1,7 +1,7 @@
 
 # Configuring Traefik with Tailscale IP Address  
 
-If you encounter issues with Traefik and Tailscale IP addresses in the future, configure Tailscale using the following command:
+If you encounter issues with Traefik and Tailscale IP addresses in the future, configure Tailscale using the following command:  
 
 ### Command:  
 ```sh
