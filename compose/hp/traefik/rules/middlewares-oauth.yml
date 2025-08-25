@@ -1,0 +1,15 @@
+http:
+  middlewares:
+    middlewares-oauth:
+      forwardAuth:
+        address: "http://oauth:4181" # Make sure you have the OAuth service in docker-compose.yml
+        trustForwardHeader: true
+        authResponseHeaders:
+          - "X-Forwarded-User"
+
+    middlewares-tinyauth-oauth:
+      forwardAuth:
+        address: "http://tinyauth:3000/api/auth/traefik" # Make sure you have the OAuth service in docker-compose.yml
+        trustForwardHeader: true
+        authResponseHeaders:
+          - "X-Forwarded-User"

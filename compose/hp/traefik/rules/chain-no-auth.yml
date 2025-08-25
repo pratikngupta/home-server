@@ -1,0 +1,10 @@
+http:
+  middlewares:
+    chain-no-auth:
+      chain:
+        middlewares:
+          # - internal-ip-whitelist
+          # - middlewares-traefik-bouncer # leave this out if you are not using CrowdSec
+          - internal-cloudflare-whitelist
+          - middlewares-rate-limit
+          - middlewares-secure-headers

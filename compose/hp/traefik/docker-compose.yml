@@ -1,0 +1,169 @@
+secrets:
+  oauth_secrets:
+    file: ./data/oauth_secrets
+
+services:
+  whoami:
+    image: traefik/whoami
+    container_name: whoami
+    restart: unless-stopped
+    networks:
+      - traefik_network
+    env_file: .env
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.whoami.rule=Host(`whoami.${DOMAIN}`)"
+      - "traefik.http.routers.whoami.entrypoints=https"
+      - "traefik.http.routers.whoami.tls=true"
+      - "traefik.http.routers.whoami.middlewares=chain-tinyauth-oauth@file" # optional, if you want to test OAuth
+
+  traefik:
+    image: traefik:v3.4
+    container_name: traefik
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    networks:
+      - traefik_network
+    ports:
+      - 80:80
+      - 443:443
+      - 443:443/tcp # Uncomment if you want HTTP3
+      - 443:443/udp # Uncomment if you want HTTP3
+      # - 8082:8082 # for metrics
+    env_file:
+      - .env
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./data/traefik.yml:/traefik.yml:ro
+      - ./data/acme.json:/acme.json
+      - ./rules:/rules
+      - ./data/usersfile:/data/usersfile
+      - /home/pratik/appData/logs/traefik:/logs
+      # - ./data/config.yml:/config.yml:ro
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.traefik.entrypoints=http"
+      - "traefik.http.routers.traefik.rule=Host(`traefik-dashboard.${DOMAIN}`)"
+      - "traefik.http.routers.traefik.middlewares=chain-tinyauth-oauth@file"
+      - "traefik.http.routers.traefik-secure.middlewares=chain-tinyauth-oauth@file"
+      - "traefik.http.middlewares.traefik-https-redirect.redirectscheme.scheme=https"
+      - "traefik.http.middlewares.sslheader.headers.customrequestheaders.X-Forwarded-Proto=https"
+      - "traefik.http.routers.traefik.middlewares=traefik-https-redirect"
+      - "traefik.http.routers.traefik-secure.entrypoints=https"
+      - "traefik.http.routers.traefik-secure.rule=Host(`traefik-dashboard.${DOMAIN}`)"
+      - "traefik.http.routers.traefik-secure.tls=true"
+      - "traefik.http.routers.traefik-secure.tls.certresolver=cloudflare"
+      - "traefik.http.routers.traefik-secure.tls.domains[0].main=${DOMAIN}"
+      - "traefik.http.routers.traefik-secure.tls.domains[0].sans=*.${DOMAIN}"
+
+      # ## Internal Traefik Dashboard
+      # - "traefik.http.routers.traefik-internal.rule=Host(`traefik-dashboard.lan.${DOMAIN}`)"
+      # - "traefik.http.routers.traefik-internal.entrypoints=https"
+      # - "traefik.http.routers.traefik-internal.tls=true"
+      # - ## no auth for internal dashboard
+      # - "traefik.http.routers.traefik-internal.middlewares=no-auth@file"
+      - "traefik.http.routers.traefik-secure.service=api@internal"
+
+  # oauth:
+  #   container_name: oauth
+  #   image: thomseddon/traefik-forward-auth:latest
+  #   # image: ghcr.io/jordemort/traefik-forward-auth:latest
+  #   security_opt:
+  #     - no-new-privileges:true
+  #   restart: unless-stopped
+  #   env_file:
+  #     - .env
+  #   networks:
+  #     - traefik_network
+  #   labels:
+  #     - "traefik.enable=true"
+  #     # HTTP Routers
+  #     - "traefik.http.routers.oauth-rtr.tls=true"
+  #     - "traefik.http.routers.oauth-rtr.entrypoints=https"
+  #     - "traefik.http.routers.oauth-rtr.rule=Host(`oauth.$DOMAIN`)"
+  #     # Middlewares
+  #     - "traefik.http.routers.oauth-rtr.middlewares=chain-tinyauth-oauth@file"
+  #     # HTTP Services
+  #     - "traefik.http.routers.oauth-rtr.service=oauth-svc"
+  #     - "traefik.http.services.oauth-svc.loadbalancer.server.port=4181"
+
+  tinyauth:
+    image: ghcr.io/steveiliop56/tinyauth:latest
+    container_name: tinyauth
+    restart: unless-stopped
+    networks:
+      - traefik_network
+    env_file: auth.env
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.tinyauth-rtr.entrypoints=https"
+      - "traefik.http.routers.tinyauth-rtr.tls=true"
+      - "traefik.http.routers.tinyauth-rtr.rule=Host(`tinyauth.${DOMAIN}`)"
+      # - "traefik.http.middlewares.tinyauth.forwardauth.address: http://tinyauth:3000/api/auth/traefik"
+      - "traefik.http.routers.tinyauth-rtr.service=tinyauth-svc"
+      - "traefik.http.services.tinyauth-svc.loadbalancer.server.port=3000"
+
+  dozzle-traefik-logs:
+    container_name: dozzle-traefik-logs
+    image: alpine
+    volumes:
+      - /home/pratik/appData/logs/traefik/traefik.log:/log/traefik.log:ro
+    command:
+      - tail
+      - -f
+      - /log/traefik.log
+    network_mode: none
+    restart: unless-stopped
+    labels:
+      - dev.dozzle.group=Logs
+
+  dozzle-traefik-access-logs:
+    container_name: dozzle-traefik-access-logs
+    image: alpine
+    volumes:
+      - /home/pratik/appData/logs/traefik/access.log:/log/access.log:ro
+    command:
+      - tail
+      - -f
+      - /log/access.log
+    network_mode: none
+    restart: unless-stopped
+    labels:
+      - dev.dozzle.group=Logs
+  # crowdsec:
+  #   image: crowdsecurity/crowdsec
+  #   container_name: crowdsec
+  #   restart: unless-stopped
+  #   networks:
+  #     - traefik_network
+  #   ports:
+  #     - 8080:8080
+  #   environment:
+  #     COLLECTIONS: "crowdsecurity/traefik crowdsecurity/http-cve crowdsecurity/whitelist-good-actors crowdsecurity/iptables crowdsecurity/linux crowdsecurity/nginx crowdsecurity/sshd"
+  #     GID: 1000
+  #   volumes:
+  #     - ./appdata/crowdsec/logs/web:/logs/web:ro
+  #     - /var/log:/var/log:ro
+  #     - ./appdata/crowdsec/data:/var/lib/crowdsec/data
+  #     - ./appdata/crowdsec/config:/etc/crowdsec
+  #     - /home/pratik/appData/logs/traefik:/logs/traefik:ro
+
+  # traefik-bouncer:
+  #   restart: unless-stopped
+  #   networks:
+  #     - traefik_network
+  #   image: fbonalair/traefik-crowdsec-bouncer
+  #   container_name: traefik-bouncer
+  #   env_file: .env
+  #   environment:
+  #     GIN_MODE: release # default is debug (more logs)
+  #     CROWDSEC_AGENT_HOST: crowdsec:8080 # CrowdSec host and port
+  #     CROWDSEC_BOUNCER_LOG_LEVEL: 2 # https://pkg.go.dev/github.com/rs/zerolog#readme-leveled-logging
+
+networks:
+  traefik_network:
+    name: traefik_network
+    driver: bridge
+
