@@ -60,7 +60,7 @@ services:
     #         count: all
     #         capabilities: [gpu]
 
-# node example
+  # node example
   tdarr-node:
     container_name: tdarr-node
     image: ghcr.io/haveagitgat/tdarr_node:latest
@@ -68,42 +68,41 @@ services:
     network_mode: service:tdarr
     environment:
       - nodeName=tdarr-node-1
-      - TZ=America/Los_Angeles
+      - TZ=America/Toronto
       - UMASK_SET=002
-      - TZ=America/Los_Angeles
       - serverIP=tdarr
       - serverPort=8266
       - inContainer=true
       - ffmpegVersion=7
       - nodeType=mapped
       - priority=-1
-      - cronPluginUpdate=
-      - apiKey=
+      # - cronPluginUpdate=
+      # - apiKey=
       - maxLogSizeMB=10
       - pollInterval=2000
       - startPaused=false
-      - transcodegpuWorkers=1
-      - transcodecpuWorkers=2
-      - healthcheckgpuWorkers=1
+      # - transcodegpuWorkers=1
+      - transcodecpuWorkers=1
+      # - healthcheckgpuWorkers=1
       - healthcheckcpuWorkers=1
-      - NVIDIA_DRIVER_CAPABILITIES=all
-      - NVIDIA_VISIBLE_DEVICES=all
+      # - NVIDIA_DRIVER_CAPABILITIES=all
+      # - NVIDIA_VISIBLE_DEVICES=all
     env_file: .env
     volumes:
       - ${DATA_DIR}/tdarr-node/configs:/app/configs
-      -  ${DATA_DIR}/tdarr-node/logs:/app/logs
+      - ${DATA_DIR}/tdarr-node/logs:/app/logs
       - ${MEDIA_DIR}:/media
       - /mnt/transcode/temp:/temp
 
     devices:
       - /dev/dri:/dev/dri
-    deploy:
-      resources:
-        reservations:
-          devices:
-          - driver: nvidia
-            count: all
-            capabilities: [gpu]
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #       - driver: nvidia
+    #         count: all
+    #         capabilities: [gpu]
 
   tdarr-node-2:
     container_name: tdarr-node-2
@@ -112,7 +111,7 @@ services:
     network_mode: service:tdarr
     environment:
       - nodeName=tdarr-node-2
-      - TZ=America/Los_Angeles
+      - TZ=America/Toronto
       - UMASK_SET=002
       - serverIP=tdarr
       - serverPort=8266
@@ -125,28 +124,28 @@ services:
       - maxLogSizeMB=10
       - pollInterval=2000
       - startPaused=false
-      - transcodegpuWorkers=1
-      - transcodecpuWorkers=2
-      - healthcheckgpuWorkers=1
+      # - transcodegpuWorkers=1
+      - transcodecpuWorkers=1
+      # - healthcheckgpuWorkers=1
       - healthcheckcpuWorkers=1
-      - NVIDIA_DRIVER_CAPABILITIES=all
-      - NVIDIA_VISIBLE_DEVICES=all
+      # - NVIDIA_DRIVER_CAPABILITIES=all
+      # - NVIDIA_VISIBLE_DEVICES=all
     env_file: .env
     volumes:
       - ${DATA_DIR}/tdarr-node/configs:/app/configs
-      -  ${DATA_DIR}/tdarr-node/logs:/app/logs
+      - ${DATA_DIR}/tdarr-node/logs:/app/logs
       - ${MEDIA_DIR}:/media
       - /mnt/transcode/temp:/temp
 
     devices:
       - /dev/dri:/dev/dri
-    deploy:
-      resources:
-        reservations:
-          devices:
-          - driver: nvidia
-            count: all
-            capabilities: [gpu]
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #       - driver: nvidia
+    #         count: all
+    #         capabilities: [gpu]
 networks:
   traefik_network:
     external: true

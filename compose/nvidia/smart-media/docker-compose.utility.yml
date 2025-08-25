@@ -53,18 +53,18 @@ services:
     restart: unless-stopped
     privileged: true # Enables privileged mode
     env_file: .env
-    environment:
-      - DN_SNAPSHOT_NVIDIA_SMI_PATH=/usr/bin/nvidia-smi
+    # environment:
+    #   # - DN_SNAPSHOT_NVIDIA_SMI_PATH=/usr/bin/nvidia-smi
     networks:
       - traefik_network
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              count: all
-              capabilities:
-                - gpu
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - driver: nvidia
+    #           count: all
+    #           capabilities:
+    #             - gpu
     # ports:
     #   - "5454:5454"
     volumes:
@@ -72,7 +72,7 @@ services:
       - /var/run/utmp:/var/run/utmp
       - /etc/machine-id:/etc/machine-id
       - /mnt/movie:/movie
-      - /usr/bin/nvidia-smi:/usr/bin/nvidia-smi:rw
+      # - /usr/bin/nvidia-smi:/usr/bin/nvidia-smi:rw
 
     labels:
       - "traefik.enable=true"
@@ -86,8 +86,6 @@ services:
       mount-check:
         condition: service_healthy
 
-
 networks:
   traefik_network:
     external: true
-

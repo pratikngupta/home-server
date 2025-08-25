@@ -36,6 +36,7 @@ services:
       # - "traefik.http.services.gluetun-qbittorrent-no-auth.loadbalancer.server.port=8080"
       # # make this high priority
       - "traefik.http.routers.gluetun-qbittorrent.priority=10"
+      - "tinyauth.domain=qbittorrent.techsanctuary.me"
 
     depends_on:
       mount-check:

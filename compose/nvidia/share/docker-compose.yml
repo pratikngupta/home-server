@@ -24,14 +24,14 @@ services:
       - ${DATA_DIR}/avahi:/etc/avahi/services:ro
     restart: always
 
-  # minidlna:
-  #   container_name: minidlna
-  #   network_mode: host
-  #   env_file: .env
-  #   volumes:
-  #     - ${STORAGE_DIR}/movies:/opt/Videos
-  #     - ${STORAGE_DIR}/music:/opt/Music
-  #   image: geekduck/minidlna
+  minidlna:
+    container_name: minidlna
+    network_mode: host
+    env_file: .env
+    volumes:
+      - ${STORAGE_DIR}:/opt/Videos
+      - ${STORAGE_DIR}/music:/opt/Music
+    image: geekduck/minidlna
 
 networks:
   traefik_network:

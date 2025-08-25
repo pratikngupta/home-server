@@ -1,0 +1,26 @@
+services:
+  n8n:
+    container_name: n8n
+    networks:
+      - traefik_network
+    # ports:
+    #   - 5678:5678
+    volumes:
+      - n8n_data:/home/node/.n8n
+      - /var/run/docker.sock:/var/run/docker.sock
+    image: docker.n8n.io/n8nio/n8n
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.n8n.rule=Host(`n8n.techsanctuary.me`)"
+      - "traefik.http.routers.n8n.entrypoints=https"
+      - "traefik.http.routers.n8n.tls=true"
+      - "traefik.http.services.n8n.loadbalancer.server.port=5678"
+      ## Middlewaress
+      - "traefik.http.routers.n8n.middlewares=chain-tinyauth-oauth@file"
+
+networks:
+  traefik_network:
+    external: true
+
+volumes:
+  n8n_data:

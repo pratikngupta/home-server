@@ -1,0 +1,14 @@
+services:
+  tailscale-proxy-node:
+    container_name: tailscale-proxy-node
+    image: ghcr.io/tailscale/tailscale:latest
+    restart: unless-stopped
+    network_mode: host
+    privileged: true # libusb_init failed
+    cap_add:
+      - NET_ADMIN
+      - NET_RAW
+    env_file:
+      - .env
+    volumes:
+      - ${DATA_DIR}/tailscale:/var/lib/tailscale

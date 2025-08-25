@@ -15,8 +15,8 @@ services:
       - PGID=1000
       - VERSION=docker
       - HOSTNAME=plex.${DOMAIN}
-      - NVIDIA_VISIBLE_DEVICES=all
-      - NVIDIA_DRIVER_CAPABILITIES=compute,video,utility
+      # - NVIDIA_VISIBLE_DEVICES=all
+      # - NVIDIA_DRIVER_CAPABILITIES=compute,video,utility
       - APPLE_DIR=/mnt/storage/photo/apple
       - GOOGLE_DIR=/mnt/storage/photo/google
       - ORIGINAL_DIR=/mnt/storage/photo/original-archive
@@ -37,14 +37,14 @@ services:
     #   - media-network
     devices:
       - /dev/dri:/dev/dri
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              count: all
-              capabilities:
-                - gpu
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - driver: nvidia
+    #           count: all
+    #           capabilities:
+    #             - gpu
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.plex.rule=Host(`playninja.${DOMAIN}`)"
@@ -107,38 +107,6 @@ services:
     depends_on:
       mount-check:
         condition: service_healthy
-
-  swingmusic:
-    image: ghcr.io/swingmx/swingmusic:latest
-    container_name: swingmusic
-    # user: 1000:1000 # should be owner of volumes
-    networks:
-      - traefik_network
-    # ports:
-    #   - "4533:4533"
-    restart: unless-stopped
-    env_file: .env
-    volumes:
-      - ${DATA_DIR}/swingmusic:/config:rw
-      - ${MEDIA_DIR}/media/music:/music:ro
-    labels:
-      - "traefik.enable=true"
-      ## swingmusic UI
-      - "traefik.http.routers.swingmusic-rtr.entrypoints=https"
-      - "traefik.http.routers.swingmusic-rtr.rule=Host(`swingmusic.$DOMAIN`)"
-      - "traefik.http.routers.swingmusic-rtr.priority=99"
-      - "traefik.http.routers.swingmusic-rtr.tls=true"
-      - "traefik.http.routers.swingmusic-rtr.middlewares=chain-no-auth@file"
-      - "traefik.http.routers.swingmusic-rtr.service=swingmusic-svc"
-      - "traefik.http.services.swingmusic-svc.loadbalancer.server.port=1970"
-      ## Redirect to GitHub
-      - "traefik.http.routers.swingmusic-github.rule=Host(`swingmusic.$DOMAIN`) && Path(`/github`)"
-      - "traefik.http.routers.swingmusic-github.entrypoints=https"
-      - "traefik.http.routers.swingmusic-github.tls=true"
-      - "traefik.http.routers.swingmusic-github.priority=100"
-      - "traefik.http.routers.swingmusic-github.middlewares=redirect-to-github-swingmusic@file"
-      - "traefik.http.routers.swingmusic-github.service=swingmusic-github"
-      - "traefik.http.services.swingmusic-github.loadbalancer.server.port=1970"
 
 networks:
   traefik_network:

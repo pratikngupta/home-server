@@ -3,17 +3,17 @@ http:
     jellyfin-svc:
       loadBalancer:
         servers:
-          - url: "http://192.168.4.70:8096"
+          - url: "http://192.168.2.102:8096"
 
     plex-media-server:
       loadBalancer:
         servers:
-          - url: "http://192.168.4.70:32400"
+          - url: "http://192.168.2.102:32400"
 
     homeassistant-server:
       loadBalancer:
         servers:
-          - url: "http://192.168.4.70:8123"
+          - url: "http://192.168.2.102:8123"
 
     # podify-media-server:
     #   loadBalancer:
