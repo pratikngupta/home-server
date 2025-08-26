@@ -19,3 +19,6 @@ include:
 
   # Overseerr, Jellyseer, requesterr
   - docker-compose.requester.yml
+
+  # Koito and multi-scrobbler
+  - docker-compose.scrobbler.yml

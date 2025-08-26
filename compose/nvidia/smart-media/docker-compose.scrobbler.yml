@@ -1,0 +1,77 @@
+services:
+  koito:
+    image: gabehf/koito:latest
+    container_name: koito
+    env_file: .env
+    depends_on:
+      - db
+    # environment:
+    #   - KOITO_DATABASE_URL=postgres://postgres:secret_password@db:5432/koitodb
+    #   - KOITO_ALLOWED_HOSTS=*
+    # ports:
+    #   - "4110:4110"
+    volumes:
+      - ${DATA_DIR}/koito/koito-data:/etc/koito
+    restart: unless-stopped
+    networks:
+      - traefik_network
+      - scrobbler_internal
+
+    labels:
+      - "traefik.enable=true"
+      ## Oauth2 authentication
+      - "traefik.http.routers.koito.rule=Host(`koito.techsanctuary.me`)"
+      - "traefik.http.routers.koito.entrypoints=https"
+      - "traefik.http.routers.koito.tls=true"
+      - "traefik.http.routers.koito.middlewares=chain-tinyauth-oauth@file"
+      - "traefik.http.routers.koito.service=koito"
+      - "traefik.http.services.koito.loadbalancer.server.port=4110"
+      - "traefik.docker.network=traefik_network"
+
+  db:
+    image: postgres:16
+    container_name: psql
+    restart: unless-stopped
+    env_file: .env
+    # environment:
+    #   POSTGRES_DB: koitodb
+    #   POSTGRES_USER: postgres
+    #   POSTGRES_PASSWORD: secret_password
+    networks:
+      - scrobbler_internal
+    volumes:
+      - ${DATA_DIR}/koito/db-data:/var/lib/postgresql/data
+
+  multi-scrobbler:
+    image: foxxmd/multi-scrobbler
+    container_name: multi-scrobbler
+    env_file: .env
+    environment:
+      - TZ=America/Toronto # Specify timezone from TZ Database name found here https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
+      - BASE_URL=https://scrobbler.techsanctuary.me
+      # all Environmental Variables in below examples go here!
+    volumes:
+      - "${DATA_DIR}/scrobbler/config:/config"
+    # ports:
+    #   - "9078:9078"
+    restart: unless-stopped
+    networks:
+      - traefik_network
+      # - scrobbler_internal
+
+    labels:
+      - "traefik.enable=true"
+      ## Oauth2 authentication
+      - "traefik.http.routers.scrobbler.rule=Host(`scrobbler.techsanctuary.me`)"
+      - "traefik.http.routers.scrobbler.entrypoints=https"
+      - "traefik.http.routers.scrobbler.tls=true"
+      - "traefik.http.routers.scrobbler.middlewares=chain-tinyauth-oauth@file"
+      - "traefik.http.routers.scrobbler.service=scrobbler"
+      - "traefik.http.services.scrobbler.loadbalancer.server.port=9078"
+      - "traefik.docker.network=traefik_network"
+
+networks:
+  traefik_network:
+    external: true
+  scrobbler_internal:
+    external: true
