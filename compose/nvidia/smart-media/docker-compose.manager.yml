@@ -24,6 +24,8 @@ services:
       - ${MEDIA_DIR}:/data
       # timezone
       - /etc/localtime:/etc/localtime:ro
+      - ${DRIVE_ONE}:/DRIVE_ONE
+      - ${DRIVE_TWO}:/DRIVE_TWO
 
     restart: unless-stopped
     networks:
@@ -82,6 +84,8 @@ services:
       - ${MEDIA_DIR}:/data
       # timezone
       - /etc/localtime:/etc/localtime:ro
+      - ${DRIVE_ONE}:/DRIVE_ONE
+      - ${DRIVE_TWO}:/DRIVE_TWO
     # ports:
     #   - 6767:6767
     restart: unless-stopped
@@ -141,6 +145,8 @@ services:
       - ${MEDIA_DIR}:/data
       # timezone
       - /etc/localtime:/etc/localtime:ro
+      - ${DRIVE_ONE}:/DRIVE_ONE
+      - ${DRIVE_TWO}:/DRIVE_TWO
     restart: unless-stopped
     networks:
       - traefik_network

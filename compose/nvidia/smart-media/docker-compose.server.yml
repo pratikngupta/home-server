@@ -29,7 +29,8 @@ services:
       - /mnt/storage/photo/apple:/mnt/photo/apple
       - /mnt/storage/photo/google:/mnt/photo/google
       - /mnt/storage/photo/original-archive:/mnt/photo/original-archive
-
+      - ${DRIVE_ONE}:/DRIVE_ONE
+      - ${DRIVE_TWO}:/DRIVE_TWO
     network_mode: host
     privileged: true # libusb_init failed
     restart: unless-stopped
