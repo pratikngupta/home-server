@@ -1,0 +1,36 @@
+services:
+  crowdsec:
+    image: crowdsecurity/crowdsec
+    container_name: crowdsec
+    restart: unless-stopped
+    env_file: .env
+    networks:
+      - traefik_network
+    ports:
+      - 8080:8080
+    environment:
+      COLLECTIONS: "crowdsecurity/traefik crowdsecurity/http-cve crowdsecurity/whitelist-good-actors crowdsecurity/iptables crowdsecurity/linux crowdsecurity/nginx crowdsecurity/sshd"
+      GID: 1000
+    volumes:
+      - /crowdsec/logs/web:/logs/web:ro
+      - /var/log:/var/log:ro
+      - ${DATA_DIR}/crowdsec/data:/var/lib/crowdsec/data
+      - ${DATA_DIR}/crowdsec/config:/etc/crowdsec
+      - /home/pratik/appData/logs/traefik:/logs/traefik:ro
+
+  # traefik-bouncer:
+  #   restart: unless-stopped
+  #   networks:
+  #     - traefik_network
+  #   image: fbonalair/traefik-crowdsec-bouncer
+  #   container_name: traefik-bouncer
+  #   env_file: .env
+  #   environment:
+  #     GIN_MODE: release # default is debug (more logs)
+  #     CROWDSEC_AGENT_HOST: crowdsec:8080 # CrowdSec host and port
+  #     CROWDSEC_BOUNCER_LOG_LEVEL: 2 # https://pkg.go.dev/github.com/rs/zerolog#readme-leveled-logging
+  # 
+
+networks:
+  traefik_network:
+    external: true
