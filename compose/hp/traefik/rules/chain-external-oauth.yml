@@ -3,7 +3,7 @@ http:
     chain-google-oauth:
       chain:
         middlewares:
-          # - middlewares-traefik-bouncer # leave this out if you are not using CrowdSec
+          - middlewares-traefik-bouncer # leave this out if you are not using CrowdSec
           - internal-cloudflare-whitelist
           - middlewares-rate-limit
           - middlewares-secure-headers
@@ -12,7 +12,7 @@ http:
     chain-github-oauth:
       chain:
         middlewares:
-          # - middlewares-traefik-bouncer # leave this out if you are not using CrowdSec
+          - middlewares-traefik-bouncer # leave this out if you are not using CrowdSec
           - internal-cloudflare-whitelist
           - middlewares-rate-limit
           - middlewares-secure-headers
@@ -21,7 +21,7 @@ http:
     chain-tinyauth-oauth:
       chain:
         middlewares:
-          # - middlewares-traefik-bouncer # leave this out if you are not using CrowdSec
+          - middlewares-traefik-bouncer # leave this out if you are not using CrowdSec
           - internal-cloudflare-whitelist
           - middlewares-rate-limit
           - middlewares-secure-headers

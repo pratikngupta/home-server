@@ -1,0 +1,54 @@
+version: '3.8'
+services:
+  dockflare:
+    #image: alplat/dockflare:stable  # alplat/dockflare:unstable docker tag for beta versions
+    build: ./dockflare  # Uncomment to build from source instead
+    container_name: dockflare
+    restart: unless-stopped
+    # ports:
+    #   - "5000:5000"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro  # Required to monitor Docker events
+      - ${DATA_DIR}/cloudflared/dockflare:/app/data  # Persistent storage for state
+    networks:
+      - traefik_network  # Network for communication with other containers
+    environment:
+      - STATE_FILE_PATH=/app/data/state.json
+      - TZ=America/Toronto  # Set your timezone here
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.dockflare.rule=Host(`dockflare.${DOMAIN}`)"
+      - "traefik.http.routers.dockflare.entrypoints=https"
+      - "traefik.http.routers.dockflare.tls=true"
+      - "traefik.http.routers.dockflare.middlewares=chain-tinyauth-oauth@file" # optional, if you want to test OAuth
+      
+    #labels: # Optional
+    #- dockflare.enable=true
+    #- dockflare.hostname=dockflare.yourdomain.tld
+    #- dockflare.service=http://dockflare:5000  
+    # 
+
+  # cloudflared:
+  #   network_mode: host
+  #   restart: always
+  #   container_name: cloudflared_tunnel
+  #   image: cloudflare/cloudflared:latest
+  #   command: tunnel --no-autoupdate run --token ${CLOUDFLARED_TOKEN}
+  #   env_file: .env
+
+  # cloudflare-ddns:
+  #   container_name: cloudflare_ddns
+  #   image: favonia/cloudflare-ddns:edge
+  #   network_mode: host
+  #   restart: always
+  #   user: "1000:1000"
+  #   read_only: true
+  #   cap_drop: [all]
+  #   security_opt: [no-new-privileges:true]
+  #   env_file: .env
+
+
+networks:
+  traefik_network:
+    external:
+      true

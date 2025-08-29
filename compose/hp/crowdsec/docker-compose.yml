@@ -18,19 +18,42 @@ services:
       - ${DATA_DIR}/crowdsec/config:/etc/crowdsec
       - /home/pratik/appData/logs/traefik:/logs/traefik:ro
 
-  # traefik-bouncer:
-  #   restart: unless-stopped
-  #   networks:
-  #     - traefik_network
-  #   image: fbonalair/traefik-crowdsec-bouncer
-  #   container_name: traefik-bouncer
-  #   env_file: .env
-  #   environment:
-  #     GIN_MODE: release # default is debug (more logs)
-  #     CROWDSEC_AGENT_HOST: crowdsec:8080 # CrowdSec host and port
-  #     CROWDSEC_BOUNCER_LOG_LEVEL: 2 # https://pkg.go.dev/github.com/rs/zerolog#readme-leveled-logging
-  # 
 
+  # CrowdSec Bouncer - Cloudflare
+  # sudo docker exec crowdsec cscli bouncer add cloudflare-bouncer
+  # Set max ip number right the first time (max 10000). Recreating container deletes all ips and readds them causing cloudflare 429 rate limiting.
+  cloudflare-bouncer:
+    image: crowdsecurity/cloudflare-bouncer
+    container_name: cloudflare-bouncer
+    security_opt:
+      - no-new-privileges:true
+    restart: unless-stopped
+    env_file: .env
+    networks:
+      - traefik_network
+    volumes:
+      -  ${DATA_DIR}/cloudflare-bouncer/cfg.yaml:/etc/crowdsec/bouncers/crowdsec-cloudflare-bouncer.yaml
+    depends_on:
+      - crowdsec
+      
+  # CrowdSec Bouncer - Traefik
+  traefik-bouncer:
+    image: fbonalair/traefik-crowdsec-bouncer
+    container_name: traefik-bouncer
+    env_file: .env
+    security_opt:
+      - no-new-privileges:true
+    restart: unless-stopped
+    networks:
+      - traefik_network
+    environment:
+      GIN_MODE: release # default is debug (more logs)
+      CROWDSEC_BOUNCER_API_KEY: $CROWDSEC_BOUNCER_TRAEFIK_API_KEY
+      CROWDSEC_AGENT_HOST: crowdsec:8080 # CrowdSec host and port
+      CROWDSEC_BOUNCER_LOG_LEVEL: 2 # https://pkg.go.dev/github.com/rs/zerolog#readme-leveled-logging
+    depends_on:
+      - crowdsec
+      
 networks:
   traefik_network:
     external: true
