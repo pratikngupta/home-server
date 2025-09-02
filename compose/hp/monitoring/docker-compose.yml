@@ -117,7 +117,7 @@ services:
       - "traefik.http.routers.speedtest.entrypoints=https"
       - "traefik.http.routers.speedtest.tls=true"
       - "traefik.http.services.speedtest.loadbalancer.server.port=3000"
-      - "traefik.http.routers.speedtest.middlewares=chain-no-auth@file"
+      - "traefik.http.routers.speedtest.middlewares=chain-tinyauth-oauth@file"
       # - "traefik.http.routers.speedtest.middlewares=chain-no-auth@file"
 
   glances:

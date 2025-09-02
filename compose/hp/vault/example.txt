@@ -1,0 +1,46 @@
+DOMAIN=
+
+APP_KEY=
+SITE_OWNER=
+# ADMIN_TOKEN=
+SMTP_PORT=587
+SMTP_HOST=smtp.sendgrid.net
+SMTP_FROM=
+SMTP_FROM_NAME=
+SMTP_USERNAME=
+SMTP_PASSWORD=
+
+SMTP_SECURITY=starttls
+SMTP_AUTH_MECHANISM="Login"
+
+## Enables push notifications (requires key and id from https://bitwarden.com/host)
+## Details about mobile client push notification:
+## - https://github.com/dani-garcia/vaultwarden/wiki/Enabling-Mobile-Client-push-notification
+PUSH_ENABLED=true
+PUSH_INSTALLATION_ID=
+PUSH_INSTALLATION_KEY=
+
+## Controls if new users can register
+SIGNUPS_ALLOWED=false
+
+## Client Settings
+## Enable experimental feature flags for clients.
+## This is a comma-separated list of flags, e.g. "flag1,flag2,flag3".
+##
+## The following flags are available:
+## - "autofill-overlay": Add an overlay menu to form fields for quick access to credentials.
+## - "autofill-v2": Use the new autofill implementation.
+## - "browser-fileless-import": Directly import credentials from other providers without a file.
+## - "extension-refresh": Temporarily enable the new extension design until general availability (should be used with the beta Chrome extension)
+## - "fido2-vault-credentials": Enable the use of FIDO2 security keys as second factor.
+## - "ssh-key-vault-item": Enable the creation and use of SSH key vault items. (Needs clients >=2024.12.0)
+## - "ssh-agent": Enable SSH agent support on Desktop. (Needs desktop >=2024.12.0)
+EXPERIMENTAL_CLIENT_FEATURE_FLAGS=extension-refresh,autofill-v2,ssh-key-vault-item
+
+
+SMTP_PORT_2FAUTH=587
+SMTP_HOST_2FAUTH=smtp.sendgrid.net
+SMTP_FROM_2FAUTH=
+SMTP_FROM_NAME_2FAUTH=
+SMTP_USERNAME_2FAUTH=
+SMTP_PASSWORD_2FAUTH=

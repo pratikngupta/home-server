@@ -1,0 +1,108 @@
+services:
+  2fauth:
+    image: 2fauth/2fauth
+    container_name: 2fauth
+    volumes:
+      - ${DATA_DIR}/2fauth:/2fauth
+    networks:
+      - traefik_network
+    env_file: .env
+    environment:
+      # You can change the name of the app
+      - APP_NAME=2FAuth
+      # You can leave this on "local". If you change it to production most console commands will ask for extra confirmation.
+      # Never set it to "testing".
+      - APP_ENV=production
+      # The timezone for your application, which is used to record dates and times to database. This global setting can be
+      # overridden by users via in-app settings for a personalised dates and times display.
+      # If this setting is changed while the application is already running, existing records in the database won't be updated
+      - APP_TIMEZONE=UTC
+      # Set to true if you want to see debug information in error screens.
+      - APP_DEBUG=true
+      # This should be your email address
+      - SITE_OWNER=${SITE_OWNER}
+      # The encryption key for  our database and sessions. Keep this very secure.
+      # If you generate a new one all existing data must be considered LOST.
+      # Change it to a string of exactly 32 chars or use command `php artisan key:generate` to generate it
+      - APP_KEY=${APP_KEY}
+      - APP_URL=https://2fauth.${DOMAIN}
+      - IS_DEMO_APP=false
+      - LOG_CHANNEL=daily
+      - LOG_LEVEL=notice
+      - DB_DATABASE="/srv/database/database.sqlite"
+      - CACHE_DRIVER=file
+      - SESSION_DRIVER=file
+      # Mail settings
+      - MAIL_MAILER=smtp
+      - MAIL_HOST=${SMTP_HOST_2FAUTH}
+      - MAIL_PORT=${SMTP_PORT_2FAUTH}
+      - MAIL_USERNAME=${SMTP_USERNAME_2FAUTH}
+      - MAIL_PASSWORD=${SMTP_PASSWORD_2FAUTH}
+      - MAIL_ENCRYPTION=tls
+      - MAIL_FROM_NAME=${SMTP_FROM_NAME_2FAUTH}
+      - MAIL_FROM_ADDRESS=${SMTP_FROM_2FAUTH}
+      - MAIL_VERIFY_SSL_PEER=true
+      # API settings
+      - THROTTLE_API=60
+      # Authentication settings
+      - LOGIN_THROTTLE=2
+      - AUTHENTICATION_GUARD=web-guard
+      - AUTHENTICATION_LOG_RETENTION=365
+      # Name of the HTTP headers sent by the reverse proxy that identifies the authenticated user at proxy level.
+      # Check your proxy documentation to find out how these headers are named (i.e 'REMOTE_USER', 'REMOTE_EMAIL', etc...)
+      # (only relevant when AUTHENTICATION_GUARD is set to 'reverse-proxy-guard')
+      - AUTH_PROXY_HEADER_FOR_USER=null
+      - AUTH_PROXY_HEADER_FOR_EMAIL=null
+      # Custom logout URL to open when using an auth proxy.
+      - PROXY_LOGOUT_URL=null
+      # WebAuthn settings
+      # Relying Party name, aka the name of the application. If blank, defaults to APP_NAME. Do not set to null.
+      - WEBAUTHN_NAME=2FAuth
+      # Relying Party ID, should equal the site domain (i.e 2fauth.example.com).
+      # If null, the device will fill it internally (recommended)
+      # See https://webauthn-doc.spomky-labs.com/prerequisites/the-relying-party#how-to-determine-the-relying-party-id
+      - WEBAUTHN_ID=null
+
+      - WEBAUTHN_USER_VERIFICATION=preferred
+      #### SSO settings (for Socialite) ####
+      # Uncomment and complete lines for the OAuth providers you want to enable.
+      # - OPENID_AUTHORIZE_URL=
+      # - OPENID_TOKEN_URL=
+      # - OPENID_USERINFO_URL=
+      # - OPENID_CLIENT_ID=
+      # - OPENID_CLIENT_SECRET=
+      # - GITHUB_CLIENT_ID=
+      # - GITHUB_CLIENT_SECRET=
+      # Use this setting to declare trusted proxied.
+      # Supported:
+      #   '*': to trust any proxy
+      #   A comma separated IP list: The list of proxies IP to trust
+      - TRUSTED_PROXIES=*
+      - PROXY_FOR_OUTGOING_REQUESTS=null
+      - BROADCAST_DRIVER=log
+      - QUEUE_DRIVER=sync
+      - SESSION_LIFETIME=120
+      - REDIS_HOST=127.0.0.1
+      - REDIS_PASSWORD=null
+      - REDIS_PORT=6379
+      - PUSHER_APP_ID=
+      - PUSHER_APP_KEY=
+      - PUSHER_APP_SECRET=
+      - PUSHER_APP_CLUSTER=mt1
+      - VITE_PUSHER_APP_KEY="${PUSHER_APP_KEY}"
+      - VITE_PUSHER_APP_CLUSTER="${PUSHER_APP_CLUSTER}"
+      - MIX_ENV=local
+
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.2fauth-secure.rule=Host(`2fauth.${DOMAIN}`)"
+      - "traefik.http.routers.2fauth-secure.entrypoints=https"
+      - "traefik.http.routers.2fauth-secure.tls=true"
+      - "traefik.http.services.2fauth-secure.loadbalancer.server.port=8000"
+
+      ## Middlewares - Chain
+      - "traefik.http.routers.2fauth-secure.middlewares=chain-no-auth@file"
+
+networks:
+  traefik_network:
+    external: true

@@ -4,13 +4,14 @@ secrets:
 
 services:
   traefik:
-    image: traefik:v3.4
+    image: traefik:v3.5
     container_name: traefik
     restart: unless-stopped
     security_opt:
       - no-new-privileges:true
     networks:
       - traefik_network
+      - vaultwarden_secure_network
     ports:
       - 80:80
       - 443:443
@@ -102,6 +103,7 @@ services:
     restart: unless-stopped
     networks:
       - traefik_network
+
     env_file: .env
     labels:
       - "traefik.enable=true"
@@ -109,11 +111,15 @@ services:
       - "traefik.http.routers.whoami.entrypoints=https"
       - "traefik.http.routers.whoami.tls=true"
       - "traefik.http.routers.whoami.middlewares=chain-tinyauth-oauth@file" # optional, if you want to test OAuth
+      - "traefik.http.routers.whoami.service=whoami-ser"
+      - "traefik.http.services.whoami-ser.loadbalancer.server.port=80"
+
 networks:
   traefik_network:
     name: traefik_network
     driver: bridge
-
+  vaultwarden_secure_network:
+    external: true
   # oauth:
   #   container_name: oauth
   #   image: thomseddon/traefik-forward-auth:latest
