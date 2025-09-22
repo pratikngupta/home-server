@@ -20,6 +20,8 @@ services:
 
       - "traefik.http.services.ha.loadBalancer.server.port=8123"
       - "traefik.http.services.ha.loadBalancer.passHostHeader=true"
+    # networks:
+    #   - traefik_network # Add this line
 
   matter-server:
     image: ghcr.io/home-assistant-libs/python-matter-server:stable
@@ -31,6 +33,8 @@ services:
       - ${DATA_DIR}/data/matter:/data
       - /run/dbus:/run/dbus:ro
     network_mode: host
+    # networks:
+    #   - traefik_network # Add this line
 
 networks:
   traefik_network:

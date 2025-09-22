@@ -12,6 +12,7 @@ services:
     networks:
       - traefik_network
       - vaultwarden_secure_network
+      - searxng_secure
     ports:
       - 80:80
       - 443:443
@@ -119,6 +120,8 @@ networks:
     name: traefik_network
     driver: bridge
   vaultwarden_secure_network:
+    external: true
+  searxng_secure:
     external: true
   # oauth:
   #   container_name: oauth

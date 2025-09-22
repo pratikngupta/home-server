@@ -1,0 +1,4 @@
+FROM couchdb:latest
+EXPOSE 5984
+COPY setup.sh setup.sh
+RUN sh setup.sh
