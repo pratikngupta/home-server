@@ -129,12 +129,16 @@ services:
     #   - 61208:61208
     networks:
       - traefik_network
+    env_file: .env
     environment:
       - GLANCES_OPT=-w
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - /sys:/sys:ro
       - /mnt/main:/mnt/main:ro
+      # - ${DRIVE_ONE}:/mnt/DRIVE_ONE:ro
+      # - ${DRIVE_TWO}:/mnt/DRIVE_TWO:ro
+      # - ${DRIVE_THREE}:/mnt/DRIVE_THREE:ro
       - /:/host:ro
     pid: "host"
     # Uncomment for GPU compatibility (Nvidia) inside the container
@@ -145,6 +149,15 @@ services:
     #         - driver: nvidia
     #           count: 1
     #           capabilities: [gpu]
+    labels:
+      - "traefik.enable=true"
+      ## No authentication access
+      - "traefik.http.routers.glance-no-auth.rule=Host(`glance-no-auth.${DOMAIN}`)"
+      - "traefik.http.routers.glance-no-auth.entrypoints=https"
+      - "traefik.http.routers.glance-no-auth.tls=true"
+      - "traefik.http.routers.glance-no-auth.middlewares=chain-no-auth@file"
+      - "traefik.http.routers.glance-no-auth.service=glance-no-auth"
+      - "traefik.http.services.glance-no-auth.loadbalancer.server.port=61208"
 
   netdata:
     image: netdata/netdata:edge

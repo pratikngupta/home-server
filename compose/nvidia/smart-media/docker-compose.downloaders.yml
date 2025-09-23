@@ -27,13 +27,13 @@ services:
       - "traefik.http.routers.gluetun-qbittorrent.middlewares=chain-tinyauth-oauth@file"
       - "traefik.http.routers.gluetun-qbittorrent.service=gluetun-qbittorrent"
       - "traefik.http.services.gluetun-qbittorrent.loadbalancer.server.port=8080"
-      # ## No authentication access
-      # - "traefik.http.routers.gluetun-qbittorrent-no-auth.rule=Host(`q-no-auth.${DOMAIN}`)"
-      # - "traefik.http.routers.gluetun-qbittorrent-no-auth.entrypoints=https"
-      # - "traefik.http.routers.gluetun-qbittorrent-no-auth.tls=true"
-      # - "traefik.http.routers.gluetun-qbittorrent-no-auth.middlewares=chain-no-auth@file"
-      # - "traefik.http.routers.gluetun-qbittorrent-no-auth.service=gluetun-qbittorrent-no-auth"
-      # - "traefik.http.services.gluetun-qbittorrent-no-auth.loadbalancer.server.port=8080"
+      ## No authentication access
+      - "traefik.http.routers.gluetun-qbittorrent-no-auth.rule=Host(`q-no-auth.${DOMAIN}`)"
+      - "traefik.http.routers.gluetun-qbittorrent-no-auth.entrypoints=https"
+      - "traefik.http.routers.gluetun-qbittorrent-no-auth.tls=true"
+      - "traefik.http.routers.gluetun-qbittorrent-no-auth.middlewares=chain-no-auth@file"
+      - "traefik.http.routers.gluetun-qbittorrent-no-auth.service=gluetun-qbittorrent-no-auth"
+      - "traefik.http.services.gluetun-qbittorrent-no-auth.loadbalancer.server.port=8080"
       # # make this high priority
       - "traefik.http.routers.gluetun-qbittorrent.priority=10"
       - "tinyauth.domain=qbittorrent.techsanctuary.me"

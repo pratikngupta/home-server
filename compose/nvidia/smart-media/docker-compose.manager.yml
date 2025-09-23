@@ -53,6 +53,14 @@ services:
       - "traefik.http.services.radarr-svc.loadbalancer.server.port=7878"
       - "dev.dozzle.group=Smart Media"
 
+      ## No authentication access
+      - "traefik.http.routers.radarr-no-auth.rule=Host(`radarr-no-auth.${DOMAIN}`)"
+      - "traefik.http.routers.radarr-no-auth.entrypoints=https"
+      - "traefik.http.routers.radarr-no-auth.tls=true"
+      - "traefik.http.routers.radarr-no-auth.middlewares=chain-no-auth@file"
+      - "traefik.http.routers.radarr-no-auth.service=radarr-no-auth"
+      - "traefik.http.services.radarr-no-auth.loadbalancer.server.port=7878"
+
       ### REDIRECT TO GITHUB ### Usefull for redirecting to github page easily
       # add if radarr.techsanctuary.me/github is called, it will redirect to the github page
       - "traefik.http.routers.radarr-techsanctuary.rule=Host(`radarr.${DOMAIN}`) && Path(`/github`)"
@@ -249,4 +257,3 @@ services:
 networks:
   traefik_network:
     external: true
-
