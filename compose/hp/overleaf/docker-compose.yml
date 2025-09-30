@@ -1,0 +1,66 @@
+services:
+  sharelatex:
+    restart: always
+    image: sharelatex/sharelatex
+    container_name: sharelatex
+    env_file: .env
+    depends_on:
+      mongo:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    ports:
+        - 8111:80
+    stop_grace_period: 60s
+    networks:
+      - traefik_network
+    volumes:
+      - ${DATA_DIR}/overleaf/sharelatex:/var/lib/overleaf
+
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=traefik_network"
+      # Don't forget to replace 'overleaf.example.org' with your own domain
+      - "traefik.http.routers.overleaf.rule=Host(`overleaf.${DOMAIN}`)"
+
+      - "traefik.http.routers.overleaf.entrypoints=https"
+      - "traefik.http.routers.overleaf.service=overleaf"
+      - "traefik.http.services.overleaf.loadbalancer.server.port=80"
+      - "traefik.http.routers.overleaf.tls=true"
+
+  mongo:
+    restart: always
+    image: mongo:6.0
+    container_name: mongo
+    command: "--replSet overleaf"
+    env_file: .env
+    volumes:
+      - ${DATA_DIR}/overleaf/mongo_data:/data/db
+      - ./bin/shared/mongodb-init-replica-set.js:/docker-entrypoint-initdb.d/mongodb-init-replica-set.js
+    environment:
+      MONGO_INITDB_DATABASE: sharelatex
+    # extra_hosts:
+    #   # Required when using the automatic database setup for initializing the replica set.
+    #   # This override is not needed when running the setup after starting up mongo.
+    #   - mongo:127.0.0.1
+    networks:
+      - traefik_network
+    healthcheck:
+      test: echo 'db.stats().ok' | mongosh localhost:27017/test --quiet
+      interval: 10s
+      timeout: 10s
+      retries: 5
+
+  redis:
+    restart: always
+    image: redis:6.2
+    container_name: redis-overleaf
+    env_file: .env
+    networks:
+      - traefik_network
+    volumes:
+      - ${DATA_DIR}/overleaf/redis_data:/data
+
+networks:
+  traefik_network:
+    external: true

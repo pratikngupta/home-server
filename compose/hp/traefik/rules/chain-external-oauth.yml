@@ -1,22 +1,22 @@
 http:
   middlewares:
-    chain-google-oauth:
-      chain:
-        middlewares:
-          - middlewares-traefik-bouncer # leave this out if you are not using CrowdSec
-          - internal-cloudflare-whitelist
-          - middlewares-rate-limit
-          - middlewares-secure-headers
-          - middlewares-oauth
+    # chain-google-oauth:
+    #   chain:
+    #     middlewares:
+    #       - middlewares-traefik-bouncer # leave this out if you are not using CrowdSec
+    #       - internal-cloudflare-whitelist
+    #       - middlewares-rate-limit
+    #       - middlewares-secure-headers
+    #       - middlewares-oauth
 
-    chain-github-oauth:
-      chain:
-        middlewares:
-          - middlewares-traefik-bouncer # leave this out if you are not using CrowdSec
-          - internal-cloudflare-whitelist
-          - middlewares-rate-limit
-          - middlewares-secure-headers
-          - middlewares-oauth
+    # chain-github-oauth:
+    #   chain:
+    #     middlewares:
+    #       - middlewares-traefik-bouncer # leave this out if you are not using CrowdSec
+    #       - internal-cloudflare-whitelist
+    #       - middlewares-rate-limit
+    #       - middlewares-secure-headers
+    #       - middlewares-oauth
 
     chain-tinyauth-oauth:
       chain:
@@ -26,3 +26,4 @@ http:
           - middlewares-rate-limit
           - middlewares-secure-headers
           - middlewares-tinyauth-oauth
+          - geoblock
