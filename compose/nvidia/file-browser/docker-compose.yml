@@ -1,0 +1,30 @@
+services:
+  copyparty:
+    container_name: copyparty
+    image: ghcr.io/9001/copyparty-iv
+    networks:
+      - traefik_network
+    # ports:
+    #   - 3923:3923
+    env_file: .env
+    volumes:
+      - ${DATA_DIR}/copyparty:/cfg
+
+      - ${DRIVE_ONE}:/w/DRIVE_ONE
+      - ${DRIVE_TWO}:/w/DRIVE_TWO
+      - ${MEDIA_DIR}:/w/MEDIA_DIR
+      - ${APPLE_DIR}:/w/APPLE_DIR
+      - ${GOOGLE_DIR}:/w/GOOGLE_DIR
+      - ${ORIGINAL_DIR}:/w/ORIGINAL_DIR
+
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.copyparty.rule=Host(`copyparty.${DOMAIN}`)"
+      - "traefik.http.routers.copyparty.entrypoints=https"
+      - "traefik.http.routers.copyparty.tls=true"
+      - "traefik.http.services.copyparty.loadbalancer.server.port=3923"
+      - "traefik.http.routers.copyparty.middlewares=chain-no-auth@file"
+
+networks:
+  traefik_network:
+    external: true

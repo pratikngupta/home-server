@@ -1,0 +1,14 @@
+services:
+  onedrive:
+    container_name: onedrive
+    image: driveone/onedrive:debian
+    restart: unless-stopped
+    environment:
+      - ONEDRIVE_UID=1000
+      - ONEDRIVE_GID=1000
+      - ONEDRIVE_UPLOADONLY=1
+      - ONEDRIVE_NOREMOTEDELETE=1
+    volumes:
+      - ${DATA_DIR}/onedrive/conf:/onedrive/conf
+      - ${DRIVE_TWO}:/onedrive/data
+      
