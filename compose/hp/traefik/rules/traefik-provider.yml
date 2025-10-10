@@ -15,6 +15,11 @@ http:
         servers:
           - url: "http://192.168.2.125:8123"
 
+    ha-music-server:
+      loadBalancer:
+        servers:
+          - url: "http://192.168.2.125:8095"
+
     # podify-media-server:
     #   loadBalancer:
     #     servers:

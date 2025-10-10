@@ -36,6 +36,32 @@ services:
     # networks:
     #   - traefik_network # Add this line
 
+  music-assistant-server:
+    image: ghcr.io/music-assistant/server:latest # <<< Desired release version here (or use beta to get the latest beta version)
+    container_name: music-assistant-server
+    restart: unless-stopped
+    # Network mode must be set to host for MA to work correctly
+    network_mode: host
+    volumes:
+      - ${DATA_DIR}/music-assistant-server/data:/data/
+    cap_add:
+      - SYS_ADMIN
+      - DAC_READ_SEARCH
+    security_opt:
+      - apparmor:unconfined
+    env_file: .env
+    environment:
+      - LOG_LEVEL=info
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.ha-music.rule=Host(`music.${DOMAIN}`)"
+      - "traefik.http.routers.ha-music.entrypoints=https"
+      - "traefik.http.routers.ha-music.tls=true"
+      - "traefik.http.routers.ha-music.service=ha-music-server@file"
+
+      - "traefik.http.services.ha-music.loadBalancer.server.port=8095"
+      - "traefik.http.services.ha-music.loadBalancer.passHostHeader=true"
+      
 networks:
   traefik_network:
     external: true

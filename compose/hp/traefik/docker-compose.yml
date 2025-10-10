@@ -29,6 +29,7 @@ services:
       - ./rules:/rules
       - ./data/usersfile:/data/usersfile
       - /home/pratik/appData/logs/traefik:/logs
+      - /home/pratik/traefik-plugin-geoblock:/geoblock
       # - ./data/config.yml:/config.yml:ro
     labels:
       - "traefik.enable=true"
@@ -61,12 +62,13 @@ services:
     networks:
       - traefik_network
     env_file: auth.env
+    volumes:
+      - ${DATA_DIR}/tinyauth/data:/data
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.tinyauth-rtr.entrypoints=https"
       - "traefik.http.routers.tinyauth-rtr.tls=true"
       - "traefik.http.routers.tinyauth-rtr.rule=Host(`tinyauth.${DOMAIN}`)"
-      # - "traefik.http.middlewares.tinyauth.forwardauth.address: http://tinyauth:3000/api/auth/traefik"
       - "traefik.http.routers.tinyauth-rtr.service=tinyauth-svc"
       - "traefik.http.services.tinyauth-svc.loadbalancer.server.port=3000"
 

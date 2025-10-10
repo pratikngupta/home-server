@@ -6,7 +6,7 @@ http:
           # Enable this plugin?
           enabled: true
           # Path to ip2location database file
-          databaseFilePath: /plugins-local/src/github.com/nscuro/traefik-plugin-geoblock/IP2LOCATION-LITE-DB1.IPV6.BIN
+          databaseFilePath: /geoblock/IP2LOCATION-LITE-DB1.IPV6.BIN
           # Whitelist of countries to allow (ISO 3166-1 alpha-2)
           # only USA and Canada
           allowedCountries: [ "US", "CA" ]
