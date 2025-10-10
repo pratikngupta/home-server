@@ -97,6 +97,8 @@ services:
     restart: unless-stopped
     networks:
       - traefik_network
+    volumes:
+      - ${DATA_DIR}/tinyauth:/app/data
     env_file: auth.env
     labels:
       - "traefik.enable=true"
