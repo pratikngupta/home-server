@@ -108,34 +108,6 @@ services:
       mount-check:
         condition: service_healthy
 
-  feishin:
-    container_name: feishin
-    image: "ghcr.io/jeffvli/feishin:latest"
-    networks:
-      - traefik_network
-    environment:
-      # - SERVER_NAME=navidrome # pre defined server name
-      # - SERVER_LOCK=true # When true AND name/type/url are set, only username/password can be toggled
-      # - SERVER_TYPE=navidrome # navidrome also works
-      # - SERVER_URL=http://navidrome:4533 # http://address:port
-      - PUID=1000
-      - PGID=1000
-      - UMASK=002
-      - TZ=America/Los_Angeles
-    # ports:
-    #   - 9180:9180
-    restart: unless-stopped
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.feishin.rule=Host(`feishin.${DOMAIN}`)"
-      - "traefik.http.routers.feishin.entrypoints=https"
-      - "traefik.http.services.feishin.loadbalancer.server.port=9180"
-      - "traefik.http.routers.feishin.middlewares=chain-tinyauth-oauth@file"
-      - "traefik.http.routers.feishin.tls=true"
-    depends_on:
-      mount-check:
-        condition: service_healthy
-
 networks:
   traefik_network:
     external: true
