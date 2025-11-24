@@ -11,3 +11,5 @@ oauth_secrets
 .fleet/
 appdata/
 pgdata/
+
+*.toml
