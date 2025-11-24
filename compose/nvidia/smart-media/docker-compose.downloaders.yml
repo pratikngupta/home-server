@@ -27,13 +27,13 @@ services:
       - "traefik.http.routers.gluetun-qbittorrent.middlewares=chain-tinyauth-oauth@file"
       - "traefik.http.routers.gluetun-qbittorrent.service=gluetun-qbittorrent"
       - "traefik.http.services.gluetun-qbittorrent.loadbalancer.server.port=8080"
-      # ## No authentication access
-      # - "traefik.http.routers.gluetun-qbittorrent-no-auth.rule=Host(`q-no-auth.${DOMAIN}`)"
-      # - "traefik.http.routers.gluetun-qbittorrent-no-auth.entrypoints=https"
-      # - "traefik.http.routers.gluetun-qbittorrent-no-auth.tls=true"
-      # - "traefik.http.routers.gluetun-qbittorrent-no-auth.middlewares=chain-no-auth@file"
-      # - "traefik.http.routers.gluetun-qbittorrent-no-auth.service=gluetun-qbittorrent-no-auth"
-      # - "traefik.http.services.gluetun-qbittorrent-no-auth.loadbalancer.server.port=8080"
+      ## No authentication access
+      - "traefik.http.routers.gluetun-qbittorrent-no-auth.rule=Host(`q-no-auth.${DOMAIN}`)"
+      - "traefik.http.routers.gluetun-qbittorrent-no-auth.entrypoints=https"
+      - "traefik.http.routers.gluetun-qbittorrent-no-auth.tls=true"
+      - "traefik.http.routers.gluetun-qbittorrent-no-auth.middlewares=chain-no-auth@file"
+      - "traefik.http.routers.gluetun-qbittorrent-no-auth.service=gluetun-qbittorrent-no-auth"
+      - "traefik.http.services.gluetun-qbittorrent-no-auth.loadbalancer.server.port=8080"
       # # make this high priority
       - "traefik.http.routers.gluetun-qbittorrent.priority=10"
       - "tinyauth.domain=qbittorrent.techsanctuary.me"
@@ -104,34 +104,6 @@ services:
       - traefik_network
     labels:
       - "dev.dozzle.group=Smart Media"
-    depends_on:
-      mount-check:
-        condition: service_healthy
-
-  feishin:
-    container_name: feishin
-    image: "ghcr.io/jeffvli/feishin:latest"
-    networks:
-      - traefik_network
-    environment:
-      # - SERVER_NAME=navidrome # pre defined server name
-      # - SERVER_LOCK=true # When true AND name/type/url are set, only username/password can be toggled
-      # - SERVER_TYPE=navidrome # navidrome also works
-      # - SERVER_URL=http://navidrome:4533 # http://address:port
-      - PUID=1000
-      - PGID=1000
-      - UMASK=002
-      - TZ=America/Los_Angeles
-    # ports:
-    #   - 9180:9180
-    restart: unless-stopped
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.feishin.rule=Host(`feishin.${DOMAIN}`)"
-      - "traefik.http.routers.feishin.entrypoints=https"
-      - "traefik.http.services.feishin.loadbalancer.server.port=9180"
-      - "traefik.http.routers.feishin.middlewares=chain-tinyauth-oauth@file"
-      - "traefik.http.routers.feishin.tls=true"
     depends_on:
       mount-check:
         condition: service_healthy
