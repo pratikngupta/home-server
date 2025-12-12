@@ -60,7 +60,7 @@
           "foreground": "#00dfb3",
           "type": "session",
           "style": "plain",
-          "template": "{{ if .SSHSession }}ssh {{ end }}{{ .UserName }}@{{ .HostName }} "
+          "template": "{{ if .SSHSession }}ssh {{ .UserName }}@{{ .HostName }}{{ end }}"
         }
       ],
       "type": "prompt"
@@ -87,4 +87,3 @@
   ],
   "version": 3
 }
-
