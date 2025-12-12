@@ -1,0 +1,102 @@
+{
+  "$schema": "https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/schema.json",
+  "blocks": [
+    {
+      "alignment": "left",
+      "segments": [
+        {
+          "type": "os",
+          "style": "plain",
+          "foreground": "#45F1C2",
+          "template": "{{ if .WSL }}WSL at {{ end }}{{.Icon}}",
+          "properties": {
+            "macos": "\ue711",
+            "linux": "\uebc6",
+            "ubuntu": "\uf31c",
+            "debian": "\uf313",
+            "fedora": "\uf30a",
+            "arch": "\uf303",
+            "alpine": "\uf31f",
+            "centos": "\uf304",
+            "wsl": "\uf17c",
+            "windows": "\uf17a"
+          }
+        },
+        {
+          "foreground": "#0CA0D8",
+          "properties": {
+            "folder_separator_icon": ">",
+            "style": "full"
+          },
+          "style": "plain",
+          "template": " \uf07b {{ .Path }} ",
+          "type": "path"
+        },
+        {
+          "foreground": "#14A5AE",
+          "powerline_symbol": "\ue0b0",
+          "properties": {
+            "fetch_upstream_icon": true
+          },
+          "style": "plain",
+          "template": "{{ .UpstreamIcon }}{{ .HEAD }}{{ if gt .StashCount 0 }} \ueb4b {{ .StashCount }}{{ end }} ",
+          "type": "git"
+        },
+        {
+            "type": "docker",
+            "style": "plain",
+            "foreground": "#14A5AE",
+            "template": " \ue7b0 {{ .Context }} ",
+            "properties": {
+                "display_mode": "files"
+            }
+        }
+      ],
+      "type": "prompt"
+    },
+    {
+      "alignment": "right",
+      "segments": [
+        {
+          "type": "python",
+          "style": "plain",
+          "foreground": "#14A5AE",
+          "template": "  {{ if .Error }}{{ .Error }}{{ else }}{{ if .Venv }}{{ .Venv }} {{ end }}{{ .Major }}.{{ .Minor }}{{ end }}",
+          "properties": {
+            "fetch_virtual_env": true,
+            "display_default": true,
+            "fetch_version": true,
+            "display_mode": "context"
+          }
+        },
+        {
+            "type": "session",
+            "style": "plain",
+            "foreground": "#ae6114",
+            "template": "{{ if .SSHSession }}\ueba9 {{ end }}{{ .UserName }}@{{ .HostName }}"
+        }
+      ],
+      "type": "prompt"
+    },
+    {
+      "alignment": "left",
+      "newline": true,
+      "segments": [
+        {
+          "foreground": "#cd5e42",
+          "style": "plain",
+          "template": "\ue3bf ",
+          "type": "root"
+        },
+        {
+          "foreground": "#CD4277",
+          "style": "plain",
+          "template": "# ",
+          "type": "text"
+        }
+      ],
+      "type": "prompt"
+    }
+  ],
+  "version": 3
+}
