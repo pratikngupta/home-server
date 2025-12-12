@@ -4,11 +4,16 @@ services:
     image: driveone/onedrive:debian
     restart: unless-stopped
     environment:
+      # Required for non-root user operation
       - ONEDRIVE_UID=1000
       - ONEDRIVE_GID=1000
-      - ONEDRIVE_UPLOADONLY=1
-      - ONEDRIVE_NOREMOTEDELETE=1
+      # Set to '1' to only download from OneDrive and not upload local changes
+      - ONEDRIVE_DOWNLOADONLY=1
+      # Specify the single directory within your OneDrive account to sync
+      - ONEDRIVE_SINGLE_DIRECTORY="sports"
     volumes:
+      # Volume for configuration and runtime state (refresh token, db, etc.)
       - ${DATA_DIR}/onedrive/conf:/onedrive/conf
-      - ${DRIVE_TWO}:/onedrive/data
-      
+      # Volume to store the downloaded 'Sports' data locally.
+      # The local directory (e.g., ${SPORT}) will contain the 'Sports' folder content.
+      - ${SPORT}:/onedrive/data
