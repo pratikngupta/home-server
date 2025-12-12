@@ -1,0 +1,110 @@
+{
+  "$schema": "https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/schema.json",
+  "blocks": [
+    {
+      "alignment": "left",
+      "segments": [
+        {
+          "background": "#29315A",
+          "foreground": "#45F1C2",
+          "leading_diamond": "\ue0b6",
+          "style": "diamond",
+          "template": " {{ if eq .OS \"darwin\" }}\ue711{{ else }}\uf233{{ end }}",
+          "trailing_diamond": "\ue0b4 ",
+          "type": "session"
+        },
+        {
+          "background": "#29315A",
+          "foreground": "#3EC669",
+          "leading_diamond": "\ue0b6",
+          "properties": {
+            "folder_separator_icon": "/",
+            "style": "full",
+            "mapped_locations": {
+              "~/home-server/compose/nvidia": "code/"
+            }
+          },
+          "style": "diamond",
+          "template": " \uf07b {{ .Path }} ",
+          "trailing_diamond": "\ue0b4",
+          "type": "path"
+        },
+        {
+          "background": "#29315A",
+          "foreground": "#43CCEA",
+          "leading_diamond": " \ue0b6",
+          "properties": {
+            "fetch_upstream_icon": true
+          },
+          "style": "diamond",
+          "template": "{{ .UpstreamIcon }}{{ .HEAD }}{{ if gt .StashCount 0 }} \ueb4b {{ .StashCount }}{{ end }} ",
+          "trailing_diamond": "\ue0b4",
+          "type": "git"
+        }
+      ],
+      "type": "prompt"
+    },
+    {
+      "alignment": "right",
+      "segments": [
+        {
+          "background": "#29315A",
+          "foreground": "#0B59E7",
+          "leading_diamond": "\ue0b6",
+          "properties": {
+            "hide_if_default": true
+          },
+          "style": "diamond",
+          "template": "  {{ if ne .Context \"\" }}{{ .Context }}{{ end }} ",
+          "trailing_diamond": "\ue0b4",
+          "type": "docker"
+        },
+        {
+          "background": "#29315A",
+          "foreground": "#E4F34A",
+          "leading_diamond": " \ue0b6",
+          "style": "diamond",
+          "template": "  {{ .Venv }} ",
+          "trailing_diamond": "\ue0b4",
+          "type": "python"
+        },
+        {
+          "background": "#29315A",
+          "foreground": "#00dfb3",
+          "leading_diamond": " \ue0b6",
+          "style": "diamond",
+          "template": "{{ if .SSHSession }}ssh {{ .UserName }}@{{ .HostName }}{{ end }}",
+          "trailing_diamond": "\ue0b4",
+          "type": "session"
+        }
+      ],
+      "type": "prompt"
+    },
+    {
+      "alignment": "left",
+      "newline": true,
+      "segments": [
+        {
+          "background": "#29315A",
+          "foreground": "#cd5e42",
+          "leading_diamond": "\ue0b6",
+          "style": "diamond",
+          "template": "\ue3bf ",
+          "trailing_diamond": "\ue0b4 ",
+          "type": "root"
+        },
+        {
+          "background": "#29315A",
+          "foreground": "#45F1C2",
+          "leading_diamond": "\ue0b6",
+          "style": "diamond",
+          "template": "-> ",
+          "trailing_diamond": "\ue0b4",
+          "type": "text"
+        }
+      ],
+      "type": "prompt"
+    }
+  ],
+  "version": 3
+}
