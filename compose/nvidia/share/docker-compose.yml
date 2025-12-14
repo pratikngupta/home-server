@@ -7,7 +7,7 @@ services:
     volumes:
       - ${DATA_DIR}/samba:/data
       - ${DRIVE_TWO}:/samba/storage
-      - ${DRIVE_ONE}:/samba/movie
+      - ${DRIVE_POOL}:/samba/movie
       - ${DATA_DIR}:/samba/appData
     environment:
       - "BROWSABLE=yes"

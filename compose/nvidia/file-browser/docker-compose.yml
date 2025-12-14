@@ -10,7 +10,7 @@ services:
     volumes:
       - ${DATA_DIR}/copyparty:/cfg
 
-      - ${DRIVE_ONE}:/w/DRIVE_ONE
+      - ${DRIVE_POOL}:/w/DRIVE_POOL
       - ${DRIVE_TWO}:/w/DRIVE_TWO
       - ${MEDIA_DIR}:/w/MEDIA_DIR
       - ${APPLE_DIR}:/w/APPLE_DIR

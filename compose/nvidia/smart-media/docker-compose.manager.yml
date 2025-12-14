@@ -24,9 +24,7 @@ services:
       - ${MEDIA_DIR}:/data
       # timezone
       - /etc/localtime:/etc/localtime:ro
-      - ${DRIVE_ONE}:/DRIVE_ONE
-      - ${DRIVE_TWO}:/DRIVE_TWO
-      - ${DRIVE_ONEDRIVE}:/Onedrive
+      - ${DRIVE_POOL}:/DRIVE_POOL
 
     restart: unless-stopped
     networks:
@@ -93,10 +91,7 @@ services:
       - ${MEDIA_DIR}:/data
       # timezone
       - /etc/localtime:/etc/localtime:ro
-      - ${DRIVE_ONE}:/DRIVE_ONE
-      - ${DRIVE_TWO}:/DRIVE_TWO
-      - ${DRIVE_ONEDRIVE}:/Onedrive
-
+      - ${DRIVE_POOL}:/DRIVE_POOL
 
     # ports:
     #   - 6767:6767
@@ -157,9 +152,7 @@ services:
       - ${MEDIA_DIR}:/data
       # timezone
       - /etc/localtime:/etc/localtime:ro
-      - ${DRIVE_ONE}:/DRIVE_ONE
-      - ${DRIVE_TWO}:/DRIVE_TWO
-      - ${DRIVE_ONEDRIVE}:/Onedrive
+      - ${DRIVE_POOL}:/DRIVE_POOL
 
     restart: unless-stopped
     networks:

@@ -12,6 +12,8 @@ aliases_to_add=(
     ["code"]='cd /home/pratik/home-server/compose/nvidia'
     ["data"]='cd /home/pratik/appData/data'
     ["music"]='cd /mnt/movie/data/media/music'
+    ["dockupr"]='docker compose pull && docker compose up -d --force-recreate'
+    ["dockup"]='docker compose pull && docker compose up -d'
 )
 
 # Path to the Zsh configuration file

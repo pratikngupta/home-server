@@ -136,7 +136,7 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - /sys:/sys:ro
       - /mnt/main:/mnt/main:ro
-      # - ${DRIVE_ONE}:/mnt/DRIVE_ONE:ro
+      # - ${DRIVE_POOL}:/mnt/DRIVE_POOL:ro
       # - ${DRIVE_TWO}:/mnt/DRIVE_TWO:ro
       # - ${DRIVE_THREE}:/mnt/DRIVE_THREE:ro
       - /:/host:ro
