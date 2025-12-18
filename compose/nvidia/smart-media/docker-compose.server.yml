@@ -30,6 +30,7 @@ services:
       - /mnt/storage/photo/google:/mnt/photo/google
       - /mnt/storage/photo/original-archive:/mnt/photo/original-archive
       - ${DRIVE_POOL}:/DRIVE_POOL
+      - /mnt/transcode/plex-transcode:/transcode
 
 
     network_mode: host

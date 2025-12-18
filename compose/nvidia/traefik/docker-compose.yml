@@ -42,7 +42,7 @@ services:
       - ./data/acme.json:/acme.json
       - ./rules:/rules
       - ./data/usersfile:/data/usersfile
-      - /home/pratik/appData/logs/traefik:/logs
+      - /mnt/docker/appData/logs/traefik:/logs
       # - ./data/config.yml:/config.yml:ro
     labels:
       - "traefik.enable=true"
@@ -113,7 +113,7 @@ services:
     container_name: dozzle-traefik-logs
     image: alpine
     volumes:
-      - /home/pratik/appData/logs/traefik/traefik.log:/log/traefik.log:ro
+      - /mnt/docker/appData/logs/traefik/traefik.log:/log/traefik.log:ro
     command:
       - tail
       - -f
@@ -127,7 +127,7 @@ services:
     container_name: dozzle-traefik-access-logs
     image: alpine
     volumes:
-      - /home/pratik/appData/logs/traefik/access.log:/log/access.log:ro
+      - /mnt/docker/appData/logs/traefik/access.log:/log/access.log:ro
     command:
       - tail
       - -f
@@ -152,7 +152,7 @@ services:
   #     - /var/log:/var/log:ro
   #     - ./appdata/crowdsec/data:/var/lib/crowdsec/data
   #     - ./appdata/crowdsec/config:/etc/crowdsec
-  #     - /home/pratik/appData/logs/traefik:/logs/traefik:ro
+  #     - /mnt/docker/appData/logs/traefik:/logs/traefik:ro
 
   # traefik-bouncer:
   #   restart: unless-stopped
