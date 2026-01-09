@@ -86,6 +86,33 @@ services:
       mount-check:
         condition: service_healthy
 
+  obzorarr:
+    container_name: obzorarr
+    image: ghcr.io/engels74/obzorarr-docker
+    # ports:
+    #   - 3000:3000
+    env_file: .env
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - UMASK=002
+      - TZ=Etc/UTC
+      - PLEX_SERVER_URL=https://playninja.techsanctuary.me
+      - PLEX_TOKEN=1
+    volumes:
+      - ${DATA_DIR}/media-server/obzorarr:/config
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.obzorarr.rule=Host(`obzorarr.${DOMAIN}`)"
+      - "traefik.http.routers.obzorarr.entrypoints=https"
+      - "traefik.http.routers.obzorarr.tls=true"
+      ## Middlewares
+      - "traefik.http.routers.obzorarr.middlewares=chain-tinyauth-oauth@file"
+      # - "traefik.http.routers.obzorarr.middlewares=chain-no-auth@file"
+
+    networks:
+      - traefik_network
+
 networks:
   traefik_network:
     external: true

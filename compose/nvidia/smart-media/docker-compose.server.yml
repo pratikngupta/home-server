@@ -15,8 +15,6 @@ services:
       - PGID=1000
       - VERSION=docker
       - HOSTNAME=plex.${DOMAIN}
-      # - NVIDIA_VISIBLE_DEVICES=all
-      # - NVIDIA_DRIVER_CAPABILITIES=compute,video,utility
       - APPLE_DIR=/mnt/storage/photo/apple
       - GOOGLE_DIR=/mnt/storage/photo/google
       - ORIGINAL_DIR=/mnt/storage/photo/original-archive
@@ -30,52 +28,59 @@ services:
       - /mnt/storage/photo/google:/mnt/photo/google
       - /mnt/storage/photo/original-archive:/mnt/photo/original-archive
       - ${DRIVE_POOL}:/DRIVE_POOL
-      - /mnt/transcode/plex-transcode:/transcode
-
-
+    tmpfs:
+      - /transcode:size=15G
     network_mode: host
     privileged: true # libusb_init failed
     restart: unless-stopped
-    # networks:
-    #   - media-network
     devices:
       - /dev/dri:/dev/dri
-    # deploy:
-    #   resources:
-    #     reservations:
-    #       devices:
-    #         - driver: nvidia
-    #           count: all
-    #           capabilities:
-    #             - gpu
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.plex.rule=Host(`playninja.${DOMAIN}`)"
       - "traefik.http.routers.plex.entrypoints=https"
       - "traefik.http.routers.plex.tls=true"
       - "traefik.http.routers.plex.service=plex-media-server@file"
-      - "traefik.http.routers.plex.middlewares=jellyfin-mw"
+      - "traefik.http.routers.plex.middlewares=secure-media-mw@file"
 
       ## HTTP Service
       - "traefik.http.services.plex.loadBalancer.server.port=32400"
       - "traefik.http.services.plex.loadBalancer.passHostHeader=true"
-
-      ## Middleware
-      - "traefik.http.middlewares.jellyfin-mw.headers.customResponseHeaders.X-Robots-Tag=noindex,nofollow,nosnippet,noarchive,notranslate,noimageindex"
-      - "traefik.http.middlewares.jellyfin-mw.headers.SSLRedirect=true"
-      - "traefik.http.middlewares.jellyfin-mw.headers.SSLForceHost=true"
-      - "traefik.http.middlewares.jellyfin-mw.headers.STSSeconds=315360000"
-      - "traefik.http.middlewares.jellyfin-mw.headers.STSIncludeSubdomains=true"
-      - "traefik.http.middlewares.jellyfin-mw.headers.STSPreload=true"
-      - "traefik.http.middlewares.jellyfin-mw.headers.forceSTSHeader=true"
-      - "traefik.http.middlewares.jellyfin-mw.headers.frameDeny=true"
-      - "traefik.http.middlewares.jellyfin-mw.headers.contentTypeNosniff=true"
-      - "traefik.http.middlewares.jellyfin-mw.headers.customResponseHeaders.X-XSS-PROTECTION=1"
-      - "traefik.http.middlewares.jellyfin-mw.headers.customFrameOptionsValue='allow-from https://${DOMAIN}'"
       - "dev.dozzle.group=Smart Media"
     depends_on:
       mount-check:
         condition: service_healthy
+
+  jellyfin:
+    image: jellyfin/jellyfin
+    container_name: jellyfin
+    # Optional - specify the uid and gid you would like Jellyfin to use instead of root
+    user: 1000:1000
+    ports:
+      - 8096:8096/tcp
+      - 7359:7359/udp
+    volumes:
+      - ${DATA_DIR}/jellyfin:/config
+      - ${MEDIA_DIR}/media:/media
+      - ${DRIVE_POOL}:/DRIVE_POOL
+    restart: 'unless-stopped'
+    env_file: .env
+    environment:
+      - JELLYFIN_PublishedServerUrl=https://jellyfin.${DOMAIN}
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.jellyfin.rule=Host(`jellyfin.${DOMAIN}`)"
+      - "traefik.http.routers.jellyfin.entrypoints=https"
+      - "traefik.http.routers.jellyfin.tls=true"
+      - "traefik.http.routers.jellyfin.service=jellyfin-svc@file"
+      - "traefik.http.routers.jellyfin.middlewares=secure-media-mw@file"
+      - "traefik.http.services.jellyfin-svc.loadbalancer.server.port=8096"
+      - "dev.dozzle.group=Smart Media"
+    devices:
+      - /dev/dri:/dev/dri
+    tmpfs:
+      - /transcodes:size=15G      
+
   navidrome:
     image: deluan/navidrome:latest
     container_name: navidrome
@@ -111,6 +116,47 @@ services:
       mount-check:
         condition: service_healthy
 
+  tunarr:
+    image: chrisbenincasa/tunarr:latest
+    container_name: tunarr
+    # ports:
+    #   - "8000:8000"
+    environment:
+      - LOG_LEVEL=${TUNARR_LOG_LEVEL:-INFO}
+      - TZ=America/New_York
+      - PUID=1000
+      - PGID=1000
+      - TUNARR_SERVER_ADMIN_MODE=true
+      - NVIDIA_VISIBLE_DEVICES=all
+
+    env_file: .env
+    volumes:
+      - ${DATA_DIR}/tunarr:/config/tunarr
+      # mount all the media and drive pool
+      - ${MEDIA_DIR}/media:/movies
+      - ${DRIVE_POOL}:/DRIVE_POOL
+
+    tmpfs:
+      - /transcode:size=15G
+    networks:
+      - traefik_network
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.tunarr.rule=Host(`tunarr.${DOMAIN}`)"
+      - "traefik.http.routers.tunarr.entrypoints=https"
+      - "traefik.http.routers.tunarr.tls=true"
+
+      - "traefik.http.routers.tunarr.service=tunarr"
+      - "traefik.http.services.tunarr.loadbalancer.server.port=8000"
+      - "traefik.http.services.tunarr.loadBalancer.passHostHeader=true"
+
+      ## Middlewares
+      - "traefik.http.routers.tunarr.middlewares=secure-media-mw@file,chain-no-auth@file"
+
+    # pass intel gpu to container
+    devices:
+      - /dev/dri:/dev/dri
+    runtime: nvidia
 networks:
   traefik_network:
     external: true

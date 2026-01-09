@@ -1,0 +1,18 @@
+http:
+  middlewares:
+    secure-media-mw:
+      headers:
+        customResponseHeaders:
+          X-Robots-Tag: "noindex,nofollow,nosnippet,noarchive,notranslate,noimageindex"
+          X-Accel-Buffering: "no"
+          Cache-Control: "no-cache"
+          X-XSS-PROTECTION: "1"
+        sslRedirect: true
+        sslForceHost: true
+        stsSeconds: 31536000
+        stsIncludeSubdomains: true
+        stsPreload: true
+        forceSTSHeader: true
+        frameDeny: true
+        contentTypeNosniff: true
+        customFrameOptionsValue: "allow-from https://techsanctuary.me"
