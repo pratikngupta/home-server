@@ -72,9 +72,9 @@ services:
       - "traefik.http.routers.radarr-techsanctuary.service=radarr-techsanctuary"
       - "traefik.http.services.radarr-techsanctuary.loadbalancer.server.port=7878"
 
-    depends_on:
-      mount-check:
-        condition: service_healthy
+    #depends_on:
+    #mount-check:
+    #condition: service_healthy
 
   bazarr:
     image: lscr.io/linuxserver/bazarr:latest
@@ -130,9 +130,9 @@ services:
       - "traefik.http.routers.bazarr-techsanctuary.service=bazarr-techsanctuary"
       - "traefik.http.services.bazarr-techsanctuary.loadbalancer.server.port=6767"
 
-    depends_on:
-      mount-check:
-        condition: service_healthy
+    #depends_on:
+    #mount-check:
+    #condition: service_healthy
 
   # Sonarr: TV management system
   sonarr:
@@ -191,9 +191,9 @@ services:
       - "traefik.http.routers.sonarr-techsanctuary.service=sonarr-techsanctuary"
       - "traefik.http.services.sonarr-techsanctuary.loadbalancer.server.port=8989"
 
-    depends_on:
-      mount-check:
-        condition: service_healthy
+    #depends_on:
+    #mount-check:
+    #condition: service_healthy
 
   # Prowlarr: Indexer manager
   prowlarr:
@@ -249,9 +249,9 @@ services:
       ## Metadata
       - "dev.dozzle.group=Smart Media"
 
-    depends_on:
-      mount-check:
-        condition: service_healthy
+    #depends_on:
+    #mount-check:
+    #condition: service_healthy
 
 networks:
   traefik_network:

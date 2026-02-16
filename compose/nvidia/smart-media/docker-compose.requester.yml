@@ -2,14 +2,15 @@
 #
 # Requester Services
 #
-# Services: overseerr, requestrr
+# Services: seerr, requestrr
 #
 ######################################################
 
 services:
-  overseerr:
-    image: sctx/overseerr:develop
-    container_name: overseerr #overseerr
+  seerr:
+    image: seerr/seerr:develop
+    init: true
+    container_name: seerr
     environment:
       - PUID=1000
       - PGID=1000
@@ -25,39 +26,39 @@ services:
     labels:
       - "traefik.enable=true"
       ## HTTP Routers Auth Bypass
-      - "traefik.http.routers.overseerr-rtr-bypass.entrypoints=https"
-      - "traefik.http.routers.overseerr-rtr-bypass.rule=Host(`overseerr.$DOMAIN`) && Header(`traefik-auth-bypass-key`, `$TRAEFIK_AUTH_BYPASS_KEY`)" # Bypass Auth for LunaSea on iOS
-      - "traefik.http.routers.overseerr-rtr-bypass.priority=100"
+      - "traefik.http.routers.seerr-rtr-bypass.entrypoints=https"
+      - "traefik.http.routers.seerr-rtr-bypass.rule=Host(`seerr.$DOMAIN`) && Header(`traefik-auth-bypass-key`, `$TRAEFIK_AUTH_BYPASS_KEY`)" # Bypass Auth for LunaSea on iOS
+      - "traefik.http.routers.seerr-rtr-bypass.priority=100"
       ## HTTP Routers Auth
-      - "traefik.http.routers.overseerr-rtr.entrypoints=https"
-      - "traefik.http.routers.overseerr-rtr.rule=Host(`overseerr.$DOMAIN`)"
-      - "traefik.http.routers.overseerr-rtr.priority=99"
+      - "traefik.http.routers.seerr-rtr.entrypoints=https"
+      - "traefik.http.routers.seerr-rtr.rule=Host(`seerr.$DOMAIN`)"
+      - "traefik.http.routers.seerr-rtr.priority=99"
       ## Enable tls
-      - "traefik.http.routers.overseerr-rtr.tls=true"
-      - "traefik.http.routers.overseerr-rtr-bypass.tls=true"
+      - "traefik.http.routers.seerr-rtr.tls=true"
+      - "traefik.http.routers.seerr-rtr-bypass.tls=true"
       ## Middleware
-      - "traefik.http.routers.overseerr-rtr-bypass.middlewares=chain-no-auth@file"
-      - "traefik.http.routers.overseerr-rtr.middlewares=chain-tinyauth-oauth@file"
+      - "traefik.http.routers.seerr-rtr-bypass.middlewares=chain-no-auth@file"
+      - "traefik.http.routers.seerr-rtr.middlewares=chain-tinyauth-oauth@file"
       ## HTTP Services
-      - "traefik.http.routers.overseerr-rtr.service=overseerr-svc"
-      - "traefik.http.routers.overseerr-rtr-bypass.service=overseerr-svc"
-      - "traefik.http.services.overseerr-svc.loadbalancer.server.port=5055"
+      - "traefik.http.routers.seerr-rtr.service=seerr-svc"
+      - "traefik.http.routers.seerr-rtr-bypass.service=seerr-svc"
+      - "traefik.http.services.seerr-svc.loadbalancer.server.port=5055"
 
       ### REDIRECT TO GITHUB ### Usefull for redirecting to github page easily
-      # add if overseerr.techsanctuary.me/github is called, it will redirect to the github page
-      - "traefik.http.routers.overseerr-techsanctuary.rule=Host(`overseerr.${DOMAIN}`) && Path(`/github`)"
-      - "traefik.http.routers.overseerr-techsanctuary.entrypoints=https"
-      - "traefik.http.routers.overseerr-techsanctuary.middlewares=redirect-to-github-overseerr@file"
-      - "traefik.http.routers.overseerr-techsanctuary.tls=true"
+      # add if seerr.techsanctuary.me/github is called, it will redirect to the github page
+      - "traefik.http.routers.seerr-techsanctuary.rule=Host(`seerr.${DOMAIN}`) && Path(`/github`)"
+      - "traefik.http.routers.seerr-techsanctuary.entrypoints=https"
+      - "traefik.http.routers.seerr-techsanctuary.middlewares=redirect-to-github-seerr@file"
+      - "traefik.http.routers.seerr-techsanctuary.tls=true"
       # set priority to 1 so it will be checked first
-      - "traefik.http.routers.overseerr-techsanctuary.priority=100"
+      - "traefik.http.routers.seerr-techsanctuary.priority=100"
       # define service for the redirect
-      - "traefik.http.routers.overseerr-techsanctuary.service=overseerr-techsanctuary"
-      - "traefik.http.services.overseerr-techsanctuary.loadbalancer.server.port=5055"
+      - "traefik.http.routers.seerr-techsanctuary.service=seerr-techsanctuary"
+      - "traefik.http.services.seerr-techsanctuary.loadbalancer.server.port=5055"
       - "dev.dozzle.group=Smart Media"
-    depends_on:
-      mount-check:
-        condition: service_healthy
+    #depends_on:
+    #mount-check:
+    #condition: service_healthy
 networks:
   traefik_network:
     external: true

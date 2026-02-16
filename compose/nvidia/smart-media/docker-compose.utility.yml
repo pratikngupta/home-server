@@ -42,9 +42,9 @@ services:
       - "traefik.http.routers.tautulli-rtr-bypass.service=tautulli-svc"
       - "traefik.http.services.tautulli-svc.loadbalancer.server.port=8181"
       - "dev.dozzle.group=Smart Media"
-    depends_on:
-      mount-check:
-        condition: service_healthy
+    #depends_on:
+    #mount-check:
+    #condition: service_healthy
 
   notifiarr:
     container_name: notifiarr
@@ -82,37 +82,60 @@ services:
       ## Middlewares
       # - "traefik.http.routers.notifiarr.middlewares=chain-tinyauth-oauth@file"
       - "traefik.http.routers.notifiarr.middlewares=chain-no-auth@file"
-    depends_on:
-      mount-check:
-        condition: service_healthy
+    #depends_on:
+    #mount-check:
+    #condition: service_healthy
 
-  obzorarr:
-    container_name: obzorarr
-    image: ghcr.io/engels74/obzorarr-docker
-    # ports:
-    #   - 3000:3000
+  jellystat-db:
+    image: postgres:15.14
+    shm_size: "1gb"
+    container_name: jellystat-db
+    restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-file: "5"
+        max-size: "10m"
+    env_file: .env
+    networks:
+      - jellystat_network
+    volumes:
+      - ${DATA_DIR}/media-server/jellystat/db:/var/lib/postgresql/data
+
+  jellystat:
+    image: cyfershepard/jellystat:latest
+    container_name: jellystat
+    restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-file: "5"
+        max-size: "10m"
     env_file: .env
     environment:
-      - PUID=1000
-      - PGID=1000
-      - UMASK=002
-      - TZ=Etc/UTC
-      - PLEX_SERVER_URL=https://playninja.techsanctuary.me
-      - PLEX_TOKEN=1
+      POSTGRES_IP: jellystat-db
+      POSTGRES_PORT: 5432
+      TZ: america/toronto
     volumes:
-      - ${DATA_DIR}/media-server/obzorarr:/config
+      - ${DATA_DIR}/media-server/jellystat/backup-data:/app/backend/backup-data
+    depends_on:
+      - jellystat-db
+    networks:
+      - jellystat_network
+      - traefik_network
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.obzorarr.rule=Host(`obzorarr.${DOMAIN}`)"
-      - "traefik.http.routers.obzorarr.entrypoints=https"
-      - "traefik.http.routers.obzorarr.tls=true"
+      - "traefik.http.routers.jellystat.rule=Host(`jellystat.${DOMAIN}`)"
+      - "traefik.http.routers.jellystat.entrypoints=https"
+      - "traefik.http.routers.jellystat.tls=true"
       ## Middlewares
-      - "traefik.http.routers.obzorarr.middlewares=chain-tinyauth-oauth@file"
-      # - "traefik.http.routers.obzorarr.middlewares=chain-no-auth@file"
-
-    networks:
-      - traefik_network
+      - "traefik.http.routers.jellystat.middlewares=chain-tinyauth-oauth@file"
+      # use traefik_network as multiple networks are not supported
+      - "traefik.docker.network=traefik_network"
+      - "dev.dozzle.group=Smart Media"
 
 networks:
+  jellystat_network:
+    driver: bridge
   traefik_network:
     external: true

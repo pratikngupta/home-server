@@ -40,9 +40,9 @@ services:
       - "traefik.http.routers.gluetun-qbittorrent.priority=10"
       - "tinyauth.domain=qbittorrent.techsanctuary.me"
 
-    depends_on:
-      mount-check:
-        condition: service_healthy
+    #depends_on:
+    #mount-check:
+    #condition: service_healthy
 
   # qBittorrent: Torrent client
   qbittorrent:
@@ -78,9 +78,9 @@ services:
       - traefik_network
     labels:
       - "dev.dozzle.group=Smart Media"
-    depends_on:
-      mount-check:
-        condition: service_healthy
+    #depends_on:
+    #mount-check:
+    #condition: service_healthy
 
 networks:
   traefik_network:

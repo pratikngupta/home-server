@@ -5,147 +5,174 @@
 # Services: tdarr, tdarr-node
 #################################################################################
 
-version: "3.4"
 services:
-  tdarr:
-    container_name: tdarr
-    image: ghcr.io/haveagitgat/tdarr:latest
-    restart: unless-stopped
-    env_file: .env
-    networks:
-      - traefik_network
-    # ports:
-    #   - 8265:8265 # webUI port
-    #   - 8266:8266 # server port
-    environment:
-      - TZ=America/Los_Angeles
-      - UMASK_SET=002
-      - file_mode=0777
-      - dir_mode=0777
-      - serverIP=tdarr
-      - serverPort=8266
-      - webUIPort=8265
-      - internalNode=false
-      - inContainer=true
-      - ffmpegVersion=7
-      - nodeName=MyInternalNode
-      - auth=false
-      - openBrowser=true
-      - maxLogSizeMB=10
-      - cronPluginUpdate=
-      - bypassAuthOnLocalhost=true
-      # - NVIDIA_DRIVER_CAPABILITIES=all
-      # - NVIDIA_VISIBLE_DEVICES=all
-    volumes:
-      - ${DATA_DIR}/tdarr/server:/app/server
-      - ${DATA_DIR}/tdarr/configs:/app/configs
-      - ${DATA_DIR}/tdarr/logs:/app/logs
-      - ${MEDIA_DIR}:/media
-      - /mnt/transcode/temp:/temp
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.tdarr.rule=Host(`tdarr.${DOMAIN}`)"
-      - "traefik.http.routers.tdarr.entrypoints=https"
-      - "traefik.http.routers.tdarr.tls=true"
-      - "traefik.http.routers.tdarr.middlewares=chain-tinyauth-oauth@file" # optional, if you want to test OAuth
-      - "traefik.http.services.tdarr.loadbalancer.server.port=8265"
+  # fileflows:
+  #   image: revenz/fileflows
+  #   restart: unless-stopped
+  #   # ports:
+  #   #   - "19200:5000"
+  #   networks:
+  #     - traefik_network
+  #   devices:
+  #     - "/dev/dri:/dev/dri"
+  #   env_file: .env
+  #   environment:
+  #     - TempPathHost=/mnt/transcode/temp
+  #     - TZ=america/toronto
+  #   volumes:
+  #     - /var/run/docker.sock:/var/run/docker.sock:ro
+  #     - /mnt/transcode/temp:/temp
+  #     - ${DATA_DIR}/fileflows/server:/app/Data
+  #     - ${DATA_DIR}/fileflows/server-logs:/app/Logs
+  #     - ${MEDIA_DIR}:/media/main
+  #     - ${DRIVE_POOL}:/media/pool
+  #   labels:
+  #     - "traefik.enable=true"
+  #     - "traefik.http.routers.fileflows.rule=Host(`fileflows.${DOMAIN}`)"
+  #     - "traefik.http.routers.fileflows.entrypoints=https"
+  #     - "traefik.http.routers.fileflows.tls=true"
+  #     - "traefik.http.routers.fileflows.middlewares=chain-tinyauth-oauth@file" # optional, if you want to test OAuth
+  #     - "traefik.http.services.fileflows.loadbalancer.server.port=5000"
 
-    devices:
-      - /dev/dri:/dev/dri
-    # deploy:
-    #   resources:
-    #     reservations:
-    #       devices:
-    #       - driver: nvidia
-    #         count: all
-    #         capabilities: [gpu]
+# tdarr:
+#   container_name: tdarr
+#   image: ghcr.io/haveagitgat/tdarr:latest
+#   restart: unless-stopped
+#   env_file: .env
+#   networks:
+#     - traefik_network
+#   # ports:
+#   #   - 8265:8265 # webUI port
+#   #   - 8266:8266 # server port
+#   environment:
+#     - TZ=America/Los_Angeles
+#     - UMASK_SET=002
+#     - file_mode=0777
+#     - dir_mode=0777
+#     - serverIP=tdarr
+#     - serverPort=8266
+#     - webUIPort=8265
+#     - internalNode=false
+#     - inContainer=true
+#     - ffmpegVersion=7
+#     - nodeName=MyInternalNode
+#     - auth=false
+#     - openBrowser=true
+#     - maxLogSizeMB=10
+#     - cronPluginUpdate=
+#     - bypassAuthOnLocalhost=true
+#     # - NVIDIA_DRIVER_CAPABILITIES=all
+#     # - NVIDIA_VISIBLE_DEVICES=all
+#   volumes:
+#     - ${DATA_DIR}/tdarr/server:/app/server
+#     - ${DATA_DIR}/tdarr/configs:/app/configs
+#     - ${DATA_DIR}/tdarr/logs:/app/logs
+#     - ${MEDIA_DIR}:/media
+#     - /mnt/transcode/temp:/temp
+#   labels:
+#     - "traefik.enable=true"
+#     - "traefik.http.routers.tdarr.rule=Host(`tdarr.${DOMAIN}`)"
+#     - "traefik.http.routers.tdarr.entrypoints=https"
+#     - "traefik.http.routers.tdarr.tls=true"
+#     - "traefik.http.routers.tdarr.middlewares=chain-tinyauth-oauth@file" # optional, if you want to test OAuth
+#     - "traefik.http.services.tdarr.loadbalancer.server.port=8265"
 
-  # node example
-  tdarr-node:
-    container_name: tdarr-node
-    image: ghcr.io/haveagitgat/tdarr_node:latest
-    restart: unless-stopped
-    network_mode: service:tdarr
-    environment:
-      - nodeName=tdarr-node-1
-      - TZ=America/Toronto
-      - UMASK_SET=002
-      - serverIP=tdarr
-      - serverPort=8266
-      - inContainer=true
-      - ffmpegVersion=7
-      - nodeType=mapped
-      - priority=-1
-      # - cronPluginUpdate=
-      # - apiKey=
-      - maxLogSizeMB=10
-      - pollInterval=2000
-      - startPaused=false
-      # - transcodegpuWorkers=1
-      - transcodecpuWorkers=1
-      # - healthcheckgpuWorkers=1
-      - healthcheckcpuWorkers=1
-      # - NVIDIA_DRIVER_CAPABILITIES=all
-      # - NVIDIA_VISIBLE_DEVICES=all
-    env_file: .env
-    volumes:
-      - ${DATA_DIR}/tdarr-node/configs:/app/configs
-      - ${DATA_DIR}/tdarr-node/logs:/app/logs
-      - ${MEDIA_DIR}:/media
-      - /mnt/transcode/temp:/temp
+#   devices:
+#     - /dev/dri:/dev/dri
+#   # deploy:
+#   #   resources:
+#   #     reservations:
+#   #       devices:
+#   #       - driver: nvidia
+#   #         count: all
+#   #         capabilities: [gpu]
 
-    devices:
-      - /dev/dri:/dev/dri
-    # deploy:
-    #   resources:
-    #     reservations:
-    #       devices:
-    #       - driver: nvidia
-    #         count: all
-    #         capabilities: [gpu]
+# # node example
+# tdarr-node:
+#   container_name: tdarr-node
+#   image: ghcr.io/haveagitgat/tdarr_node:latest
+#   restart: unless-stopped
+#   network_mode: service:tdarr
+#   environment:
+#     - nodeName=tdarr-node-1
+#     - TZ=America/Toronto
+#     - UMASK_SET=002
+#     - serverIP=tdarr
+#     - serverPort=8266
+#     - inContainer=true
+#     - ffmpegVersion=7
+#     - nodeType=mapped
+#     - priority=-1
+#     # - cronPluginUpdate=
+#     # - apiKey=
+#     - maxLogSizeMB=10
+#     - pollInterval=2000
+#     - startPaused=false
+#     # - transcodegpuWorkers=1
+#     - transcodecpuWorkers=1
+#     # - healthcheckgpuWorkers=1
+#     - healthcheckcpuWorkers=1
+#     # - NVIDIA_DRIVER_CAPABILITIES=all
+#     # - NVIDIA_VISIBLE_DEVICES=all
+#   env_file: .env
+#   volumes:
+#     - ${DATA_DIR}/tdarr-node/configs:/app/configs
+#     - ${DATA_DIR}/tdarr-node/logs:/app/logs
+#     - ${MEDIA_DIR}:/media
+#     - /mnt/transcode/temp:/temp
 
-  tdarr-node-2:
-    container_name: tdarr-node-2
-    image: ghcr.io/haveagitgat/tdarr_node:latest
-    restart: unless-stopped
-    network_mode: service:tdarr
-    environment:
-      - nodeName=tdarr-node-2
-      - TZ=America/Toronto
-      - UMASK_SET=002
-      - serverIP=tdarr
-      - serverPort=8266
-      - inContainer=true
-      - ffmpegVersion=7
-      - nodeType=mapped
-      - priority=-1
-      - cronPluginUpdate=
-      - apiKey=
-      - maxLogSizeMB=10
-      - pollInterval=2000
-      - startPaused=false
-      # - transcodegpuWorkers=1
-      - transcodecpuWorkers=1
-      # - healthcheckgpuWorkers=1
-      - healthcheckcpuWorkers=1
-      # - NVIDIA_DRIVER_CAPABILITIES=all
-      # - NVIDIA_VISIBLE_DEVICES=all
-    env_file: .env
-    volumes:
-      - ${DATA_DIR}/tdarr-node/configs:/app/configs
-      - ${DATA_DIR}/tdarr-node/logs:/app/logs
-      - ${MEDIA_DIR}:/media
-      - /mnt/transcode/temp:/temp
+#   devices:
+#     - /dev/dri:/dev/dri
+#   # deploy:
+#   #   resources:
+#   #     reservations:
+#   #       devices:
+#   #       - driver: nvidia
+#   #         count: all
+#   #         capabilities: [gpu]
 
-    devices:
-      - /dev/dri:/dev/dri
-    # deploy:
-    #   resources:
-    #     reservations:
-    #       devices:
-    #       - driver: nvidia
-    #         count: all
-    #         capabilities: [gpu]
+# tdarr-node-2:
+#   container_name: tdarr-node-2
+#   image: ghcr.io/haveagitgat/tdarr_node:latest
+#   restart: unless-stopped
+#   network_mode: service:tdarr
+#   environment:
+#     - nodeName=tdarr-node-2
+#     - TZ=America/Toronto
+#     - UMASK_SET=002
+#     - serverIP=tdarr
+#     - serverPort=8266
+#     - inContainer=true
+#     - ffmpegVersion=7
+#     - nodeType=mapped
+#     - priority=-1
+#     - cronPluginUpdate=
+#     - apiKey=
+#     - maxLogSizeMB=10
+#     - pollInterval=2000
+#     - startPaused=false
+#     # - transcodegpuWorkers=1
+#     - transcodecpuWorkers=1
+#     # - healthcheckgpuWorkers=1
+#     - healthcheckcpuWorkers=1
+#     # - NVIDIA_DRIVER_CAPABILITIES=all
+#     # - NVIDIA_VISIBLE_DEVICES=all
+#   env_file: .env
+#   volumes:
+#     - ${DATA_DIR}/tdarr-node/configs:/app/configs
+#     - ${DATA_DIR}/tdarr-node/logs:/app/logs
+#     - ${MEDIA_DIR}:/media
+#     - /mnt/transcode/temp:/temp
+
+#   devices:
+#     - /dev/dri:/dev/dri
+#   # deploy:
+#   #   resources:
+#   #     reservations:
+#   #       devices:
+#   #       - driver: nvidia
+#   #         count: all
+#   #         capabilities: [gpu]
 networks:
   traefik_network:
     external: true
